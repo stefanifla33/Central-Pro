@@ -1,0 +1,71 @@
+/* Central Pro — acabamento visual compartilhado */
+:root{--cp-bg:#070807;--cp-panel:#111311;--cp-panel-soft:#151815;--cp-line:#272b28;--cp-text:#f4f6f4;--cp-muted:#89918c;--cp-green:#00e889;--cp-green-soft:#0b2d1e}
+html,body{background:var(--cp-bg)!important;color:var(--cp-text)!important;font-family:Inter,"Segoe UI",Arial,sans-serif!important}
+body{letter-spacing:-.01em}
+button,input,select{font:inherit}
+
+/* Dashboard */
+.app{padding-left:224px!important}
+.app .brand{width:224px!important;height:72px!important;padding:0 17px!important;background:#090a09!important;border-color:#202320!important}
+.app .brand-ball{width:34px!important;height:34px!important;flex-basis:34px!important;border-radius:9px!important;font-size:16px!important}
+.app .sidebar{top:72px!important;width:224px!important;padding:18px 10px 26px!important;background:#090a09!important;border-right:1px solid #202320!important}
+.app .nav:before{padding-left:14px!important;color:#565d58!important}
+.app .nav-title{color:#555c57!important}
+.app .nav a{min-height:42px!important;margin:3px 0!important;padding:11px 14px!important;border-radius:9px!important;color:#8e9690!important;font-size:12px!important}
+.app .nav a.active{background:#0d2117!important;color:#fff!important;box-shadow:inset 2px 0 var(--cp-green)!important}
+.app .nav-icon{font-size:0!important;width:10px!important}
+.app .nav-icon:after{content:'';display:block;width:5px;height:5px;margin:auto;border:1px solid #667069;border-radius:50%}
+.app .nav a.active .nav-icon:after{border-color:var(--cp-green);background:var(--cp-green);box-shadow:0 0 9px rgba(0,232,137,.7)}
+.app .topbar{left:224px!important;height:72px!important;padding:0 28px!important;background:rgba(9,10,9,.97)!important;border-color:#202320!important}
+.app .searchbox{max-width:560px!important;height:42px!important;background:#131513!important;border:1px solid #292e2a!important;border-radius:11px!important}
+.app .content{max-width:1420px!important;padding:102px 28px 42px!important}
+.app .score-nav{border:1px solid var(--cp-line)!important;border-radius:14px!important;background:var(--cp-panel)!important;overflow:hidden!important}
+.app .score-tabs{gap:7px!important;padding:9px!important;background:#0e100f!important}
+.app .score-tabs button{min-height:42px!important;padding:10px 18px!important;border-radius:9px!important;font-size:12px!important}
+.app .score-tabs button.active{background:var(--cp-green)!important;color:#03150c!important;box-shadow:none!important}
+.app .date-tabs{padding:10px 14px!important;background:var(--cp-panel)!important}
+.app .date-tabs button{min-height:60px!important;border-radius:10px!important}
+.app .date-tabs button.active{background:var(--cp-green-soft)!important;border-color:#087d49!important;color:#50f4a5!important;box-shadow:none!important}
+.app #all{background:var(--cp-panel)!important;border-color:var(--cp-line)!important;box-shadow:none!important}
+.app .panel-head{min-height:60px!important;padding:15px 20px!important}
+.app .panel-head h2{font-size:16px!important}
+.app .table-head{min-height:40px!important;background:#0c0e0d!important}
+.app .league-group-head{padding:12px 20px!important;background:#171a17!important}
+.app .game-row{min-height:62px!important;background:#111311!important;border-color:#242824!important}
+.app .game-row:nth-child(even){background:#131613!important}
+.app .game-row:hover{background:#17231c!important;box-shadow:inset 2px 0 var(--cp-green)!important}
+.app .favorite{width:29px!important;height:29px!important;font-size:17px!important}
+.app .score{min-width:64px!important;padding:7px 8px!important;border-radius:7px!important;background:#070908!important;font-size:13px!important}
+.app .team-name{font-size:12px!important}
+.app .minute{font-size:10px!important}
+
+/* Página da partida: cabeçalho compacto sem faixa vazia */
+.layout{padding-left:0!important}
+.layout>.sidebar{position:sticky!important;inset:0!important;width:100%!important;height:72px!important;display:flex!important;align-items:center!important;padding:0 22px!important;background:#090a09!important;border:0!important;border-bottom:1px solid #202320!important;z-index:20!important}
+.layout>.sidebar .brand{padding:0!important;margin-right:auto!important;font-size:18px!important}
+.layout>.sidebar .ball{width:34px!important;height:34px!important;border:0!important;border-radius:9px!important;background:var(--cp-green)!important;color:#04150c!important;font-size:0!important}
+.layout>.sidebar .ball:after{content:'C';font-size:17px;font-weight:900}
+.layout>.sidebar .nav{display:flex!important;align-items:center!important;gap:8px!important}
+.layout>.sidebar .nav-title,.layout>.sidebar .api{display:none!important}
+.layout>.sidebar .nav a{display:none!important}
+.layout>.sidebar .nav a:first-child,.layout>.sidebar .nav a:nth-of-type(2){display:block!important;margin:0!important;padding:10px 14px!important;border-radius:8px!important;background:transparent!important;color:#abb3ae!important;font-size:12px!important;text-decoration:none!important}
+.layout>.sidebar .nav a:hover{background:#151915!important;color:var(--cp-green)!important}
+.layout main{max-width:1320px!important;margin:auto!important;padding:20px 24px 48px!important}
+.layout .top{margin-bottom:14px!important;min-height:34px!important}
+.layout .back{font-size:12px!important}
+.layout .hero{padding:22px 28px!important;border-color:var(--cp-line)!important;border-radius:13px!important;background:var(--cp-panel)!important}
+.layout .comp{margin-bottom:16px!important;font-size:12px!important}
+.layout .teams{gap:28px!important}
+.layout .team{font-size:21px!important}
+.layout .team img{width:58px!important;height:58px!important;margin-bottom:9px!important}
+.layout .score{font-size:30px!important}
+.layout .tabs{display:grid!important;grid-template-columns:repeat(6,1fr)!important;gap:0!important;margin:14px 0 18px!important;padding:0 12px!important;border:1px solid var(--cp-line)!important;border-radius:12px!important;background:var(--cp-panel)!important}
+.layout .tab{min-height:54px!important;padding:10px 8px!important;border:0!important;border-bottom:2px solid transparent!important;background:transparent!important;font-size:12px!important}
+.layout .tab.active{border-bottom-color:var(--cp-green)!important;color:var(--cp-green)!important}
+.layout .card{border-color:var(--cp-line)!important;border-radius:12px!important;background:var(--cp-panel)!important}
+.layout .row,.layout .stat-row,.layout .event{border-color:#242824!important}
+.layout .period-card,.layout .summary-item{border-color:var(--cp-line)!important;background:#0d100e!important}
+.layout .player-hub{background:var(--cp-panel)!important;border-color:var(--cp-line)!important}
+
+@media(max-width:900px){.app{padding-left:0!important}.app .brand{width:100%!important}.app .topbar{left:0!important}.app .content{padding:154px 12px 32px!important}.layout>.sidebar{padding:0 14px!important}.layout>.sidebar .nav a{padding:9px!important}.layout main{padding:15px 12px 36px!important}.layout .tabs{display:flex!important;padding:0 6px!important}.layout .tab{min-width:112px!important}.layout .team{font-size:16px!important}}
+@media(max-width:600px){.layout>.sidebar .brand small{display:none}.layout>.sidebar .nav a:nth-of-type(2){display:none!important}.layout .hero{padding:18px 10px!important}.layout .teams{gap:10px!important}.layout .team img{width:44px!important;height:44px!important}}
