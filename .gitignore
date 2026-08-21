@@ -1,3 +1,7 @@
 node_modules/
 .env
-data/period-stats.json.tmp
+*.session
+*.session-journal
+__pycache__/
+*.pyc
+data/*.tmp

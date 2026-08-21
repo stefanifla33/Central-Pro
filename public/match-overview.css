@@ -1,0 +1,317 @@
+/* Etapa 3B.1 — camada exclusivamente visual do cabeçalho, abas e Visão Geral. */
+.match-shell-page #hero {
+  position: relative;
+  min-height: 0;
+  margin-bottom: 14px;
+  padding: 18px 22px 17px;
+  overflow: hidden;
+  border: 1px solid #26322b;
+  border-radius: 14px;
+  background:
+    radial-gradient(circle at 50% -65%, rgba(53, 226, 124, .12), transparent 48%),
+    linear-gradient(145deg, #151b17 0%, #101411 100%);
+  box-shadow: 0 12px 34px rgba(0, 0, 0, .2);
+}
+
+.match-shell-page #hero::after {
+  content: "";
+  position: absolute;
+  inset: auto 16% 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(53, 226, 124, .32), transparent);
+}
+
+.match-shell-page #hero .hero-kicker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  margin: 0 0 13px;
+}
+
+.match-shell-page #hero .comp {
+  max-width: min(680px, 74vw);
+  overflow: hidden;
+  color: #aeb8b1;
+  font-size: 10px;
+  font-weight: 750;
+  letter-spacing: .075em;
+  line-height: 1.35;
+  text-align: center;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.match-shell-page #hero .match-status {
+  flex: 0 0 auto;
+  padding: 4px 8px;
+  border: 1px solid #344039;
+  border-radius: 999px;
+  background: #1b211d;
+  color: #c4ccc7;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: .07em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.match-shell-page #hero .match-status.live {
+  border-color: rgba(53, 226, 124, .42);
+  background: rgba(53, 226, 124, .1);
+  color: var(--green);
+  box-shadow: 0 0 0 3px rgba(53, 226, 124, .035);
+}
+
+.match-shell-page #hero .teams {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 142px minmax(0, 1fr);
+  align-items: center;
+  gap: 22px;
+  width: min(850px, 100%);
+  margin: 0 auto;
+}
+
+.match-shell-page #hero .team {
+  display: grid;
+  grid-template-columns: 54px minmax(0, 1fr);
+  align-items: center;
+  gap: 13px;
+  width: auto;
+  min-width: 0;
+  color: #f0f4f1;
+  font-size: 16px;
+  font-weight: 750;
+  line-height: 1.25;
+}
+
+.match-shell-page #hero .team:last-child {
+  grid-template-columns: minmax(0, 1fr) 54px;
+  text-align: right;
+}
+
+.match-shell-page #hero .team:last-child img { order: 2; }
+
+.match-shell-page #hero .team img {
+  width: 54px;
+  height: 54px;
+  padding: 5px;
+  object-fit: contain;
+  border: 1px solid rgba(255, 255, 255, .07);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, .025);
+}
+
+.match-shell-page #hero .score {
+  color: #f7faf8;
+  font-size: 32px;
+  font-weight: 850;
+  letter-spacing: -.04em;
+  line-height: 1;
+  text-align: center;
+}
+
+.match-shell-page #hero .state {
+  margin-top: 7px;
+  color: #8f9a93;
+  font-size: 10px;
+  font-weight: 650;
+  line-height: 1.35;
+  text-align: center;
+}
+
+.match-shell-page #hero .hero-meta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px 14px;
+  min-height: 14px;
+  margin-top: 14px;
+  color: #7f8a83;
+  font-size: 10px;
+  line-height: 1.4;
+}
+
+.match-shell-page main > .tabs {
+  display: flex;
+  gap: 4px;
+  margin: 0 0 15px;
+  padding: 4px;
+  overflow-x: auto;
+  border: 1px solid #222b26;
+  border-radius: 11px;
+  background: rgba(16, 21, 18, .92);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, .13);
+}
+
+.match-shell-page main > .tabs .tab {
+  flex: 0 0 auto;
+  min-height: 34px;
+  padding: 8px 13px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  color: #909b94;
+  font-size: 10px;
+  font-weight: 750;
+  letter-spacing: .025em;
+  white-space: nowrap;
+}
+
+.match-shell-page main > .tabs .tab:hover {
+  background: #19201c;
+  color: #dce3de;
+}
+
+.match-shell-page main > .tabs .tab.active {
+  border-color: rgba(53, 226, 124, .25);
+  background: rgba(53, 226, 124, .09);
+  color: var(--green);
+  box-shadow: inset 0 -2px 0 rgba(53, 226, 124, .56);
+}
+
+.match-shell-page #overview.active {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.match-shell-page #overview > .periods {
+  gap: 8px;
+  margin: 0;
+}
+
+.match-shell-page #overview > .periods .period-card {
+  min-height: 0;
+  padding: 11px 13px;
+  border-color: #222b26;
+  border-radius: 10px;
+  background: #121713;
+}
+
+.match-shell-page #overview .premium-overview {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(250px, 320px);
+  gap: 12px;
+  margin: 0;
+}
+
+.match-shell-page #overview .metric-strip {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.match-shell-page #overview .premium-metric,
+.match-shell-page #overview .quick-read {
+  min-height: 0;
+  margin: 0;
+  padding: 13px 15px;
+  border: 1px solid #222b26;
+  border-radius: 11px;
+  background: linear-gradient(145deg, #151a17, #111512);
+  box-shadow: none;
+}
+
+.match-shell-page #overview .premium-metric .label {
+  color: #7f8a83;
+  font-size: 9px;
+  font-weight: 750;
+  letter-spacing: .055em;
+  text-transform: uppercase;
+}
+
+.match-shell-page #overview .premium-metric strong {
+  display: block;
+  margin-top: 6px;
+  color: #edf2ee;
+  font-size: 15px;
+  line-height: 1.25;
+}
+
+.match-shell-page #overview .quick-read {
+  border-color: #29362f;
+  background: linear-gradient(145deg, rgba(53, 226, 124, .075), #121713 62%);
+}
+
+.match-shell-page #overview .quick-read h3 {
+  margin: 0 0 7px;
+  color: #dfe7e1;
+  font-size: 11px;
+  letter-spacing: .025em;
+}
+
+.match-shell-page #overview .quick-read p {
+  margin: 0;
+  color: #9ba69f;
+  font-size: 11px;
+  line-height: 1.55;
+}
+
+.match-shell-page #overview > .grid {
+  gap: 10px;
+  margin: 0;
+}
+
+.match-shell-page #overview > .grid > .card {
+  min-height: 0;
+  padding: 15px;
+  border-color: #222b26;
+  border-radius: 11px;
+  background: #121713;
+  box-shadow: none;
+}
+
+.match-shell-page #overview > .grid > .card h2,
+.match-shell-page #overview > .grid > .card h3 {
+  margin-bottom: 10px;
+  color: #dce4df;
+  font-size: 11px;
+  letter-spacing: .035em;
+  text-transform: uppercase;
+}
+
+.match-shell-page #overview > .grid > .card .row {
+  min-height: 28px;
+  padding: 6px 0;
+  border-color: #202722;
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.match-shell-page #overview > .grid > .card .row span:first-child { color: #87928b; }
+.match-shell-page #overview > .grid > .card .row span:last-child { color: #d2d9d4; }
+
+@media (max-width: 920px) {
+  .match-shell-page #hero .teams {
+    grid-template-columns: minmax(0, 1fr) 112px minmax(0, 1fr);
+    gap: 14px;
+  }
+
+  .match-shell-page #overview .premium-overview { grid-template-columns: 1fr; }
+  .match-shell-page #overview .quick-read { grid-column: 1; }
+}
+
+@media (max-width: 680px) {
+  .match-shell-page #hero { padding: 15px 12px; }
+  .match-shell-page #hero .hero-kicker { margin-bottom: 12px; }
+  .match-shell-page #hero .teams {
+    grid-template-columns: minmax(0, 1fr) 74px minmax(0, 1fr);
+    gap: 8px;
+  }
+  .match-shell-page #hero .team,
+  .match-shell-page #hero .team:last-child {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    font-size: 12px;
+    text-align: center;
+  }
+  .match-shell-page #hero .team:last-child img { order: initial; }
+  .match-shell-page #hero .team img { width: 44px; height: 44px; }
+  .match-shell-page #hero .score { font-size: 26px; }
+  .match-shell-page #hero .state { font-size: 9px; }
+  .match-shell-page main > .tabs .tab { min-height: 32px; padding: 7px 10px; }
+  .match-shell-page #overview .metric-strip { grid-template-columns: 1fr; }
+}

@@ -1,0 +1,97 @@
+(function(){
+  'use strict';
+  const STORAGE_KEY='centralPro.opportunities.v1';
+  const MARKETS={
+    over05HT:{label:'+0.5 HT',detail:'Mais de 0.5 gol no 1º tempo',minimum:6},
+    over05:{label:'+0.5 gols',detail:'Mais de 0.5 gol na partida',minimum:8},
+    over15:{label:'+1.5 gols',detail:'Mais de 1.5 gols na partida',minimum:8},
+    over25:{label:'+2.5 gols',detail:'Mais de 2.5 gols na partida',minimum:8},
+    btts:{label:'Ambas marcam',detail:'As duas equipes marcam',minimum:8},
+    homeScores:{label:'Casa marca',detail:'Mandante marca pelo menos um gol',minimum:4},
+    awayScores:{label:'Fora marca',detail:'Visitante marca pelo menos um gol',minimum:4},
+    cornersOver65:{label:'+6.5 escanteios',detail:'Mais de 6.5 escanteios na partida',minimum:6,family:'corners',metricKey:'over65'},
+    cornersOver75:{label:'+7.5 escanteios',detail:'Mais de 7.5 escanteios na partida',minimum:6,family:'corners',metricKey:'over75'},
+    cornersOver85:{label:'+8.5 escanteios',detail:'Mais de 8.5 escanteios na partida',minimum:6,family:'corners',metricKey:'over85'},
+    cornersOver95:{label:'+9.5 escanteios',detail:'Mais de 9.5 escanteios na partida',minimum:6,family:'corners',metricKey:'over95'}
+  };
+  const RANKING_MARKET_KEYS=['over05HT','over05','over15','over25','btts','homeScores','awayScores'];
+  const rankingMarkets=()=>RANKING_MARKET_KEYS.map(key=>[key,MARKETS[key]]);
+  let level='all';
+  const $=id=>document.getElementById(id);
+  const escape=value=>{const node=document.createElement('i');node.textContent=value??'—';return node.innerHTML};
+
+  function loadSnapshot(){try{const data=JSON.parse(localStorage.getItem(STORAGE_KEY)),generated=Date.parse(data?.generatedAt),fresh=Number.isFinite(generated)&&Date.now()-generated<172800000;return data?.version===1&&fresh&&/^\d{4}-\d{2}-\d{2}$/.test(data.date||'')&&Array.isArray(data.games)?data:{games:[]}}catch{return{games:[]}}}
+  function opportunities(snapshot){
+    return snapshot.games.flatMap(game=>rankingMarkets().map(([key,market])=>{const metric=game.metrics?.[key],minimum=Math.min(market.minimum,4);if(!metric||metric.total<minimum)return null;return{game,key,market,metric,family:'goals',level:confidenceLevel(metric),sampleQuality:metric.total,sampleLabel:`${metric.total} jogos válidos`}}).filter(Boolean));
+  }
+
+  function confidenceLevel(metric){
+    const value=Number(metric?.value||0),total=Number(metric?.total||0);
+    if(total>=10&&value>=80)return 'strong';
+    if(total>=8&&value>=75)return 'moderate';
+    return 'cautious';
+  }
+  function confidenceLabel(item){return item.level==='strong'?'Alta':item.level==='moderate'?'Moderada':'Atenção'}
+  function secondarySignals(item){
+    const metrics=item.game.metrics||{};
+    return rankingMarkets()
+      .filter(([key])=>key!==item.key)
+      .map(([key,market])=>({key,label:market.label,metric:metrics[key]}))
+      .filter(signal=>signal.metric&&signal.metric.total>=4&&signal.metric.value>=60)
+      .sort((a,b)=>b.metric.value-a.metric.value||b.metric.total-a.metric.total)
+      .slice(0,3);
+  }
+  function reasonText(item){
+    const m=item.metric,n=m.total,hit=m.hits;
+    if(item.key==='homeScores')return `${item.game.teams.home.name} marcou em ${hit} de ${n} jogos recentes válidos.`;
+    if(item.key==='awayScores')return `${item.game.teams.away.name} marcou em ${hit} de ${n} jogos recentes válidos.`;
+    if(item.family==='corners')return `A frequência histórica de escanteios ocorreu em ${hit} de ${n} jogos recentes válidos; não representa previsão.`;
+    return `O padrão apareceu em ${hit} de ${n} registros recentes combinados das equipes.`;
+  }
+  function hour(game){return Number(new Date(game.fixture.date).toLocaleTimeString('pt-BR',{hour:'2-digit',hour12:false,timeZone:'America/Sao_Paulo'}).slice(0,2))}
+  function timeLabel(game){return new Date(game.fixture.date).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit',timeZone:'America/Sao_Paulo'})}
+  function entryFields(item){
+    const game=item.game,selections={over05HT:['Gols no 1º tempo','+0.5 gol no 1º tempo'],over05:['Total de gols','+0.5 gols'],over15:['Total de gols','+1.5 gols'],over25:['Total de gols','+2.5 gols'],btts:['Ambas marcam','Sim'],homeScores:['Time marca',`${game.teams.home.name} marca`],awayScores:['Time marca',`${game.teams.away.name} marca`],cornersOver65:['Total de escanteios','+6.5 escanteios'],cornersOver75:['Total de escanteios','+7.5 escanteios'],cornersOver85:['Total de escanteios','+8.5 escanteios'],cornersOver95:['Total de escanteios','+9.5 escanteios']},[market,selection]=selections[item.key];
+    return{date:new Date(game.fixture.date).toLocaleDateString('en-CA',{timeZone:'America/Sao_Paulo'}),competition:game.league.name,match:`${game.teams.home.name} x ${game.teams.away.name}`,market,selection};
+  }
+  function normalized(value){return String(value||'').trim().toLocaleLowerCase('pt-BR')}
+  function pendingDuplicate(fields){return window.BankrollStore.load().entries.some(entry=>entry.result==='pending'&&normalized(entry.match)===normalized(fields.match)&&normalized(entry.market)===normalized(fields.market)&&normalized(entry.selection)===normalized(fields.selection))}
+  function showToast(message){$('toastMessage').textContent=message;$('opportunityToast').hidden=false;clearTimeout(showToast.timer);showToast.timer=setTimeout(()=>$('opportunityToast').hidden=true,6000)}
+  function openEntry(item){const fields=entryFields(item);if(pendingDuplicate(fields)){showToast('Esta oportunidade já está na sua banca.');return}$('opportunityEntryForm').reset();$('entryFixtureId').value=item.game.fixture.id;Object.entries(fields).forEach(([key,value])=>$(`entry${key[0].toUpperCase()}${key.slice(1)}`).value=value);$('opportunityEntryDialog').showModal();setTimeout(()=>$('entryOdd').focus(),50)}
+  function filtered(items){const market=$('marketFilter').value,league=$('leagueFilter').value,time=$('timeFilter').value;return items.filter(item=>(level==='all'||item.level===level)&&(market==='all'||item.key===market)&&(league==='all'||String(item.game.league.id)===league)&&(time==='all'||time==='morning'&&hour(item.game)<12||time==='afternoon'&&hour(item.game)>=12&&hour(item.game)<18||time==='night'&&hour(item.game)>=18)).sort((a,b)=>(b.level==='strong')-(a.level==='strong')||b.metric.value-a.metric.value||b.sampleQuality-a.sampleQuality||b.metric.total-a.metric.total||new Date(a.game.fixture.date)-new Date(b.game.fixture.date));}
+  function fillFilters(snapshot){
+    $('marketFilter').innerHTML='<option value="all">Todos os mercados</option>'+rankingMarkets().map(([key,item])=>`<option value="${key}">${item.label}</option>`).join('');
+    const leagues=[...new Map(snapshot.games.map(game=>[game.league.id,game.league])).values()].sort((a,b)=>a.name.localeCompare(b.name));
+    $('leagueFilter').innerHTML='<option value="all">Todos os campeonatos</option>'+leagues.map(item=>`<option value="${item.id}">${escape(item.name)}</option>`).join('');
+  }
+  function recommendationScore(item){
+    const levelScore={strong:30,moderate:18,cautious:8};
+    const marketWeight={over25:18,btts:17,cornersOver95:18,cornersOver85:16,homeScores:14,awayScores:14,cornersOver75:12,over15:12,over05HT:10,cornersOver65:3,over05:2};
+    const sample=Math.min(Number(item.metric?.total||0),10)*1.6;
+    const hitRate=Number(item.metric?.value||0)*0.45;
+    return (levelScore[item.level]||0)+(marketWeight[item.key]||0)+sample+hitRate;
+  }
+  function topItems(items,limit=3){
+    const sorted=[...items].sort((a,b)=>recommendationScore(b)-recommendationScore(a)||b.metric.value-a.metric.value||b.metric.total-a.metric.total),chosen=[],families={};for(const item of sorted){if((families[item.family]||0)>=2)continue;chosen.push(item);families[item.family]=(families[item.family]||0)+1;if(chosen.length===limit)return chosen}for(const item of sorted){if(!chosen.includes(item))chosen.push(item);if(chosen.length===limit)break}return chosen;
+  }
+  function render(){
+    const snapshot=loadSnapshot(),all=opportunities(snapshot),items=filtered(all),groups=new Map;
+    items.forEach(item=>{const id=item.game.fixture.id;if(!groups.has(id))groups.set(id,{game:item.game,items:[]});groups.get(id).items.push(item)});
+    const cards=[...groups.values()].map(group=>({...group,recommendations:topItems(group.items,3)}));
+    const allGames=new Set(all.map(item=>item.game.fixture.id));
+    const strongGames=new Set(all.filter(item=>item.level==='strong').map(item=>item.game.fixture.id));
+    $('opportunityCount').textContent=allGames.size;$('strongCount').textContent=strongGames.size;$('analyzedCount').textContent=snapshot.games.length;
+    $('snapshotMeta').textContent=snapshot.generatedAt?`Atualizado ${new Date(snapshot.generatedAt).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}`:'Aguardando análises';
+    $('opportunityList').innerHTML=cards.map(({game,recommendations})=>{const rows=recommendations.map((item,index)=>{const signals=secondarySignals(item).filter(signal=>!recommendations.some(rec=>rec.key===signal.key)).slice(0,2);return `<div class="recommendation-row ${index===0?'primary':''}"><div class="best-copy"><span class="best-kicker">${index===0?'Melhor opção':`Opção ${index+1}`}</span><div class="best-title"><strong>${item.market.label}</strong><span>${item.market.detail}</span></div><p class="opportunity-reason"><b>Por que entrou:</b> ${escape(reasonText(item))}</p>${signals.length?`<div class="secondary-signals"><span>Complementa com</span>${signals.map(signal=>`<i>${escape(signal.label)} <b>${Math.round(signal.metric.value)}%</b> <small>${signal.metric.hits}/${signal.metric.total}</small></i>`).join('')}</div>`:''}</div><div class="best-score"><span class="opportunity-percent ${item.level}">${Math.round(item.metric.value)}%</span><span class="frequency"><strong>${item.metric.hits}/${item.metric.total}</strong><small>${item.sampleLabel}</small></span><span class="confidence ${item.level}"><small>Confiança</small>${confidenceLabel(item)}</span><button class="add-bankroll" data-fixture="${game.fixture.id}" data-market="${item.key}" type="button">+ Adicionar à banca</button></div></div>`}).join('');return `<article class="fixture-opportunities compact"><header class="fixture-head"><span class="fixture-time">${timeLabel(game)}</span><div class="fixture-main"><small>${escape(game.league.name)} · ${escape(game.league.country)}</small><div class="fixture-teams"><img src="${escape(game.teams.home.logo)}" alt=""><span>${escape(game.teams.home.name)}</span><i>×</i><span>${escape(game.teams.away.name)}</span><img src="${escape(game.teams.away.logo)}" alt=""></div></div><a class="view-analysis" href="match.html?id=${game.fixture.id}">Ver análise</a></header><div class="recommendations-list">${rows}</div></article>`}).join('')||`<div class="opportunity-empty"><div><strong>${snapshot.games.length?'Nenhuma oportunidade encontrada com estes filtros.':'Nenhuma análise disponível neste momento.'}</strong><span>${snapshot.games.length?'Ajuste os filtros para visualizar outras oportunidades classificadas.':'Abra a Análise Rápida para preparar as partidas principais e relevantes.'}</span><a class="analysis-link" href="analysis.html">Abrir Análise Rápida</a></div></div>`;
+  }
+  $('menuButton').onclick=()=>$('sidebar').classList.toggle('open');
+  document.addEventListener('keydown',event=>{if((event.ctrlKey||event.metaKey)&&event.key.toLowerCase()==='k'){event.preventDefault();$('globalSearch').focus()}});
+  $('globalSearch').addEventListener('keydown',event=>{if(event.key==='Enter'&&event.target.value.trim().length>=3)location.href=`teams.html?q=${encodeURIComponent(event.target.value.trim())}`});
+  $('levelFilters').onclick=event=>{const button=event.target.closest('[data-level]');if(!button)return;level=button.dataset.level;$('levelFilters').querySelectorAll('button').forEach(item=>item.classList.toggle('active',item===button));render()};
+  ['marketFilter','leagueFilter','timeFilter'].forEach(id=>$(id).onchange=render);
+  $('opportunityList').addEventListener('click',event=>{const button=event.target.closest('.add-bankroll');if(!button)return;const item=opportunities(loadSnapshot()).find(candidate=>String(candidate.game.fixture.id)===button.dataset.fixture&&candidate.key===button.dataset.market);if(item)openEntry(item)});
+  $('closeEntryDialog').onclick=$('cancelEntryDialog').onclick=()=>$('opportunityEntryDialog').close();
+  $('closeToast').onclick=()=>$('opportunityToast').hidden=true;
+  $('opportunityEntryForm').addEventListener('submit',event=>{event.preventDefault();const fields={date:$('entryDate').value,competition:$('entryCompetition').value,match:$('entryMatch').value,market:$('entryMarket').value,selection:$('entrySelection').value};if(pendingDuplicate(fields)){$('opportunityEntryDialog').close();showToast('Esta oportunidade já está na sua banca.');return}window.BankrollStore.upsertEntry({...fields,odd:$('entryOdd').value,stake:$('entryStake').value,result:'pending'});$('opportunityEntryDialog').close();showToast('Entrada adicionada à Minha Banca')});
+  const snapshot=loadSnapshot();fillFilters(snapshot);render();
+}());

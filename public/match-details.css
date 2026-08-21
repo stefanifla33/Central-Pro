@@ -1,0 +1,502 @@
+/* Etapa 3B.2 — somente apresentação de Análise, Estatísticas e Eventos. */
+.match-shell-page #analysis,
+.match-shell-page #stats,
+.match-shell-page #events {
+  color: #dce4df;
+}
+
+.match-shell-page #analysis > .card,
+.match-shell-page #analysis .analysis-grid > .card,
+.match-shell-page #stats .card,
+.match-shell-page #events > .card {
+  border-color: #222b26;
+  border-radius: 12px;
+  background: linear-gradient(145deg, #151a17, #111512);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, .14);
+}
+
+.match-shell-page #analysis .pregame-head {
+  min-height: 50px;
+  margin: 0 0 12px;
+  padding: 0 2px;
+}
+
+.match-shell-page #analysis .pregame-head h2 {
+  color: #edf2ee;
+  font-size: 17px;
+  letter-spacing: -.015em;
+}
+
+.match-shell-page #analysis .sample {
+  display: block;
+  margin-top: 4px;
+  color: #7f8b83;
+  font-size: 10px;
+}
+
+.match-shell-page #analysis .analysis-grid {
+  grid-template-columns: minmax(0, 1.65fr) minmax(260px, .75fr);
+  gap: 12px;
+}
+
+.match-shell-page #analysis .analysis-grid > .card { padding: 0; overflow: hidden; }
+.match-shell-page #analysis .analysis-grid > aside.card { padding: 15px; }
+
+.match-shell-page #analysis .analysis-grid > aside.card h2 {
+  margin: 0 0 11px;
+  color: #dce4df;
+  font-size: 11px;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+.match-shell-page #analysis .compare-head,
+.match-shell-page #stats .compare-head {
+  grid-template-columns: minmax(0, 1fr) 108px minmax(0, 1fr);
+  min-height: 65px;
+  padding: 12px 16px;
+  border-bottom-color: #242d28;
+  background: rgba(255, 255, 255, .012);
+}
+
+.match-shell-page #analysis .compare-team,
+.match-shell-page #stats .compare-team {
+  min-width: 0;
+  gap: 9px;
+  color: #e5ebe7;
+  font-size: 12px;
+  line-height: 1.3;
+}
+
+.match-shell-page #analysis .compare-team img,
+.match-shell-page #stats .compare-team img {
+  width: 34px;
+  height: 34px;
+  flex: 0 0 auto;
+  object-fit: contain;
+}
+
+.match-shell-page #analysis .compare-vs,
+.match-shell-page #stats .compare-vs {
+  color: #69756e;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: .08em;
+}
+
+.match-shell-page #analysis .metric-row,
+.match-shell-page #stats .metric-row {
+  grid-template-columns: minmax(120px, 1fr) minmax(140px, 190px) minmax(120px, 1fr);
+  gap: 14px;
+  min-height: 48px;
+  padding: 9px 16px;
+  border-bottom-color: #202823;
+}
+
+.match-shell-page #analysis .metric-label,
+.match-shell-page #stats .metric-label {
+  color: #9da8a1;
+  font-size: 10px;
+  font-weight: 650;
+  line-height: 1.35;
+}
+
+.match-shell-page #analysis .metric-value,
+.match-shell-page #stats .metric-value {
+  font-size: 17px;
+  font-weight: 850;
+  letter-spacing: -.02em;
+}
+
+.match-shell-page #analysis .metric-bar,
+.match-shell-page #stats .metric-bar {
+  height: 6px;
+  background: #202823 !important;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, .28);
+}
+
+.match-shell-page #analysis .metric-bar i,
+.match-shell-page #stats .metric-bar i {
+  background: linear-gradient(90deg, #159b55, var(--green)) !important;
+  box-shadow: none;
+}
+
+.match-shell-page #analysis .analysis-note,
+.match-shell-page #stats .analysis-note,
+.match-shell-page #stats .coverage-note,
+.match-shell-page #stats .unsupported,
+.match-shell-page #stats .stats-note {
+  margin: 0;
+  padding: 10px 13px;
+  border: 0;
+  border-top: 1px solid #222b26;
+  background: rgba(53, 226, 124, .035);
+  color: #849088;
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+.match-shell-page #analysis .row {
+  min-height: 36px;
+  padding: 8px 0;
+  border-color: #222a25;
+  color: #8d9991;
+  font-size: 11px;
+}
+
+.match-shell-page #analysis .form-badge {
+  width: 23px;
+  height: 23px;
+  margin: 1px;
+  border: 1px solid rgba(255, 255, 255, .06);
+  border-radius: 6px;
+  font-size: 9px;
+}
+
+.match-shell-page #analysis .hint {
+  margin-bottom: 0;
+  color: #76827a;
+  font-size: 10px;
+}
+
+.match-shell-page #analysis .empty,
+.match-shell-page #stats .empty,
+.match-shell-page #events .empty {
+  min-height: 150px;
+  display: grid;
+  place-items: center;
+  padding: 28px;
+  color: #7e8a82;
+  font-size: 11px;
+}
+
+.match-shell-page #stats > .periods {
+  gap: 8px;
+  margin-bottom: 9px;
+}
+
+.match-shell-page #stats > .periods .period-card {
+  padding: 10px 12px;
+  border-color: #222b26;
+  border-radius: 9px;
+  background: #121713;
+}
+
+.match-shell-page #stats > .stats-note { margin-bottom: 10px; border: 1px solid #243029; border-radius: 8px; }
+
+.match-shell-page #stats .filter-toolbar {
+  max-width: 960px;
+  margin-bottom: 8px;
+  padding: 10px;
+  border: 1px solid #222b26;
+  border-radius: 10px;
+  background: #121713;
+}
+
+.match-shell-page #stats .filter-toolbar label,
+.match-shell-page #stats .sample-switch {
+  color: #7f8a83;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .025em;
+}
+
+.match-shell-page #stats .filter-toolbar select,
+.match-shell-page #stats .sample-switch button,
+.match-shell-page #stats .period-switch button {
+  min-height: 31px;
+  border-color: #29342e;
+  border-radius: 7px;
+  background: #0e1310;
+  color: #98a39c;
+  font-size: 10px;
+}
+
+.match-shell-page #stats .sample-switch button.active,
+.match-shell-page #stats .period-switch button.active {
+  border-color: rgba(53, 226, 124, .32);
+  background: rgba(53, 226, 124, .09);
+  color: var(--green);
+}
+
+.match-shell-page #stats .coverage-status {
+  max-width: 960px;
+  margin-bottom: 8px;
+  color: #6f7d74;
+  font-size: 9px;
+}
+
+.match-shell-page #stats .stats-nav {
+  max-width: 960px;
+  gap: 4px;
+  margin-bottom: 12px;
+  padding: 4px;
+  border: 1px solid #222b26;
+  border-radius: 10px;
+  background: #111613;
+}
+
+.match-shell-page #stats .stats-nav button {
+  min-height: 43px;
+  padding: 7px 9px;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  color: #86928a;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.match-shell-page #stats .stats-nav button span {
+  display: inline-block;
+  margin: 0 5px 0 0;
+  color: #6f7c73;
+  font-size: 12px;
+}
+
+.match-shell-page #stats .stats-nav button:hover { background: #19201c; color: #d4dcd6; }
+
+.match-shell-page #stats .stats-nav button.active {
+  border-color: rgba(53, 226, 124, .22);
+  background: rgba(53, 226, 124, .08);
+  color: var(--green);
+}
+
+.match-shell-page #stats .stats-nav button.active span { color: var(--green); }
+.match-shell-page #stats .stats-shell { max-width: 960px; }
+
+.match-shell-page #stats .compact-card {
+  overflow: hidden;
+  padding: 0;
+  border-color: #222b26;
+}
+
+.match-shell-page #stats .stats-section-title,
+.match-shell-page #stats .market-title {
+  margin: 0;
+  padding: 10px 15px;
+  border-color: #222b26;
+  background: #101511;
+  color: #b6c0b9;
+  font-size: 10px;
+  font-weight: 750;
+  letter-spacing: .045em;
+  text-transform: uppercase;
+}
+
+.match-shell-page #stats .metric-side { min-width: 0; }
+.match-shell-page #stats .metric-value.home,
+.match-shell-page #stats .metric-value.away { min-width: 52px; }
+
+.match-shell-page #stats .threshold-grid,
+.match-shell-page #stats .threshold-col:first-child,
+.match-shell-page #stats .market-block,
+.match-shell-page #stats .market-team:first-child,
+.match-shell-page #stats .shot-quality {
+  border-color: #222b26;
+}
+
+.match-shell-page #stats .threshold-head,
+.match-shell-page #stats .market-team h3 {
+  padding: 9px 12px;
+  border-color: #222b26;
+  color: #7e8a82;
+  font-size: 9px;
+  letter-spacing: .02em;
+}
+
+.match-shell-page #stats .threshold-row,
+.match-shell-page #stats .market-line {
+  min-height: 36px;
+  padding: 7px 12px;
+  border-color: #1d2520;
+  color: #929d96;
+  font-size: 10px;
+}
+
+.match-shell-page #stats .threshold-row b,
+.match-shell-page #stats .market-line b { color: #dce5df; font-size: 11px; }
+
+.match-shell-page #stats .mini-bar {
+  height: 5px;
+  background: #202823;
+}
+
+.match-shell-page #stats .mini-bar i { background: linear-gradient(90deg, #168a4e, var(--green)); }
+
+.match-shell-page #stats .outcome-grid,
+.match-shell-page #stats .shot-quality { gap: 7px; padding: 10px; }
+
+.match-shell-page #stats .outcome,
+.match-shell-page #stats .shot-quality div {
+  padding: 9px;
+  border-color: #263029;
+  border-radius: 8px;
+  background: #121713;
+  color: #86928a;
+  font-size: 9px;
+}
+
+.match-shell-page #stats .journey-grid { gap: 10px; }
+.match-shell-page #stats .journey-grid .card { padding: 15px; }
+
+.match-shell-page #stats .journey-grid h2 {
+  margin: 0 0 9px;
+  color: #d8e0da;
+  font-size: 11px;
+}
+
+.match-shell-page #stats .journey-row {
+  min-height: 42px;
+  padding: 7px 0;
+  border-color: #202823;
+  color: #9ca79f;
+  font-size: 10px;
+}
+
+.match-shell-page #stats .result-score { border-radius: 6px; font-size: 10px; }
+
+.match-shell-page #events > .card {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 16px 18px;
+}
+
+.match-shell-page #events .section-heading {
+  margin-bottom: 8px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #222b26;
+}
+
+.match-shell-page #events .section-heading small {
+  color: var(--green);
+  font-size: 8px;
+  letter-spacing: .13em;
+}
+
+.match-shell-page #events .section-heading h2,
+.match-shell-page #events > .card > h2 {
+  margin: 3px 0 0;
+  color: #e8eeea;
+  font-size: 15px;
+}
+
+.match-shell-page #events .section-heading > span {
+  border-color: #2a352e;
+  background: #121713;
+  color: #8d9991;
+}
+
+.match-shell-page #events .match-timeline { padding: 3px 0; }
+.match-shell-page #events .match-timeline::before { left: 62px; background: #2a352e; }
+
+.match-shell-page #events .timeline-event {
+  grid-template-columns: 45px 30px minmax(0, 1fr);
+  gap: 11px;
+  min-height: 54px;
+  padding: 7px 4px;
+  border-color: rgba(255, 255, 255, .045);
+}
+
+.match-shell-page #events .timeline-event time {
+  color: var(--green);
+  font-size: 11px;
+  font-weight: 850;
+}
+
+.match-shell-page #events .timeline-icon {
+  width: 28px;
+  height: 28px;
+  border-color: #303b34;
+  background: #151b17;
+  color: #cbd4ce;
+  box-shadow: 0 0 0 4px #121613;
+}
+
+.match-shell-page #events .timeline-event strong {
+  color: #dce4df;
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+.match-shell-page #events .timeline-event small {
+  color: #7f8b83;
+  font-size: 9px;
+  line-height: 1.4;
+}
+
+/* Compatibilidade visual com a listagem/filtros de eventos já existentes. */
+.match-shell-page #events .periods { gap: 8px; margin-bottom: 10px; }
+.match-shell-page #events .period-card,
+.match-shell-page #events .summary-item {
+  padding: 10px;
+  border-color: #222b26;
+  border-radius: 8px;
+  background: #121713;
+}
+
+.match-shell-page #events .period-filter { gap: 5px; margin-bottom: 10px; }
+
+.match-shell-page #events .period-btn {
+  min-height: 31px;
+  padding: 7px 12px;
+  border-color: #29342e;
+  border-radius: 7px;
+  background: #0f1411;
+  color: #8e9a92;
+  font-size: 10px;
+}
+
+.match-shell-page #events .period-btn.active {
+  border-color: rgba(53, 226, 124, .28);
+  background: rgba(53, 226, 124, .09);
+  color: var(--green);
+}
+
+.match-shell-page #events .period-summary { gap: 7px; margin-bottom: 10px; }
+.match-shell-page #events .summary-item b { color: #e3eae5; font-size: 16px; }
+
+.match-shell-page #events .event {
+  grid-template-columns: 48px minmax(0, 1fr) minmax(90px, auto);
+  gap: 12px;
+  min-height: 54px;
+  padding: 9px 5px;
+  border-color: #202823;
+  color: #cbd4ce;
+  font-size: 11px;
+}
+
+.match-shell-page #events .event time { color: var(--green); font-size: 11px; }
+.match-shell-page #events .event small { color: #849088; font-size: 9px; }
+.match-shell-page #events .event > span:last-child { color: #89958d; text-align: right; }
+
+.match-shell-page #events .event-empty {
+  min-height: 210px;
+  box-shadow: none;
+}
+
+@media (max-width: 780px) {
+  .match-shell-page #analysis .analysis-grid { grid-template-columns: 1fr; }
+  .match-shell-page #analysis .compare-head,
+  .match-shell-page #stats .compare-head { grid-template-columns: minmax(0, 1fr) 50px minmax(0, 1fr); }
+  .match-shell-page #analysis .compare-team,
+  .match-shell-page #stats .compare-team { flex-direction: column; font-size: 10px; text-align: center; }
+  .match-shell-page #analysis .metric-row,
+  .match-shell-page #stats .metric-row { grid-template-columns: minmax(82px, 1fr) minmax(90px, 120px) minmax(82px, 1fr); gap: 8px; padding: 8px; }
+  .match-shell-page #stats .filter-toolbar { align-items: stretch; }
+}
+
+@media (max-width: 560px) {
+  .match-shell-page #analysis .pregame-head { align-items: stretch; }
+  .match-shell-page #analysis .period-switch { width: 100%; }
+  .match-shell-page #analysis .period-switch button { flex: 1; }
+  .match-shell-page #stats .stats-nav { overflow-x: auto; }
+  .match-shell-page #stats .stats-nav button { flex: 0 0 auto; min-width: 88px; }
+  .match-shell-page #stats .metric-value { font-size: 14px; }
+  .match-shell-page #stats .metric-bar { display: none; }
+  .match-shell-page #stats .metric-side { justify-content: center; }
+  .match-shell-page #events > .card { padding: 13px 11px; }
+  .match-shell-page #events .timeline-event { grid-template-columns: 36px 28px minmax(0, 1fr); gap: 7px; }
+  .match-shell-page #events .match-timeline::before { left: 51px; }
+  .match-shell-page #events .event { grid-template-columns: 38px minmax(0, 1fr); }
+  .match-shell-page #events .event > span:last-child { grid-column: 2; text-align: left; }
+}
