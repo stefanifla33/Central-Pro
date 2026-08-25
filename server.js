@@ -12,6 +12,7 @@ const APP_TIMEZONE = "America/Sao_Paulo";
 const SNAPSHOT_FILE = path.join(__dirname, "data", "period-stats.json");
 const PLAYER_HISTORY_FILE = path.join(__dirname, "data", "player-history.json");
 const CORNER_HISTORY_FILE = path.join(__dirname, "data", "corner-history.json");
+const IS_SERVERLESS = process.env.VERCEL === "1" || Boolean(process.env.AWS_LAMBDA_FUNCTION_NAME);
 const cache = new Map();
 const pending = new Map();
 const lineupRefreshes = new Map();
@@ -42,25 +43,30 @@ try {
     if (erro.code !== "ENOENT") console.error("NÃ£o foi possÃ­vel ler o histÃ³rico de escanteios:", erro.message);
 }
 
+function persistStore(file, store, label) {
+    if (IS_SERVERLESS) return false;
+    try {
+        fs.mkdirSync(path.dirname(file), { recursive: true });
+        const temporary = `${file}.tmp`;
+        fs.writeFileSync(temporary, JSON.stringify(store, null, 2));
+        fs.renameSync(temporary, file);
+        return true;
+    } catch (erro) {
+        console.error(`[CACHE-PERSIST] store=${label} status=skipped error=${erro.code || erro.message}`);
+        return false;
+    }
+}
+
 function savePeriodStore() {
-    fs.mkdirSync(path.dirname(SNAPSHOT_FILE), { recursive: true });
-    const temporary = `${SNAPSHOT_FILE}.tmp`;
-    fs.writeFileSync(temporary, JSON.stringify(periodStore, null, 2));
-    fs.renameSync(temporary, SNAPSHOT_FILE);
+    return persistStore(SNAPSHOT_FILE, periodStore, "period-stats");
 }
 
 function savePlayerHistoryStore() {
-    fs.mkdirSync(path.dirname(PLAYER_HISTORY_FILE), { recursive: true });
-    const temporary = `${PLAYER_HISTORY_FILE}.tmp`;
-    fs.writeFileSync(temporary, JSON.stringify(playerHistoryStore, null, 2));
-    fs.renameSync(temporary, PLAYER_HISTORY_FILE);
+    return persistStore(PLAYER_HISTORY_FILE, playerHistoryStore, "player-history");
 }
 
 function saveCornerHistoryStore() {
-    fs.mkdirSync(path.dirname(CORNER_HISTORY_FILE), { recursive: true });
-    const temporary = `${CORNER_HISTORY_FILE}.tmp`;
-    fs.writeFileSync(temporary, JSON.stringify(cornerHistoryStore, null, 2));
-    fs.renameSync(temporary, CORNER_HISTORY_FILE);
+    return persistStore(CORNER_HISTORY_FILE, cornerHistoryStore, "corner-history");
 }
 
 function statisticNumber(statistics, type) {
@@ -1538,20 +1544,27 @@ app.get("/api/partidas/:id/jogadores-recentes", async (req, res) => {
     const fixtureId = Number(req.params.id);
     const externalStart = metrics.externalRequests;
     const cacheStart = metrics.cacheHits;
+    let stage = "validation";
     if (!Number.isSafeInteger(fixtureId) || fixtureId <= 0) return res.status(400).json({ erro: "Partida inválida." });
     try {
+        stage = "fixture";
         const fixtureData = await football(`/fixtures?id=${fixtureId}`, 30_000);
         const fixture = fixtureData.response?.[0];
         if (!fixture) return res.status(404).json({ erro: "Partida não encontrada." });
         const before = fixture.fixture.date;
         const beforeTime = new Date(before).getTime();
+        stage = "lineups";
         const lineupData = await football(`/fixtures/lineups?fixture=${fixtureId}`, 300_000).catch(() => ({ response: [] }));
         const relevantByTeam = new Map([fixture.teams.home, fixture.teams.away].map(team => {
             const lineup = (lineupData.response || []).find(item => Number(item.team?.id) === Number(team.id));
             return [team.id, new Set([...(lineup?.startXI || []), ...(lineup?.substitutes || [])].map(item => Number(item.player?.id)).filter(Number.isSafeInteger))];
         }));
         const diagnostics = [];
-        for (const team of [fixture.teams.home, fixture.teams.away]) diagnostics.push(await ensureTeamPlayerHistory(fixture, team, relevantByTeam.get(team.id), 5, 30));
+        for (const team of [fixture.teams.home, fixture.teams.away]) {
+            stage = `history-team-${team.id}`;
+            diagnostics.push(await ensureTeamPlayerHistory(fixture, team, relevantByTeam.get(team.id), 5, 30));
+        }
+        stage = "payload";
         const teams = [fixture.teams.home, fixture.teams.away].map(team => {
             const relevantIds = relevantByTeam.get(team.id) || new Set();
             const playerIds = new Set(Object.values(playerHistoryStore.fixtures)
@@ -1585,6 +1598,7 @@ app.get("/api/partidas/:id/jogadores-recentes", async (req, res) => {
             source: "persistent-fixture-player-cache"
         });
     } catch (erro) {
+        console.error(`[PLAYER-HISTORY-ERROR] fixture=${fixtureId} stage=${stage} error=${erro.message}\n${erro.stack || ""}`);
         res.status(502).json({ erro: "Histórico recente de jogadores indisponível.", detalhe: erro.message });
     }
 });
