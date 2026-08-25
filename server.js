@@ -471,11 +471,17 @@ function normalizeStatistics(response) {
 }
 
 const PERIOD_SHOT_METRICS = ["Total Shots", "Shots on Goal", "Shots off Goal", "Blocked Shots", "Shots insidebox", "Shots outsidebox"];
+const PERIOD_ACCUMULATIVE_METRICS = new Set([
+    ...PERIOD_SHOT_METRICS, "Fouls", "Corner Kicks", "Offsides", "Yellow Cards",
+    "Red Cards", "Goalkeeper Saves", "Total passes", "Passes accurate"
+]);
 
 function validPeriodStatistics(statistics, game) {
     const teamIds = [game.teams?.home?.id, game.teams?.away?.id].filter(Number.isInteger);
-    return teamIds.length === 2 && teamIds.every(teamId => PERIOD_SHOT_METRICS.every(metric =>
-        typeof statistics?.[teamId]?.values?.[metric] === "number"
+    // Um snapshot parcial continua sendo real e util. A validade de cada campo
+    // e decidida depois, na cobertura da metrica, sem converter ausencia em zero.
+    return teamIds.length === 2 && teamIds.every(teamId => PERIOD_SHOT_METRICS.some(metric =>
+        Number.isFinite(statistics?.[teamId]?.values?.[metric])
     ));
 }
 
@@ -485,7 +491,9 @@ function subtractStatistics(total, firstHalf) {
         const first = firstHalf?.[teamId]?.values || {};
         const values = {};
         for (const [type, value] of Object.entries(team.values || {})) {
-            if (typeof value === "number" && typeof first[type] === "number" && value >= first[type]) values[type] = value - first[type];
+            // 2T = FT - HT apenas para contagens acumulativas. Percentuais,
+            // posse, precisao e metricas de modelo nunca sao subtraidos.
+            if (PERIOD_ACCUMULATIVE_METRICS.has(type) && typeof value === "number" && typeof first[type] === "number" && value >= first[type]) values[type] = value - first[type];
         }
         result[teamId] = { team: team.team, values };
     }
@@ -669,34 +677,38 @@ app.get("/api/estatisticas-periodos", async (req, res) => {
             .filter(record => record.fixture?.id !== fixtureId)
             .filter(record => record.fixture?.teams?.home?.id === team || record.fixture?.teams?.away?.id === team);
         const previous = candidates.filter(record => new Date(record.fixture.date).getTime() < fixtureTime);
-        const valid = previous.filter(record => {
+        // A cobertura e valida por metrica, nao por partida. Um campo ausente nao
+        // invalida as demais contagens reais presentes no mesmo snapshot.
+        const usable = previous.filter(record => {
             const halftime = record.halftime?.statistics?.[team]?.values;
             const fulltime = record.fulltime?.statistics?.[team]?.values;
-            const secondHalf = record.secondHalf?.statistics?.[team]?.values;
-            if (!halftime || !fulltime || !secondHalf) return false;
-            return metrics.every(metric => {
-                const first = halftime[metric];
-                const full = fulltime[metric];
-                const second = secondHalf[metric];
-                return Number.isFinite(first) && Number.isFinite(full) && Number.isFinite(second)
-                    && full >= first && second >= 0 && second === full - first;
-            });
+            return Boolean(halftime || fulltime);
         });
-        const rows = valid
+        const rows = usable
             .sort((a, b) => new Date(b.fixture.date) - new Date(a.fixture.date))
             .slice(0, limit)
             .map(record => ({
                 fixture: record.fixture,
-                halftime: record.halftime.statistics[team].values,
-                secondHalf: record.secondHalf.statistics[team].values,
-                fulltime: record.fulltime.statistics[team].values
+                halftime: record.halftime?.statistics?.[team]?.values || null,
+                secondHalf: record.secondHalf?.statistics?.[team]?.values || null,
+                fulltime: record.fulltime?.statistics?.[team]?.values || null
             }));
+        const metricCoverage = Object.fromEntries(metrics.map(metric => [metric, {
+            halftime: rows.filter(row => Number.isFinite(row.halftime?.[metric])).length,
+            secondHalf: rows.filter(row => Number.isFinite(row.secondHalf?.[metric])).length,
+            fulltime: rows.filter(row => Number.isFinite(row.fulltime?.[metric])).length
+        }]));
         res.json({
             team,
             fixtureId,
             requested: limit,
-            coverage: rows.length,
-            diagnostics: { storedForTeam: candidates.length, previous: previous.length, valid: valid.length, invalid: previous.length - valid.length },
+            coverage: {
+                halftime: rows.filter(row => row.halftime && Object.values(row.halftime).some(Number.isFinite)).length,
+                secondHalf: rows.filter(row => row.secondHalf && Object.values(row.secondHalf).some(Number.isFinite)).length,
+                fulltime: rows.filter(row => row.fulltime && Object.values(row.fulltime).some(Number.isFinite)).length,
+                metrics: metricCoverage
+            },
+            diagnostics: { storedForTeam: candidates.length, previous: previous.length, usable: usable.length, omitted: previous.length - usable.length },
             response: rows
         });
     } catch (erro) {

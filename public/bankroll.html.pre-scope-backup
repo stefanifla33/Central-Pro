@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Minha Banca | Central Pro</title>
+  <link rel="stylesheet" href="app-shell.css">
+  <link rel="stylesheet" href="bankroll.css">
+  <link rel="stylesheet" href="design-system.css?v=1">
+</head>
+<body>
+  <button class="menu-button" id="menuButton" aria-label="Abrir menu">☰</button>
+  <aside class="sidebar" id="sidebar">
+    <a class="brand" href="index.html"><span class="brand-mark">CP</span><span>CENTRAL <b>PRO</b><small>SPORTS INTELLIGENCE</small></span></a>
+    <div class="user-card"><span class="avatar">S</span><span><strong>Stefani</strong><small>Analista</small></span><span class="status-dot"></span></div>
+    <nav class="main-nav" aria-label="Navegação principal">
+      <a href="index.html"><span>⌂</span>Início</a>
+      <a href="games.html"><span>◉</span>Jogos</a>
+      <a href="analysis.html"><span>⌁</span>Análises</a>
+      <a href="players.html"><span>♙</span>Jogadores</a>
+      <a href="opportunities.html"><span>↗</span>Melhores Oportunidades</a>
+      <a class="active" href="bankroll.html"><span>◈</span>Minha Banca</a>
+      <a href="bankroll.html#history"><span>↺</span>Histórico</a>
+    </nav>
+    <div class="sidebar-future"><small>CONTA</small><span>Perfil</span><span>Configurações</span><span>Plano Premium</span></div>
+    <div class="api-state"><span><i></i> Armazenamento local</span><small>Dados salvos neste navegador</small></div>
+  </aside>
+
+  <div class="app-frame">
+    <header class="app-header"><label class="global-search"><span>⌕</span><input id="globalSearch" placeholder="Buscar time, jogador, campeonato..." autocomplete="off"><kbd>Ctrl K</kbd></label><div class="header-actions"><button aria-label="Notificações">♢</button><span class="header-avatar">S</span></div></header>
+    <main class="page-content bankroll-page">
+      <div class="page-heading">
+        <div><span class="eyebrow">GESTÃO DE APOSTAS</span><h1>Minha Banca</h1><p>Controle manual das suas entradas e resultados.</p></div>
+        <div class="heading-actions">
+          <details class="settings-menu">
+            <summary aria-label="Configurações da banca">⚙</summary>
+            <div><span>Configurações</span><button id="resetBankrollButton" type="button">Resetar banca</button></div>
+          </details>
+          <button class="btn btn-secondary export-excel-button" id="exportExcelButton" type="button">Exportar Excel</button>
+          <button class="btn btn-secondary" id="initialBankrollButton" type="button">Definir banca inicial</button>
+          <button class="btn btn-primary" id="newEntryButton" type="button">+ Nova entrada</button>
+        </div>
+      </div>
+
+      <div class="setup-notice" id="setupNotice" hidden>
+        <div><strong>Comece definindo sua banca inicial</strong><span>Esse valor será a base dos indicadores e do gráfico.</span></div>
+        <button class="btn btn-primary" id="setupNoticeButton" type="button">Definir banca inicial</button>
+      </div>
+
+      <section class="summary-grid" aria-label="Resumo da banca">
+        <article class="metric-card primary"><span>Banca inicial</span><strong id="initialBankroll">—</strong></article>
+        <article class="metric-card primary"><span>Banca atual</span><strong id="currentBankroll">—</strong></article>
+        <article class="metric-card"><span>Lucro / Prejuízo</span><strong id="netProfit">R$ 0,00</strong></article>
+        <article class="metric-card"><span>ROI</span><strong id="roi">0,00%</strong></article>
+        <article class="metric-card"><span>Total apostado</span><strong id="totalStake">R$ 0,00</strong></article>
+        <article class="metric-card result-green"><span>Greens</span><strong id="greens">0</strong></article>
+        <article class="metric-card result-red"><span>Reds</span><strong id="reds">0</strong></article>
+        <article class="metric-card"><span>Voids</span><strong id="voids">0</strong></article>
+        <article class="metric-card result-pending"><span>Pendentes</span><strong id="pendings">0</strong></article>
+        <article class="metric-card"><span>Odd média</span><strong id="averageOdd">0,00</strong></article>
+        <article class="metric-card"><span>Taxa de acerto</span><strong id="hitRate">0,00%</strong></article>
+      </section>
+
+      <section class="panel chart-panel">
+        <div class="panel-title"><div><span class="eyebrow">DESEMPENHO</span><h2>Evolução da banca</h2></div><small>Somente entradas liquidadas</small></div>
+        <div class="chart-wrap"><canvas id="bankrollChart" aria-label="Gráfico da evolução da banca"></canvas><div class="chart-empty" id="chartEmpty">Defina a banca e liquide entradas para visualizar a evolução.</div></div>
+      </section>
+
+      <section class="panel history-panel" id="history">
+        <div class="panel-title history-title"><div><span class="eyebrow">REGISTROS</span><h2>Histórico de entradas</h2></div><strong id="entryCount">0 entradas</strong></div>
+        <div class="history-controls">
+          <div class="filter-tabs" id="resultFilters">
+            <button class="active" data-filter="all" type="button">Todas</button><button data-filter="pending" type="button">Pendentes</button><button data-filter="green" type="button">Greens</button><button data-filter="red" type="button">Reds</button><button data-filter="void" type="button">Voids</button>
+          </div>
+          <label class="table-search"><span>⌕</span><input id="entrySearch" type="search" placeholder="Buscar partida, mercado ou seleção"></label>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Data</th><th>Partida</th><th>Mercado</th><th>Seleção</th><th>Odd</th><th>Stake</th><th>Resultado</th><th>Lucro/Prejuízo</th><th class="actions-column">Ações</th></tr></thead>
+            <tbody id="entriesBody"></tbody>
+          </table>
+          <div class="empty-state" id="emptyState" hidden><strong>Nenhuma entrada registrada ainda.</strong><span>Adicione sua primeira aposta para começar o acompanhamento.</span><button class="btn btn-primary" id="firstEntryButton" type="button">Adicionar primeira entrada</button></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <dialog id="initialBankrollDialog" class="modal">
+    <form id="initialBankrollForm" method="dialog">
+      <div class="modal-head"><div><span class="eyebrow">CONFIGURAÇÃO</span><h2>Definir banca inicial</h2></div><button class="icon-button close-dialog" type="button" aria-label="Fechar">×</button></div>
+      <label class="field"><span>Valor inicial</span><div class="money-input"><span>R$</span><input id="initialBankrollInput" type="number" min="0" step="0.01" required placeholder="1.000,00"></div></label>
+      <div class="modal-actions"><button class="btn btn-secondary close-dialog" type="button">Cancelar</button><button class="btn btn-primary" type="submit">Salvar banca</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="entryDialog" class="modal modal-wide">
+    <form id="entryForm" method="dialog">
+      <input id="entryId" type="hidden">
+      <div class="modal-head"><div><span class="eyebrow">ENTRADA MANUAL</span><h2 id="entryDialogTitle">Nova entrada</h2></div><button class="icon-button close-dialog" type="button" aria-label="Fechar">×</button></div>
+      <div class="form-grid">
+        <label class="field"><span>Data</span><input id="entryDate" type="date" required></label>
+        <label class="field"><span>Competição</span><input id="entryCompetition" type="text" required maxlength="80" placeholder="Ex.: Brasileirão"></label>
+        <label class="field full"><span>Partida</span><input id="entryMatch" type="text" required maxlength="120" placeholder="Mandante x Visitante"></label>
+        <label class="field"><span>Mercado</span><input id="entryMarket" type="text" required maxlength="80" placeholder="Ex.: Mais de 2.5 gols"></label>
+        <label class="field"><span>Seleção</span><input id="entrySelection" type="text" required maxlength="100" placeholder="Ex.: Over 2.5"></label>
+        <label class="field"><span>Odd</span><input id="entryOdd" type="number" min="1.01" step="0.01" required placeholder="1,85"></label>
+        <label class="field"><span>Stake (R$)</span><input id="entryStake" type="number" min="0.01" step="0.01" required placeholder="50,00"></label>
+        <label class="field full"><span>Resultado</span><select id="entryResult"><option value="pending">Pendente</option><option value="green">Green</option><option value="red">Red</option><option value="void">Void</option></select></label>
+      </div>
+      <div class="modal-actions"><button class="btn btn-secondary close-dialog" type="button">Cancelar</button><button class="btn btn-primary" type="submit">Salvar entrada</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="resetBankrollDialog" class="modal">
+    <form id="resetBankrollForm" method="dialog">
+      <div class="modal-head"><div><span class="eyebrow danger">AÇÃO IRREVERSÍVEL</span><h2>Resetar Minha Banca?</h2></div><button class="icon-button close-dialog" type="button" aria-label="Fechar">×</button></div>
+      <div class="reset-warning"><p>Isso apagará a banca inicial, todas as entradas, histórico, resultados e dados utilizados pelo gráfico.</p><strong>A ação não poderá ser desfeita.</strong></div>
+      <label class="field"><span>Digite RESETAR para confirmar</span><input id="resetConfirmationInput" type="text" autocomplete="off" spellcheck="false" placeholder="RESETAR"></label>
+      <div class="modal-actions"><button class="btn btn-secondary close-dialog" type="button">Cancelar</button><button class="btn btn-danger" id="confirmResetButton" type="submit" disabled>Resetar Minha Banca</button></div>
+    </form>
+  </dialog>
+
+  <script src="/vendor/exceljs/exceljs.min.js"></script>
+  <script src="bankroll-store.js"></script>
+  <script src="bankroll-export.js"></script>
+  <script src="bankroll.js"></script>
+  <script src="app-shell.js?v=2"></script>
+</body>
+</html>

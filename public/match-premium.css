@@ -97,3 +97,22 @@
   .match-shell-page #stats .cp-h2h-list{display:grid;grid-auto-flow:column;grid-template-columns:none;grid-auto-columns:minmax(145px,72vw);overflow-x:auto;overscroll-behavior-inline:contain;scroll-snap-type:x proximity}
   .match-shell-page #stats .cp-h2h-list>*{scroll-snap-align:start}
 }
+
+/* Estatisticas pre-jogo: composicao mobile em cards, sem comprimir a tabela. */
+@media(max-width:560px){
+  .match-shell-page,.match-shell-page *{box-sizing:border-box}
+  .match-shell-page main>.tabs{max-width:100%;overflow-x:auto;overscroll-behavior-inline:contain}
+  .match-shell-page main>.tabs .tab{flex:0 0 auto;min-width:max-content;padding:10px 12px}
+  .match-shell-page>.app-frame>.app-header .global-search{height:36px;max-width:100%;padding-inline:10px}
+  .match-shell-page>.app-frame>.app-header .search-key,.match-shell-page>.app-frame>.app-header kbd{display:none!important}
+  .match-shell-page #stats .stats-nav{width:100%;max-width:100%;overflow-x:auto;overscroll-behavior-inline:contain}
+  .match-shell-page #stats .stats-nav button{flex:0 0 auto;min-width:92px;padding:8px 10px}
+  .match-shell-page #stats .cp-period-grid{grid-template-columns:1fr}
+  .match-shell-page #stats .cp-compare-row,.match-shell-page #stats .cp-period-panel .cp-compare-row{display:grid;grid-template-columns:1fr 1fr;grid-template-areas:"label label" "home away";gap:8px;margin:6px;padding:10px;border:1px solid #26312b;border-radius:9px;background:#0d120f}
+  .match-shell-page #stats .cp-compare-row>strong{grid-area:label;text-align:left;font-size:10px}
+  .match-shell-page #stats .cp-compare-side.home{grid-area:home}.match-shell-page #stats .cp-compare-side.away{grid-area:away}
+  .match-shell-page #stats .cp-compare-side{display:grid;grid-template-columns:1fr;gap:4px;padding:7px;border-radius:7px;background:#131a15;text-align:center}
+  .match-shell-page #stats .cp-compare-side>span{display:none}
+  .match-shell-page #stats .cp-compare-side b{font-size:16px}.match-shell-page #stats .cp-compare-side small{font-size:8px}
+  .match-shell-page #stats .cp-analysis-sidebar{position:static}
+}
