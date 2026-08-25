@@ -1667,4 +1667,4 @@ function startServer() {
 
 if (require.main === module) startServer();
 
-module.exports = { app, startServer, applyPeriodSnapshot, validPeriodStatistics, subtractStatistics, PERIOD_SHOT_METRICS };
+module.exports = app;
