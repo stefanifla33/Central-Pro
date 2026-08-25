@@ -115,4 +115,20 @@
   .match-shell-page #stats .cp-compare-side>span{display:none}
   .match-shell-page #stats .cp-compare-side b{font-size:16px}.match-shell-page #stats .cp-compare-side small{font-size:8px}
   .match-shell-page #stats .cp-analysis-sidebar{position:static}
+
+  /* Escanteios: cards próprios para 360–412 px; nenhuma regra afeta desktop. */
+  .match-shell-page #stats .cp-stats-layout[data-premium-renderer="corners"],
+  .match-shell-page #stats .cp-stats-layout[data-premium-renderer="corners"] .cp-main-column,
+  .match-shell-page #stats .cp-stats-layout[data-premium-renderer="corners"] .cp-analysis-board,
+  .match-shell-page #stats .cp-stats-layout[data-premium-renderer="corners"] .cp-period-grid,
+  .match-shell-page #stats .cp-stats-layout[data-premium-renderer="corners"] .cp-period-panel{width:100%;max-width:100%;min-width:0}
+  .match-shell-page #stats .cp-stats-layout[data-premium-renderer="corners"] .cp-period-grid{display:grid;grid-template-columns:minmax(0,1fr);gap:10px;padding:10px}
+  .match-shell-page #stats .cp-stats-layout[data-premium-renderer="corners"] .cp-period-panel{overflow:hidden;border:1px solid #29342e!important;border-radius:10px!important}
+  .match-shell-page #stats .cp-stats-layout[data-premium-renderer="corners"] .cp-period-panel+.cp-period-panel{border-left:1px solid #29342e!important}
+  .match-shell-page #stats .cp-stats-layout[data-premium-renderer="corners"] .cp-period-panel>header{justify-content:space-between;min-height:42px;padding:9px 12px;text-align:left}
+  .match-shell-page #stats .cp-stats-layout[data-premium-renderer="corners"] .cp-period-panel .cp-metric-stack{width:100%;min-width:0;padding:0 4px 5px}
+  .match-shell-page #stats .cp-stats-layout[data-premium-renderer="corners"] .cp-compare-row{width:auto;max-width:calc(100% - 8px);min-width:0;margin:4px;padding:10px;grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+  .match-shell-page #stats .cp-stats-layout[data-premium-renderer="corners"] .cp-compare-side{width:100%;max-width:100%;min-width:0;padding:8px 6px}
+  .match-shell-page #stats .cp-stats-layout[data-premium-renderer="corners"] .cp-compare-side b{font-size:17px;line-height:1.15}
+  .match-shell-page #stats .cp-stats-layout[data-premium-renderer="corners"] .cp-compare-side small{display:block;max-width:100%;margin:0;overflow:visible;color:#8d9991;font-size:9px;line-height:1.25;text-align:center;white-space:normal}
 }
