@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="app-shell.css?v=1">
   <link rel="stylesheet" href="dashboard.css?v=2">
   <link rel="stylesheet" href="design-system.css?v=1">
-  <link rel="stylesheet" href="home.css?v=14">
+  <link rel="stylesheet" href="home.css?v=18">
 </head>
 <body class="home-page">
   <button class="menu-button" id="menuButton" aria-label="Abrir menu">☰</button>
@@ -19,6 +19,7 @@
     <div class="sidebar-theme"><span>◔</span><b>Tema escuro</b><small>⌄</small></div>
     <div class="sidebar-footer"><span>© 2026 Central Pro</span><small>Todos os direitos reservados.</small></div>
   </aside>
+  <div class="menu-overlay" id="menuOverlay" aria-hidden="true"></div>
   <div class="app-frame">
     <main class="page-content home-content">
       <section class="page-heading home-hero"><div><p class="eyebrow">VISÃO GERAL</p><h1><span id="homeGreeting">Olá, Stefani!</span> <span class="hero-wave" aria-hidden="true">👋</span></h1><p>Acompanhe os melhores jogos e tendências do futebol de hoje.</p></div><div class="home-hero-side"><div class="header-actions"><span class="header-avatar">S</span><span class="header-user"><strong>Stefani</strong><small>Analista</small></span></div><div class="last-update">Atualizado <strong id="updatedAt">agora</strong></div></div></section>
@@ -41,5 +42,6 @@
   </div>
   <script>const homeHour=new Date().getHours();document.getElementById('homeGreeting').textContent=`${homeHour>=5&&homeHour<12?'Bom dia':homeHour>=12&&homeHour<18?'Boa tarde':'Boa noite'}, Stefani!`;</script>
   <script src="competition-config.js?v=1"></script><script src="app-shell.js?v=1"></script><script src="dashboard.js?v=3"></script>
+  <script>const homeMenu=document.getElementById('sidebar'),homeMenuButton=document.getElementById('menuButton'),homeMenuOverlay=document.getElementById('menuOverlay');function syncHomeMenu(){const open=homeMenu.classList.contains('open');homeMenuOverlay.classList.toggle('active',open);homeMenuOverlay.setAttribute('aria-hidden',String(!open));document.body.classList.toggle('menu-open',open)}homeMenuButton.addEventListener('click',()=>requestAnimationFrame(syncHomeMenu));homeMenuOverlay.addEventListener('click',()=>{homeMenu.classList.remove('open');syncHomeMenu()});</script>
 </body>
 </html>

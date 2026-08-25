@@ -68,3 +68,111 @@
 
 .home-page .home-primary{grid-template-columns:minmax(0,68fr) minmax(340px,32fr)}
 @media(max-width:1180px){.home-page .home-primary{grid-template-columns:1fr}}
+
+/* Home mobile — sem impacto no desktop */
+@media(max-width:768px){
+  .home-page .page-content.home-content{padding:12px 12px 68px}
+  .home-page .home-hero{position:relative;display:block!important;min-height:118px;margin-bottom:12px!important;padding:2px 0 0}
+  .home-page .home-hero>div:first-child{padding-top:31px}
+  .home-page .home-hero h1{margin:4px 0 4px!important;font-size:clamp(24px,7.4vw,29px)!important;line-height:1.08!important;white-space:nowrap}
+  .home-page .home-hero>div:first-child>p:last-child{display:-webkit-box;max-width:100%;margin:0;font-size:12px!important;line-height:1.4!important;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
+  .home-page .home-hero .eyebrow{font-size:8px!important}
+  .home-page .home-hero-side{position:absolute;top:0;right:0;display:flex;min-width:0;align-items:flex-end;gap:2px}
+  .home-page .home-hero-side .header-actions{display:flex;gap:7px}
+  .home-page .home-hero-side .header-avatar{width:30px;height:30px;font-size:11px}
+  .home-page .home-hero-side .header-user{display:grid;min-width:48px;gap:1px}
+  .home-page .home-hero-side .header-user strong{font-size:10px}
+  .home-page .home-hero-side .header-user small{font-size:8px}
+  .home-page .home-hero-side .last-update{display:block!important;margin-top:2px;font-size:8px!important}
+  .home-page .home-hero-side .last-update:before{display:none}
+  .home-page .home-kpis{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px}
+  .home-page .home-kpis .summary-card{min-height:76px;padding:7px 9px;gap:8px;border-radius:12px}
+  .home-page .home-kpis .summary-card:after{display:none}
+  .home-page .summary-icon,.home-page .summary-icon.green,.home-page .summary-icon.blue,.home-page .summary-icon.amber,.home-page .summary-icon.red{width:34px;height:34px;flex-basis:34px;border-radius:9px;font-size:16px}
+  .home-page .summary-card small{font-size:9px;line-height:1.05}
+  .home-page .summary-card strong{margin:2px 0 1px;font-size:25px;line-height:1}
+  .home-page .summary-card em{font-size:8px;line-height:1.1}
+  .home-page .home-primary{grid-template-columns:1fr;gap:10px;margin-top:12px}
+  .home-page .home-primary .highlight-grid{display:grid;grid-template-columns:repeat(3,86vw);gap:10px;width:100%;padding:0 0 8px;overflow-x:auto;overscroll-behavior-inline:contain;scroll-snap-type:x mandatory;scrollbar-width:none}
+  .home-page .home-primary .highlight-grid::-webkit-scrollbar{display:none}
+  .home-page .home-primary .featured-match-card{width:86vw;min-width:0;scroll-snap-align:start;scroll-snap-stop:always}
+  .home-page .home-primary .home-live{width:100%;min-width:0}
+  .home-page .home-primary .home-live-list{width:100%;min-width:0}
+  .home-page .home-primary .home-live .match-row{width:100%;min-width:0;padding-inline:3px}
+  .home-page .home-primary .home-live .match-main{grid-template-columns:minmax(0,1fr) 44px minmax(0,1fr) 31px;gap:4px}
+  .home-page .home-primary .home-live .match-team{min-width:0;gap:4px}
+  .home-page .home-primary .home-live .match-team img{width:22px;height:22px;flex-basis:22px}
+  .home-page .home-primary .home-live .match-team span{min-width:0;font-size:9px}
+  .home-page .home-primary .home-live .match-score{min-width:44px;font-size:12px}
+  .home-page .home-primary .home-live .match-status{font-size:10px}
+  .home-page .menu-button{right:12px;bottom:12px;width:40px;height:40px;font-size:17px;box-shadow:0 8px 24px rgba(0,0,0,.3)}
+}
+@media(max-width:380px){
+  .home-page .home-hero h1{font-size:23px!important}
+  .home-page .home-primary .highlight-grid{grid-template-columns:repeat(3,88vw)}
+  .home-page .home-primary .featured-match-card{width:88vw}
+}
+
+
+/* Correção mobile final */
+.home-page .menu-overlay{display:none}
+@media(max-width:768px){
+  html,body.home-page{max-width:100%;overflow-x:hidden}
+  body.home-page.menu-open{overflow:hidden}
+  .home-page .app-frame,.home-page .page-content.home-content,.home-page .home-primary,.home-page .home-secondary,.home-page .home-stage{min-width:0;max-width:100%}
+  .home-page .page-content.home-content{padding:9px 10px 76px}
+  .home-page .home-hero{min-height:91px;margin-bottom:8px!important;padding:0}
+  .home-page .home-hero>div:first-child{padding-top:27px}
+  .home-page .home-hero h1{margin:2px 0 2px!important;font-size:clamp(21px,6.4vw,25px)!important;line-height:1.06!important}
+  .home-page .home-hero>div:first-child>p:last-child{font-size:10px!important;line-height:1.3!important}
+  .home-page .home-hero .eyebrow{font-size:7px!important;line-height:1}
+  .home-page .home-hero-side{top:0;right:0;gap:0}
+  .home-page .home-hero-side .header-actions{gap:5px}
+  .home-page .home-hero-side .header-avatar{width:25px;height:25px;font-size:9px}
+  .home-page .home-hero-side .header-user{min-width:43px;gap:0}
+  .home-page .home-hero-side .header-user strong{font-size:9px;line-height:1.05}
+  .home-page .home-hero-side .header-user small{font-size:7px;line-height:1.05}
+  .home-page .home-hero-side .last-update{margin-top:1px;font-size:7px!important;line-height:1}
+  .home-page .home-kpis{gap:6px!important}
+  .home-page .home-kpis .summary-card{height:50px;min-height:50px;padding:3px 6px;gap:6px;border-radius:9px;overflow:hidden}
+  .home-page .summary-icon,.home-page .summary-icon.green,.home-page .summary-icon.blue,.home-page .summary-icon.amber,.home-page .summary-icon.red{width:26px;height:26px;flex-basis:26px;border-radius:7px;font-size:12px}
+  .home-page .summary-card>div{min-width:0}
+  .home-page .summary-card small{font-size:7px;line-height:1;white-space:normal}
+  .home-page .summary-card strong{margin:1px 0 0;font-size:20px;line-height:.9}
+  .home-page .summary-card em{overflow:hidden;font-size:7px;line-height:1;white-space:nowrap;text-overflow:ellipsis}
+  .home-page .home-primary{margin-top:9px}
+  .home-page .home-primary .highlight-grid{grid-template-columns:repeat(3,88%);width:100%;max-width:100%;gap:9px;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scroll-padding-inline:0}
+  .home-page .home-primary .featured-match-card{width:auto;max-width:none;scroll-snap-align:start}
+  .home-page .menu-button{right:14px;bottom:18px;width:48px;height:48px;font-size:17px}
+  .home-page .sidebar{inset:0 auto 0 0;width:84vw;max-width:320px;height:100dvh;overflow-y:auto;overscroll-behavior:contain;z-index:50}
+  .home-page .menu-overlay{position:fixed;inset:0;display:block;visibility:hidden;background:rgba(0,0,0,.72);opacity:0;pointer-events:none;transition:opacity .2s ease,visibility .2s ease;z-index:45}
+  .home-page .menu-overlay.active{visibility:visible;opacity:1;pointer-events:auto}
+}
+@media(max-width:380px){
+  .home-page .page-content.home-content{padding-inline:8px}
+  .home-page .home-kpis .summary-card{padding-inline:5px}
+  .home-page .summary-card strong{font-size:19px}
+}
+
+/* Acabamento mobile */
+@media(max-width:768px){
+  .home-page .sidebar{width:80vw;max-width:340px}
+  .home-page .home-kpis .summary-card{height:48px;min-height:48px;padding:2px 7px;gap:6px}
+  .home-page .summary-card small{display:-webkit-box;overflow:hidden;-webkit-box-orient:vertical;-webkit-line-clamp:2}
+  .home-page .summary-card strong{margin:1px 0 0}
+  .home-page .home-primary .highlight-grid{grid-template-columns:repeat(3,90%);gap:9px;padding:0 5% 8px;scroll-padding-inline:5%}
+  .home-page .home-primary .featured-match-card{width:auto;scroll-snap-align:center}
+  .home-page .home-primary{gap:8px;margin-top:8px}
+  .home-page .home-secondary{gap:8px;margin-top:9px}
+  .home-page .home-status{margin-top:9px}
+  .home-page .menu-button{right:12px;bottom:calc(14px + env(safe-area-inset-bottom));width:48px;height:48px}
+}
+
+@media(max-width:768px){
+  .home-page .page-content.home-content{padding-bottom:calc(92px + env(safe-area-inset-bottom))}
+  .home-page .home-secondary .dashboard-opportunity{grid-template-columns:minmax(0,1fr);gap:6px;min-width:0}
+  .home-page .home-secondary .dashboard-opportunity-league,.home-page .home-secondary .dashboard-opportunity-teams,.home-page .home-secondary .dashboard-opportunity-insight{grid-column:1;min-width:0}
+  .home-page .home-secondary .dashboard-opportunity-teams{justify-content:center;align-items:center}
+  .home-page .home-secondary .dashboard-opportunity-teams strong{overflow:visible;white-space:normal;text-align:center;text-overflow:clip;line-height:1.25}
+  .home-page .home-secondary .dashboard-opportunity-insight{justify-content:space-between;text-align:left}
+}
