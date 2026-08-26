@@ -333,3 +333,18 @@
   .home-page .highlight-controls{padding-top:6px}
   .home-page .highlight-arrow{width:32px;height:32px}
 }
+
+
+/* L5/L10: leitura secundaria, sem competir com a tendencia principal */
+.home-page .trend-score{display:grid!important;grid-template-columns:auto auto;align-items:baseline;justify-content:end;column-gap:7px;row-gap:5px;min-width:max-content;line-height:1!important;text-align:right}
+.home-page .trend-score .trend-percent{color:#35ed96;font-size:inherit;font-weight:850;white-space:nowrap}
+.home-page .trend-score .trend-main-sample{display:inline!important;color:#78847d!important;font-size:9px!important;font-weight:750;white-space:nowrap;text-shadow:none}
+.home-page .trend-windows{grid-column:1/-1;display:flex!important;align-items:center;justify-content:flex-end;gap:5px;margin:0!important;white-space:nowrap}
+.home-page .trend-windows>span{display:inline-flex!important;align-items:center;gap:3px;padding:3px 6px;border:1px solid rgba(255,255,255,.07);border-radius:6px;background:rgba(255,255,255,.035);color:#8d9992;font-size:8px!important;font-weight:700;line-height:1}
+.home-page .trend-windows>span b{display:inline!important;margin:0!important;color:#b8c3bd!important;font-size:8px!important;font-weight:850;letter-spacing:.02em}
+.home-page .featured-trend>span:first-child{min-width:0}
+.home-page .featured-trend>span:first-child b{white-space:nowrap}
+.home-page .dashboard-opportunity-insight .trend-score{justify-self:end}
+.home-page .dashboard-opportunity-insight .trend-windows{gap:4px}
+.home-page .dashboard-opportunity-insight .trend-windows>span{padding:2px 5px;font-size:7px!important}
+.home-page .dashboard-opportunity-insight .trend-windows>span b{font-size:7px!important}
