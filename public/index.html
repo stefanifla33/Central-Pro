@@ -7,12 +7,21 @@
   <link rel="stylesheet" href="app-shell.css?v=1">
   <link rel="stylesheet" href="dashboard.css?v=2">
   <link rel="stylesheet" href="design-system.css?v=1">
-  <link rel="stylesheet" href="home.css?v=19">
+  <link rel="stylesheet" href="home.css?v=20">
 </head>
 <body class="home-page">
   <button class="menu-button" id="menuButton" aria-label="Abrir menu">☰</button>
   <aside class="sidebar" id="sidebar">
-    <a class="brand" href="index.html"><span class="brand-name">CENTRAL <b>PRO</b><small>SPORTS INTELLIGENCE</small></span></a>
+    <a class="brand" href="index.html" aria-label="Central Pro — Inteligência Esportiva">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 94 54" role="img">
+          <path class="cp-mark-c" d="M39 6H18C10 6 5 11 3 19L0 31c-2 9 3 17 13 17h17l6-10H16c-4 0-6-3-5-7l3-12c1-3 3-4 6-4h24z"/>
+          <path class="cp-mark-p" d="M37 17h36c9 0 14 6 12 14l-1 3c-2 8-8 13-17 13H48l-4 7H31l14-24h23c3 0 5-1 5-3 1-2-1-3-4-3H33z"/>
+          <path class="cp-mark-speed" d="M4 50h7l-2 4H2zm10 0h7l-2 4h-7zm10 0h7l-2 4h-7z"/>
+        </svg>
+      </span>
+      <span class="brand-name"><span>CENTRAL</span> <b>PRO</b><small>INTELIGÊNCIA ESPORTIVA</small></span>
+    </a>
     <div class="user-card"><span class="avatar">S</span><span><strong>Stefani</strong><small>Analista</small></span><span class="status-dot"></span></div>
     <nav class="main-nav"><a class="active" href="index.html"><span>⌂</span>Início</a><a href="games.html"><span>◫</span>Jogos</a><a href="analysis.html"><span>⌁</span>Análises</a><a href="players.html"><span>♙</span>Jogadores</a><a href="opportunities.html"><span>↗</span>Melhores Oportunidades</a><a href="bankroll.html"><span>◈</span>Minha Banca</a><a href="bankroll.html#history"><span>↺</span>Histórico</a><a href="leagues.html"><span>♜</span>Competições</a></nav>
     <div class="sidebar-insight"><strong>CENTRAL PRO</strong><p>Inteligência em cada detalhe, vantagem em cada aposta.</p><span aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></span></div>
@@ -23,6 +32,13 @@
   <div class="app-frame">
     <main class="page-content home-content">
       <section class="page-heading home-hero"><div><p class="eyebrow">VISÃO GERAL</p><h1><span id="homeGreeting">Olá, Stefani!</span> <span class="hero-wave" aria-hidden="true">👋</span></h1><p>Acompanhe os melhores jogos e tendências do futebol de hoje.</p></div><div class="home-hero-side"><div class="header-actions"><span class="header-avatar">S</span><span class="header-user"><strong>Stefani</strong><small>Analista</small></span></div><div class="last-update">Atualizado <strong id="updatedAt">agora</strong></div></div></section>
+      <section class="home-signature" aria-label="Dados que geram vantagem">
+        <div class="home-signature-copy">
+          <p>DADOS QUE<br>GERAM <strong>VANTAGEM.</strong></p>
+          <span>ANÁLISES <i></i> ESTATÍSTICAS <i></i> OPORTUNIDADES</span>
+        </div>
+        <div class="home-signature-data" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      </section>
       <section class="summary-grid home-kpis" aria-label="Resumo do dia">
         <article class="summary-card"><span class="summary-icon green">◫</span><div><small>Jogos hoje</small><strong id="totalGames">—</strong><em id="totalLeagues">Carregando</em></div></article>
         <article class="summary-card"><span class="summary-icon red">●</span><div><small>Jogos ao vivo</small><strong id="liveGames">—</strong><em id="liveLabel">Carregando</em></div></article>
