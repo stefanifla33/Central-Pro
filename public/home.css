@@ -312,3 +312,11 @@
   .home-page .home-signature-data{position:absolute;right:8px;bottom:8px;width:31%;opacity:.28}
   .home-page .home-signature-copy>span{max-width:250px}
 }
+
+/* Correção pontual: dimensões da sidebar somente no mobile. */
+@media(max-width:768px){
+  .home-page .sidebar{width:min(82vw,300px);max-width:none;overflow-x:hidden}
+  .home-page .sidebar .brand{display:flex;width:100%;height:auto;min-height:0;padding:8px 0 6px;align-items:center;justify-content:center}
+  .home-page .sidebar-logo{display:block;width:150px;max-width:70%;height:auto;object-fit:contain;margin:0 auto}
+  .home-page .sidebar .main-nav{padding-top:8px}
+}
