@@ -287,14 +287,8 @@
 }
 
 /* Identidade visual da Home: marca compacta, assinatura editorial e atmosfera. */
-.home-page .sidebar .brand{height:104px;padding:18px 6px;flex-direction:row;justify-content:flex-start;gap:10px;text-align:left}
-.home-page .sidebar .brand-mark{position:relative;width:66px;height:48px;flex:0 0 66px;background:none;clip-path:none;transform:none;filter:none;box-shadow:none}
-.home-page .sidebar .brand-mark:before,.home-page .sidebar .brand-mark:after{display:none}
-.home-page .sidebar .brand-mark svg{display:block;width:100%;height:100%;overflow:visible;filter:drop-shadow(0 5px 12px rgba(0,0,0,.45))}
-.home-page .cp-mark-c{fill:#f5f7f6}.home-page .cp-mark-p,.home-page .cp-mark-speed{fill:#20e887}
-.home-page .sidebar .brand-name{min-width:0;margin:0;font-size:15px!important;font-style:normal;font-weight:900;line-height:1;letter-spacing:-.01em!important;transform:none;white-space:nowrap}
-.home-page .sidebar .brand-name>span{color:#fff}.home-page .sidebar .brand-name b{color:#20e887}
-.home-page .sidebar .brand-name small{margin-top:7px;color:#9ba59f;font-size:6.5px;line-height:1;letter-spacing:.16em;transform:none}
+.home-page .sidebar .brand{height:auto;min-height:104px;padding:10px 0;justify-content:center;overflow:hidden}
+.home-page .sidebar-logo{display:block;width:100%;max-width:208px;height:auto;object-fit:contain;border:0;background:none}
 .home-page .app-frame{background:linear-gradient(180deg,rgba(4,8,6,.84) 0,rgba(5,9,7,.95) 38%,#060807 78%),radial-gradient(ellipse at 75% 4%,rgba(32,232,135,.11),transparent 29%),url("assets/stadium-central-pro.png") center top/cover fixed no-repeat}
 .home-page .app-frame:before{top:0;height:580px;opacity:.3;background:linear-gradient(90deg,transparent 0 74%,rgba(32,232,135,.06)),repeating-linear-gradient(90deg,transparent 0 47px,rgba(32,232,135,.035) 48px,transparent 49px 96px),repeating-linear-gradient(0deg,transparent 0 47px,rgba(32,232,135,.025) 48px,transparent 49px 96px);mask-image:linear-gradient(to bottom,#000,transparent 86%)}
 .home-page .home-signature{position:relative;display:flex;min-height:150px;margin:0 0 18px;padding:24px 28px;overflow:hidden;align-items:center;justify-content:space-between;border:1px solid rgba(123,151,136,.18);border-radius:16px;background:linear-gradient(100deg,rgba(5,10,8,.92),rgba(6,14,10,.75) 58%,rgba(5,12,8,.42));box-shadow:0 18px 42px rgba(0,0,0,.24),inset 0 1px rgba(255,255,255,.025)}
@@ -305,9 +299,8 @@
 .home-page .home-signature-data i{position:relative;z-index:1;flex:1;min-width:4px;border:1px solid rgba(32,232,135,.4);border-bottom:0;background:linear-gradient(180deg,rgba(32,232,135,.7),rgba(32,232,135,.08));box-shadow:0 0 12px rgba(32,232,135,.09)}
 .home-page .home-signature-data i:nth-child(1){height:14%}.home-page .home-signature-data i:nth-child(2){height:24%}.home-page .home-signature-data i:nth-child(3){height:38%}.home-page .home-signature-data i:nth-child(4){height:31%}.home-page .home-signature-data i:nth-child(5){height:55%}.home-page .home-signature-data i:nth-child(6){height:72%}.home-page .home-signature-data i:nth-child(7){height:92%}
 @media(max-width:768px){
-  .home-page .sidebar .brand{height:88px;padding:15px 12px;gap:9px}
-  .home-page .sidebar .brand-mark{width:58px;height:43px;flex-basis:58px}
-  .home-page .sidebar .brand-name{font-size:14px!important}.home-page .sidebar .brand-name small{font-size:6px;letter-spacing:.13em}
+  .home-page .sidebar .brand{height:auto;min-height:88px;padding:8px 0}
+  .home-page .sidebar-logo{width:100%;max-width:208px;height:auto;object-fit:contain}
   .home-page .app-frame{background-attachment:scroll;background-position:center top}
   .home-page .home-signature{min-height:126px;margin-bottom:12px;padding:18px;border-radius:13px}
   .home-page .home-signature-copy p{font-size:clamp(23px,7.3vw,30px)}
