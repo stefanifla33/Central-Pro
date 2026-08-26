@@ -1,4 +1,4 @@
-require("dotenv").config();
+﻿require("dotenv").config();
 
 const express = require("express");
 const path = require("path");
@@ -28,19 +28,19 @@ let cornerRequestQueue = Promise.resolve();
 try {
     periodStore = JSON.parse(fs.readFileSync(SNAPSHOT_FILE, "utf8"));
 } catch (erro) {
-    if (erro.code !== "ENOENT") console.error("Não foi possível ler os snapshots:", erro.message);
+    if (erro.code !== "ENOENT") console.error("NÃ£o foi possÃ­vel ler os snapshots:", erro.message);
 }
 
 try {
     playerHistoryStore = JSON.parse(fs.readFileSync(PLAYER_HISTORY_FILE, "utf8"));
 } catch (erro) {
-    if (erro.code !== "ENOENT") console.error("Não foi possível ler o histórico de jogadores:", erro.message);
+    if (erro.code !== "ENOENT") console.error("NÃ£o foi possÃ­vel ler o histÃ³rico de jogadores:", erro.message);
 }
 
 try {
     cornerHistoryStore = JSON.parse(fs.readFileSync(CORNER_HISTORY_FILE, "utf8"));
 } catch (erro) {
-    if (erro.code !== "ENOENT") console.error("NÃ£o foi possÃ­vel ler o histÃ³rico de escanteios:", erro.message);
+    if (erro.code !== "ENOENT") console.error("NÃƒÂ£o foi possÃƒÂ­vel ler o histÃƒÂ³rico de escanteios:", erro.message);
 }
 
 function persistStore(file, store, label) {
@@ -123,11 +123,11 @@ async function cornerRecord(game) {
 }
 
 /*
- * Histórico individual orientado por PARTIDA.
- * A API-Football fornece todos os jogadores de uma partida em uma única chamada:
- * GET /fixtures/players?fixture={fixtureId}. Não é necessário consultar jogador por jogador.
- * Cada fixture encerrada é persistida por fixtureId e indexada internamente por playerId.
- * getPlayerRecentStats apenas lê o arquivo local; ela nunca realiza chamadas externas.
+ * HistÃ³rico individual orientado por PARTIDA.
+ * A API-Football fornece todos os jogadores de uma partida em uma Ãºnica chamada:
+ * GET /fixtures/players?fixture={fixtureId}. NÃ£o Ã© necessÃ¡rio consultar jogador por jogador.
+ * Cada fixture encerrada Ã© persistida por fixtureId e indexada internamente por playerId.
+ * getPlayerRecentStats apenas lÃª o arquivo local; ela nunca realiza chamadas externas.
  */
 const PLAYER_HISTORY_METRICS = new Set([
     "minutes", "shots.total", "shots.on", "goals", "assists", "tackles",
@@ -279,19 +279,19 @@ function buildPlayerHighlights(positionGroup, markets) {
     });
     const rules = {
         D: [
-            ["offensive_frequency", "Participação ofensiva frequente", "Finalizou em {hits} dos {covered} jogos com dado.", "shotsTotal", s => s.coverage >= 4 && s.frequency.hits >= 4],
-            ["defensive_activity", "Alta participação defensiva", "Média de {average} desarmes nos jogos cobertos.", "tackles", s => s.coverage >= 4 && s.average >= 2],
-            ["duel_fouls", "Participação frequente em disputas", "Cometeu faltas em {hits} de {covered} jogos.", "foulsCommitted", s => s.coverage >= 4 && s.average >= 1.5]
+            ["offensive_frequency", "ParticipaÃ§Ã£o ofensiva frequente", "Finalizou em {hits} dos {covered} jogos com dado.", "shotsTotal", s => s.coverage >= 4 && s.frequency.hits >= 4],
+            ["defensive_activity", "Alta participaÃ§Ã£o defensiva", "MÃ©dia de {average} desarmes nos jogos cobertos.", "tackles", s => s.coverage >= 4 && s.average >= 2],
+            ["duel_fouls", "ParticipaÃ§Ã£o frequente em disputas", "Cometeu faltas em {hits} de {covered} jogos.", "foulsCommitted", s => s.coverage >= 4 && s.average >= 1.5]
         ],
         M: [
             ["fouls_target", "Alvo frequente de faltas", "Sofreu faltas em {hits} de {covered} jogos.", "foulsDrawn", s => s.coverage >= 4 && s.frequency.hits >= 4],
-            ["defensive_activity", "Alta participação defensiva", "Média de {average} desarmes nos jogos cobertos.", "tackles", s => s.coverage >= 4 && s.average >= 2],
-            ["shots_on_target", "Boa frequência de finalizações no alvo", "Acertou o alvo em {hits} de {covered} jogos.", "shotsOnGoal", s => s.coverage >= 4 && s.frequency.hits >= 3]
+            ["defensive_activity", "Alta participaÃ§Ã£o defensiva", "MÃ©dia de {average} desarmes nos jogos cobertos.", "tackles", s => s.coverage >= 4 && s.average >= 2],
+            ["shots_on_target", "Boa frequÃªncia de finalizaÃ§Ãµes no alvo", "Acertou o alvo em {hits} de {covered} jogos.", "shotsOnGoal", s => s.coverage >= 4 && s.frequency.hits >= 3]
         ],
         A: [
-            ["shots_on_target", "Boa frequência de finalizações no alvo", "Acertou o alvo em {hits} de {covered} jogos.", "shotsOnGoal", s => s.coverage >= 4 && s.frequency.hits >= 3],
+            ["shots_on_target", "Boa frequÃªncia de finalizaÃ§Ãµes no alvo", "Acertou o alvo em {hits} de {covered} jogos.", "shotsOnGoal", s => s.coverage >= 4 && s.frequency.hits >= 3],
             ["fouls_target", "Alvo frequente de faltas", "Sofreu faltas em {hits} de {covered} jogos.", "foulsDrawn", s => s.coverage >= 4 && s.frequency.hits >= 4],
-            ["goal_frequency", "Presença frequente em gols", "Marcou em {hits} de {covered} jogos com dado.", "goals", s => s.coverage >= 4 && s.frequency.hits >= 2]
+            ["goal_frequency", "PresenÃ§a frequente em gols", "Marcou em {hits} de {covered} jogos com dado.", "goals", s => s.coverage >= 4 && s.frequency.hits >= 2]
         ],
         G: []
     };
@@ -637,7 +637,7 @@ async function monitorMainLeagues() {
         }
         await collectFinishedPlayerHistory(finished, 2);
     } catch (erro) {
-        console.error("Monitor de períodos:", erro.message);
+        console.error("Monitor de perÃ­odos:", erro.message);
     } finally {
         monitorRunning = false;
     }
@@ -666,11 +666,11 @@ app.get("/api/estatisticas-periodos", async (req, res) => {
     const team = Number.parseInt(req.query.team, 10);
     const fixtureId = Number.parseInt(req.query.fixture, 10);
     const limit = req.query.limit === "10" ? 10 : 5;
-    if (!Number.isInteger(team) || !Number.isInteger(fixtureId)) return res.status(400).json({ erro: "Time ou partida inválida." });
+    if (!Number.isInteger(team) || !Number.isInteger(fixtureId)) return res.status(400).json({ erro: "Time ou partida invÃ¡lida." });
     try {
         const fixtureResponse = await football(`/fixtures?id=${fixtureId}`, 30_000);
         const currentFixture = fixtureResponse.response?.[0];
-        if (!currentFixture) return res.status(404).json({ erro: "Partida não encontrada." });
+        if (!currentFixture) return res.status(404).json({ erro: "Partida nÃ£o encontrada." });
         const fixtureTime = new Date(currentFixture.fixture.date).getTime();
         const metrics = ["Total Shots", "Shots on Goal", "Shots off Goal", "Blocked Shots", "Shots insidebox", "Shots outsidebox"];
         const candidates = Object.values(periodStore.fixtures)
@@ -712,14 +712,14 @@ app.get("/api/estatisticas-periodos", async (req, res) => {
             response: rows
         });
     } catch (erro) {
-        res.status(502).json({ erro: "Estatísticas por período indisponíveis.", detalhe: erro.message });
+        res.status(502).json({ erro: "EstatÃ­sticas por perÃ­odo indisponÃ­veis.", detalhe: erro.message });
     }
 });
 
 app.get("/api/explorer", async (req, res) => {
     const allowed = new Set(["fixtures", "teams", "standings", "players", "leagues"]);
     const endpoint = String(req.query.endpoint || "fixtures").toLowerCase();
-    if (!allowed.has(endpoint)) return res.status(400).json({ erro: "Endpoint não permitido." });
+    if (!allowed.has(endpoint)) return res.status(400).json({ erro: "Endpoint nÃ£o permitido." });
 
     const params = new URLSearchParams();
     for (const [key, value] of Object.entries(req.query)) {
@@ -733,7 +733,7 @@ app.get("/api/explorer", async (req, res) => {
         const dados = await football(cacheKey, 60_000);
         res.json({ endpoint: `/${endpoint}`, parameters: Object.fromEntries(params), cached: wasCached, responseTime: Date.now() - startedAt, data: dados });
     } catch (erro) {
-        res.status(502).json({ erro: "Não foi possível executar o endpoint.", detalhe: erro.message });
+        res.status(502).json({ erro: "NÃ£o foi possÃ­vel executar o endpoint.", detalhe: erro.message });
     }
 });
 
@@ -749,7 +749,7 @@ app.get("/api/jogos", async (req, res) => {
 
     } catch (erro) {
         console.error(erro);
-        res.status(502).json({ erro: "Não foi possível buscar os jogos.", detalhe: erro.message });
+        res.status(502).json({ erro: "NÃ£o foi possÃ­vel buscar os jogos.", detalhe: erro.message });
     }
 });
 
@@ -762,7 +762,7 @@ app.get("/api/times/busca", async (req, res) => {
         const dados = await football(`/teams?search=${encodeURIComponent(search)}`, 3_600_000);
         res.json({ query: search, response: (dados.response || []).slice(0, 30) });
     } catch (erro) {
-        res.status(502).json({ erro: "Não foi possível buscar os times.", detalhe: erro.message });
+        res.status(502).json({ erro: "NÃ£o foi possÃ­vel buscar os times.", detalhe: erro.message });
     }
 });
 
@@ -781,13 +781,13 @@ app.get("/api/times/favoritos", async (req, res) => {
         }));
         res.json({ response: settled.filter(x => x.status === "fulfilled" && x.value).map(x => x.value) });
     } catch (erro) {
-        res.status(502).json({ erro: "Não foi possível carregar seus times.", detalhe: erro.message });
+        res.status(502).json({ erro: "NÃ£o foi possÃ­vel carregar seus times.", detalhe: erro.message });
     }
 });
 
 app.get("/api/times/:id", async (req, res) => {
     const id = Number.parseInt(req.params.id, 10);
-    if (!Number.isInteger(id)) return res.status(400).json({ erro: "ID do time inválido." });
+    if (!Number.isInteger(id)) return res.status(400).json({ erro: "ID do time invÃ¡lido." });
     try {
         const [details, recent, upcoming] = await Promise.all([
             football(`/teams?id=${id}`, 21_600_000),
@@ -795,7 +795,7 @@ app.get("/api/times/:id", async (req, res) => {
             football(`/fixtures?team=${id}&next=10&timezone=${encodeURIComponent(APP_TIMEZONE)}`, 900_000)
         ]);
         const item = details.response?.[0];
-        if (!item) return res.status(404).json({ erro: "Time não encontrado." });
+        if (!item) return res.status(404).json({ erro: "Time nÃ£o encontrado." });
 
         const seasons = [...new Set((recent.response || []).map(game => game.league.season).filter(Number.isInteger))];
         const season = seasons[0] || new Date().getFullYear();
@@ -808,7 +808,7 @@ app.get("/api/times/:id", async (req, res) => {
         }
         res.json({ ...item, season, recent: recent.response || [], upcoming: upcoming.response || [], squad });
     } catch (erro) {
-        res.status(502).json({ erro: "Não foi possível carregar o time.", detalhe: erro.message });
+        res.status(502).json({ erro: "NÃ£o foi possÃ­vel carregar o time.", detalhe: erro.message });
     }
 });
 
@@ -821,7 +821,7 @@ app.get("/api/jogadores/busca", async (req, res) => {
         const dados = await football(`/players/profiles?search=${encodeURIComponent(search)}`, 3_600_000);
         res.json({ query: search, response: (dados.response || []).slice(0, 30) });
     } catch (erro) {
-        res.status(502).json({ erro: "Não foi possível buscar os jogadores.", detalhe: erro.message });
+        res.status(502).json({ erro: "NÃ£o foi possÃ­vel buscar os jogadores.", detalhe: erro.message });
     }
 });
 
@@ -829,7 +829,7 @@ app.get("/api/jogadores/:id", async (req, res) => {
     const id = Number.parseInt(req.params.id, 10);
     const season = Number.parseInt(req.query.season, 10) || new Date().getFullYear();
     if (!Number.isInteger(id) || season < 2000 || season > 2100) {
-        return res.status(400).json({ erro: "Jogador ou temporada inválida." });
+        return res.status(400).json({ erro: "Jogador ou temporada invÃ¡lida." });
     }
     try {
         const [profileResult, statsResult, transfersResult] = await Promise.allSettled([
@@ -840,7 +840,7 @@ app.get("/api/jogadores/:id", async (req, res) => {
         const profile = profileResult.status === "fulfilled" ? profileResult.value.response?.[0]?.player : null;
         const seasonal = statsResult.status === "fulfilled" ? statsResult.value.response?.[0] : null;
         const player = seasonal?.player || profile;
-        if (!player) return res.status(404).json({ erro: "Jogador não encontrado." });
+        if (!player) return res.status(404).json({ erro: "Jogador nÃ£o encontrado." });
         res.json({
             player,
             season,
@@ -848,13 +848,13 @@ app.get("/api/jogadores/:id", async (req, res) => {
             transfers: transfersResult.status === "fulfilled" ? transfersResult.value.response?.[0]?.transfers || [] : []
         });
     } catch (erro) {
-        res.status(502).json({ erro: "Não foi possível carregar o jogador.", detalhe: erro.message });
+        res.status(502).json({ erro: "NÃ£o foi possÃ­vel carregar o jogador.", detalhe: erro.message });
     }
 });
 
 app.get("/api/partidas/:id", async (req, res) => {
     const id = Number.parseInt(req.params.id, 10);
-    if (!Number.isInteger(id)) return res.status(400).json({ erro: "ID da partida inválido." });
+    if (!Number.isInteger(id)) return res.status(400).json({ erro: "ID da partida invÃ¡lido." });
 
     try {
         const [fixture, statistics, events, lineups] = await Promise.all([
@@ -872,18 +872,18 @@ app.get("/api/partidas/:id", async (req, res) => {
         });
     } catch (erro) {
         console.error(erro);
-        res.status(502).json({ erro: "Não foi possível buscar os detalhes da partida.", detalhe: erro.message });
+        res.status(502).json({ erro: "NÃ£o foi possÃ­vel buscar os detalhes da partida.", detalhe: erro.message });
     }
 });
 
 app.get("/api/partidas/:id/jogadores", async (req, res) => {
-    if (!/^\d+$/.test(req.params.id)) return res.status(400).json({ status: "error", erro: "ID da partida inválido." });
+    if (!/^\d+$/.test(req.params.id)) return res.status(400).json({ status: "error", erro: "ID da partida invÃ¡lido." });
     const id = Number(req.params.id);
-    if (!Number.isSafeInteger(id) || id <= 0) return res.status(400).json({ status: "error", erro: "ID da partida inválido." });
+    if (!Number.isSafeInteger(id) || id <= 0) return res.status(400).json({ status: "error", erro: "ID da partida invÃ¡lido." });
     try {
         const fixtureData = await football(`/fixtures?id=${id}`, 30_000);
         const fixture = fixtureData.response?.[0];
-        if (!fixture || fixture.fixture?.id !== id) return res.status(404).json({ status: "error", erro: "Partida não encontrada." });
+        if (!fixture || fixture.fixture?.id !== id) return res.status(404).json({ status: "error", erro: "Partida nÃ£o encontrada." });
 
         const endpoint = `/fixtures/lineups?fixture=${id}`;
         const now = Date.now();
@@ -1009,13 +1009,13 @@ app.get("/api/partidas/:id/jogadores", async (req, res) => {
         res.json({ fixture, fixtureId: id, status, lineupStatus, lineupSource, lineupCacheState, lineups, probableTeams, playerStatsTeams, matchPlayerStats: matchPlayers.response || [], playerStatsDiagnostics, additionalStatsCalls, updatedAt, cached: lineupCacheState === "hit", refreshAllowedIn: force || !refreshRequested ? 0 : Math.ceil((20_000 - (now - lastRefresh)) / 1000) });
     } catch (erro) {
         console.error(`[LINEUP] fixture=${id} status=error message=${erro.message}`);
-        res.status(502).json({ fixtureId: id, status: "error", erro: "Não foi possível atualizar a escalação." });
+        res.status(502).json({ fixtureId: id, status: "error", erro: "NÃ£o foi possÃ­vel atualizar a escalaÃ§Ã£o." });
     }
 });
 
 app.get("/api/partidas/:id/analise", async (req, res) => {
     const id = Number.parseInt(req.params.id, 10);
-    if (!Number.isInteger(id)) return res.status(400).json({ erro: "ID da partida inválido." });
+    if (!Number.isInteger(id)) return res.status(400).json({ erro: "ID da partida invÃ¡lido." });
     const sample = req.query.sample === "10" ? 10 : 5;
     const venue = ["home-away", "home", "away"].includes(req.query.venue) ? req.query.venue : "home-away";
     const scope = req.query.scope === "league" ? "league" : "all";
@@ -1042,7 +1042,7 @@ app.get("/api/partidas/:id/analise", async (req, res) => {
         } else {
             const base = await football(`/fixtures?id=${id}`, 30_000);
             fixture = base.response?.[0];
-            if (!fixture) return res.status(404).json({ erro: "Partida não encontrada." });
+            if (!fixture) return res.status(404).json({ erro: "Partida nÃ£o encontrada." });
         }
 
         const { home, away } = fixture.teams;
@@ -1050,11 +1050,11 @@ app.get("/api/partidas/:id/analise", async (req, res) => {
         const historySize = venue === "home-away" && scope === "all" ? sample : Math.min(30, sample * 3);
 
         // No scanner da Home/Oportunidades, a amostra recente precisa continuar
-        // válida quando uma temporada acabou de começar. Buscamos uma janela maior
-        // na MESMA competição: temporada atual primeiro e, se necessário, a anterior.
-        // O cálculo exibido continua usando somente os `sample` jogos mais recentes.
+        // vÃ¡lida quando uma temporada acabou de comeÃ§ar. Buscamos uma janela maior
+        // na MESMA competiÃ§Ã£o: temporada atual primeiro e, se necessÃ¡rio, a anterior.
+        // O cÃ¡lculo exibido continua usando somente os `sample` jogos mais recentes.
         const scannerLeagueHistory = async (teamId) => {
-            const candidateLimit = Math.max(15, sample * 3);
+            const candidateLimit = Math.max(30, sample * 3);
             const seasons = [season, season - 1];
             const settled = await Promise.allSettled(seasons.map(seasonValue =>
                 football(`/fixtures?team=${teamId}&league=${leagueId}&season=${seasonValue}&last=${candidateLimit}&timezone=${encodeURIComponent(APP_TIMEZONE)}`, 900_000)
@@ -1106,11 +1106,11 @@ app.get("/api/partidas/:id/analise", async (req, res) => {
         if (rejectedHistory.length) {
             console.warn(`[MATCH-ANALYSIS] fixture=${id} failed=${rejectedHistory.join(",")}`);
             return res.status(502).json({
-                erro: "Histórico recente indisponível. Tente novamente em instantes.",
+                erro: "HistÃ³rico recente indisponÃ­vel. Tente novamente em instantes.",
                 diagnostics
             });
         }
-        const selectHistory = (games, team, side) => {
+        const selectHistory = (games, team, side, limit = sample) => {
             const seen = new Set();
             return (games || [])
                 .filter(game => game?.fixture?.id !== id)
@@ -1126,12 +1126,23 @@ app.get("/api/partidas/:id/analise", async (req, res) => {
                     return side === "home" ? isHome : !isHome;
                 })
                 .sort((a, b) => new Date(b.fixture.date) - new Date(a.fixture.date))
-                .slice(0, sample);
+                .slice(0, Math.max(1, Number(limit) || sample));
         };
         const homeSide = venue === "away" ? "away" : "home";
         const awaySide = venue === "home" ? "home" : "away";
         const homeRecent = selectHistory(response[1] || [], home, homeSide);
         const awayRecent = selectHistory(response[2] || [], away, awaySide);
+
+        const parallelRecent = {
+            l5: {
+                home: selectHistory(response[1] || [], home, homeSide, 5),
+                away: selectHistory(response[2] || [], away, awaySide, 5)
+            },
+            l10: {
+                home: selectHistory(response[1] || [], home, homeSide, 10),
+                away: selectHistory(response[2] || [], away, awaySide, 10)
+            }
+        };
         if (scannerMode) {
             const auditGame = (game, teamId) => {
                 const isHome = Number(game.teams?.home?.id) === Number(teamId);
@@ -1191,25 +1202,43 @@ app.get("/api/partidas/:id/analise", async (req, res) => {
             awayTeamStats: response[5] || null,
             filters: { sample, venue, scope, mode: scannerMode ? "scanner" : "full" },
             coverage: { home: homeRecent.length, away: awayRecent.length },
+            parallelSamples: {
+                l5: {
+                    homeRecent: parallelRecent.l5.home,
+                    awayRecent: parallelRecent.l5.away,
+                    coverage: {
+                        home: parallelRecent.l5.home.length,
+                        away: parallelRecent.l5.away.length
+                    }
+                },
+                l10: {
+                    homeRecent: parallelRecent.l10.home,
+                    awayRecent: parallelRecent.l10.away,
+                    coverage: {
+                        home: parallelRecent.l10.home.length,
+                        away: parallelRecent.l10.away.length
+                    }
+                }
+            },
             sampleContext: {
                 home: sampleContext(homeRecent),
                 away: sampleContext(awayRecent),
                 transitionSeason: sampleContext(homeRecent).transitionSeason || sampleContext(awayRecent).transitionSeason,
                 currentSeason: season,
                 previousSeason: season - 1,
-                rule: "mesma competição; temporada atual priorizada; anterior apenas para completar os jogos recentes"
+                rule: "mesma competiÃ§Ã£o; temporada atual priorizada; anterior apenas para completar os jogos recentes"
             },
             diagnostics
         });
     } catch (erro) {
         console.error(erro);
-        res.status(502).json({ erro: "Não foi possível gerar a análise da partida.", detalhe: erro.message });
+        res.status(502).json({ erro: "NÃ£o foi possÃ­vel gerar a anÃ¡lise da partida.", detalhe: erro.message });
     }
 });
 
 app.get("/api/partidas/:id/estatisticas-avancadas", async (req, res) => {
     const id = Number.parseInt(req.params.id, 10);
-    if (!Number.isInteger(id)) return res.status(400).json({ erro: "ID da partida inválido." });
+    if (!Number.isInteger(id)) return res.status(400).json({ erro: "ID da partida invÃ¡lido." });
     const sample = req.query.sample === "10" ? 10 : 5;
     const venue = req.query.venue === "home" ? "home" : "home-away";
     const scope = req.query.scope === "league" ? "league" : "all";
@@ -1217,7 +1246,7 @@ app.get("/api/partidas/:id/estatisticas-avancadas", async (req, res) => {
     try {
         const base = await football(`/fixtures?id=${id}`, 30_000);
         const fixture = base.response?.[0];
-        if (!fixture) return res.status(404).json({ erro: "Partida não encontrada." });
+        if (!fixture) return res.status(404).json({ erro: "Partida nÃ£o encontrada." });
 
         const teams = [fixture.teams.home, fixture.teams.away];
         const historySize = 30;
@@ -1285,25 +1314,25 @@ app.get("/api/partidas/:id/estatisticas-avancadas", async (req, res) => {
         const allAttempts = [...homeResult.attempts, ...awayResult.attempts];
         const allExternalRequestsRejected = allAttempts.length > 0 && allAttempts.every(row => row.errorCode === "request_failed");
         if (allExternalRequestsRejected) return res.status(502).json({
-            erro: "Estatísticas avançadas temporariamente indisponíveis.",
+            erro: "EstatÃ­sticas avanÃ§adas temporariamente indisponÃ­veis.",
             diagnostics
         });
         res.json({ sample, venue, scope, home, away, coverage: { home: homeCovered, away: awayCovered }, diagnostics });
     } catch (erro) {
         console.error(erro);
-        res.status(502).json({ erro: "Estatísticas avançadas indisponíveis.", detalhe: erro.message });
+        res.status(502).json({ erro: "EstatÃ­sticas avanÃ§adas indisponÃ­veis.", detalhe: erro.message });
     }
 });
 
 app.get("/api/partidas/:id/cartoes", async (req, res) => {
     const id = Number.parseInt(req.params.id, 10);
-    if (!Number.isInteger(id)) return res.status(400).json({ erro: "ID da partida inválido." });
+    if (!Number.isInteger(id)) return res.status(400).json({ erro: "ID da partida invÃ¡lido." });
     const sample = 5;
     const historyLimit = 30;
     try {
         const fixtureResponse = await football(`/fixtures?id=${id}`, 30_000);
         const fixture = fixtureResponse.response?.[0];
-        if (!fixture) return res.status(404).json({ erro: "Partida não encontrada." });
+        if (!fixture) return res.status(404).json({ erro: "Partida nÃ£o encontrada." });
         const fixtureTime = new Date(fixture.fixture.date).getTime();
         const teams = [fixture.teams.home, fixture.teams.away];
         const histories = await Promise.all(teams.map(team => football(
@@ -1374,7 +1403,7 @@ app.get("/api/partidas/:id/cartoes", async (req, res) => {
                         diagnostics.periodCoverage++;
                     } else diagnostics.periodMismatches++;
                 } catch (error) {
-                    // O total permanece válido; somente a cobertura por período fica ausente.
+                    // O total permanece vÃ¡lido; somente a cobertura por perÃ­odo fica ausente.
                     diagnostics.eventFailedRequests++;
                 }
                 rows.push({
@@ -1399,7 +1428,7 @@ app.get("/api/partidas/:id/cartoes", async (req, res) => {
         const requested = homeResult.diagnostics.requested + awayResult.diagnostics.requested;
         const failedRequests = homeResult.diagnostics.failedRequests + awayResult.diagnostics.failedRequests;
         if (requested > 0 && failedRequests === requested) return res.status(502).json({
-            erro: "Histórico de cartões temporariamente indisponível.",
+            erro: "HistÃ³rico de cartÃµes temporariamente indisponÃ­vel.",
             diagnostics: { home: homeResult.diagnostics, away: awayResult.diagnostics }
         });
         res.json({
@@ -1413,8 +1442,8 @@ app.get("/api/partidas/:id/cartoes", async (req, res) => {
             source: "fixture-statistics-and-events"
         });
     } catch (erro) {
-        console.error("Histórico de cartões:", erro.message);
-        res.status(502).json({ erro: "Histórico de cartões indisponível.", detalhe: erro.message });
+        console.error("HistÃ³rico de cartÃµes:", erro.message);
+        res.status(502).json({ erro: "HistÃ³rico de cartÃµes indisponÃ­vel.", detalhe: erro.message });
     }
 });
 
@@ -1422,16 +1451,16 @@ app.get("/api/partidas/:id/escanteios", async (req, res) => {
     const id = Number.parseInt(req.params.id, 10);
     const homeId = Number.parseInt(req.query.home, 10);
     const awayId = Number.parseInt(req.query.away, 10);
-    if (![id, homeId, awayId].every(Number.isInteger)) return res.status(400).json({ erro: "Partida ou times invÃ¡lidos." });
+    if (![id, homeId, awayId].every(Number.isInteger)) return res.status(400).json({ erro: "Partida ou times invÃƒÂ¡lidos." });
     const sample = 5;
     const historyLimit = 30;
     try {
         const startedAt = Date.now();
         const fixtureResponse = await cornerFootball(`/fixtures?id=${id}`, 30_000);
         const currentFixture = fixtureResponse.response?.[0];
-        if (!currentFixture) return res.status(404).json({ erro: "Partida não encontrada." });
+        if (!currentFixture) return res.status(404).json({ erro: "Partida nÃ£o encontrada." });
         if (currentFixture.teams.home.id !== homeId || currentFixture.teams.away.id !== awayId) {
-            return res.status(400).json({ erro: "Times informados não correspondem à partida." });
+            return res.status(400).json({ erro: "Times informados nÃ£o correspondem Ã  partida." });
         }
         const fixtureTime = new Date(currentFixture.fixture.date).getTime();
         const [homeHistory, awayHistory] = await Promise.all([
@@ -1525,8 +1554,8 @@ app.get("/api/partidas/:id/escanteios", async (req, res) => {
             source: "persistent-fixture-statistics-cache"
         });
     } catch (erro) {
-        console.error("HistÃ³rico de escanteios:", erro.message);
-        res.status(502).json({ erro: "HistÃ³rico de escanteios indisponÃ­vel.", detalhe: erro.message });
+        console.error("HistÃƒÂ³rico de escanteios:", erro.message);
+        res.status(502).json({ erro: "HistÃƒÂ³rico de escanteios indisponÃƒÂ­vel.", detalhe: erro.message });
     }
 });
 
@@ -1534,7 +1563,7 @@ app.get("/api/historico-jogadores/recentes", (req, res) => {
     const metric = String(req.query.metric || "shots.on");
     const limit = Math.min(10, Math.max(1, Number(req.query.limit) || 5));
     const playerIds = String(req.query.players || "").split(",").map(Number).filter(Number.isSafeInteger).slice(0, 150);
-    if (!PLAYER_HISTORY_METRICS.has(metric)) return res.status(400).json({ erro: "Métrica de jogador inválida." });
+    if (!PLAYER_HISTORY_METRICS.has(metric)) return res.status(400).json({ erro: "MÃ©trica de jogador invÃ¡lida." });
     res.json({
         metric,
         limit,
@@ -1546,7 +1575,7 @@ app.get("/api/historico-jogadores/recentes", (req, res) => {
 
 app.get("/api/historico-jogadores/piloto", async (req, res) => {
     const fixtureId = Number(req.query.fixture);
-    if (!Number.isSafeInteger(fixtureId) || fixtureId <= 0) return res.status(400).json({ erro: "Partida piloto inválida." });
+    if (!Number.isSafeInteger(fixtureId) || fixtureId <= 0) return res.status(400).json({ erro: "Partida piloto invÃ¡lida." });
     const externalStart = metrics.externalRequests;
     const cacheStart = metrics.cacheHits;
     let persistentHits = 0;
@@ -1562,7 +1591,7 @@ app.get("/api/historico-jogadores/piloto", async (req, res) => {
     try {
         const currentData = await budgetedFootball(`/fixtures?id=${fixtureId}`, 30_000);
         const current = currentData?.response?.[0];
-        if (!current) return res.status(404).json({ erro: "Partida piloto não encontrada." });
+        if (!current) return res.status(404).json({ erro: "Partida piloto nÃ£o encontrada." });
         const historyByTeam = [];
         for (const team of [current.teams.home, current.teams.away]) {
             const history = await budgetedFootball(`/fixtures?team=${team.id}&last=30&timezone=${encodeURIComponent(APP_TIMEZONE)}`, 900_000);
@@ -1634,7 +1663,7 @@ app.get("/api/historico-jogadores/piloto", async (req, res) => {
             }
         });
     } catch (erro) {
-        res.status(502).json({ erro: "Não foi possível construir o piloto de histórico.", detalhe: erro.message, externalRequests: metrics.externalRequests - externalStart, maxExternalRequests: 10 });
+        res.status(502).json({ erro: "NÃ£o foi possÃ­vel construir o piloto de histÃ³rico.", detalhe: erro.message, externalRequests: metrics.externalRequests - externalStart, maxExternalRequests: 10 });
     }
 });
 
@@ -1643,12 +1672,12 @@ app.get("/api/partidas/:id/jogadores-recentes", async (req, res) => {
     const externalStart = metrics.externalRequests;
     const cacheStart = metrics.cacheHits;
     let stage = "validation";
-    if (!Number.isSafeInteger(fixtureId) || fixtureId <= 0) return res.status(400).json({ erro: "Partida inválida." });
+    if (!Number.isSafeInteger(fixtureId) || fixtureId <= 0) return res.status(400).json({ erro: "Partida invÃ¡lida." });
     try {
         stage = "fixture";
         const fixtureData = await football(`/fixtures?id=${fixtureId}`, 30_000);
         const fixture = fixtureData.response?.[0];
-        if (!fixture) return res.status(404).json({ erro: "Partida não encontrada." });
+        if (!fixture) return res.status(404).json({ erro: "Partida nÃ£o encontrada." });
         const before = fixture.fixture.date;
         const beforeTime = new Date(before).getTime();
         stage = "lineups";
@@ -1685,8 +1714,8 @@ app.get("/api/partidas/:id/jogadores-recentes", async (req, res) => {
             fixture,
             teams,
             selection: {
-                participation: "minutes > 0 em fixture anterior e concluída",
-                markets: "média, frequência, minutos e cobertura; sem score composto",
+                participation: "minutes > 0 em fixture anterior e concluÃ­da",
+                markets: "mÃ©dia, frequÃªncia, minutos e cobertura; sem score composto",
                 maximumPerMarket: 5,
                 candidateWindow: 30,
                 crossCompetitionAndSeason: true
@@ -1697,7 +1726,7 @@ app.get("/api/partidas/:id/jogadores-recentes", async (req, res) => {
         });
     } catch (erro) {
         console.error(`[PLAYER-HISTORY-ERROR] fixture=${fixtureId} stage=${stage} error=${erro.message}\n${erro.stack || ""}`);
-        res.status(502).json({ erro: "Histórico recente de jogadores indisponível.", detalhe: erro.message });
+        res.status(502).json({ erro: "HistÃ³rico recente de jogadores indisponÃ­vel.", detalhe: erro.message });
     }
 });
 
@@ -1705,15 +1734,15 @@ app.get("/api/jogadores/:id/recentes", async (req, res) => {
     const playerId = Number(req.params.id);
     const fixtureId = Number(req.query.fixture);
     if (!Number.isSafeInteger(playerId) || playerId <= 0 || !Number.isSafeInteger(fixtureId) || fixtureId <= 0) {
-        return res.status(400).json({ erro: "Jogador e fixture de referência são obrigatórios." });
+        return res.status(400).json({ erro: "Jogador e fixture de referÃªncia sÃ£o obrigatÃ³rios." });
     }
     try {
         const fixtureData = await football(`/fixtures?id=${fixtureId}`, 30_000);
         const fixture = fixtureData.response?.[0];
-        if (!fixture) return res.status(404).json({ erro: "Partida de referência não encontrada." });
+        if (!fixture) return res.status(404).json({ erro: "Partida de referÃªncia nÃ£o encontrada." });
         const team = [fixture.teams.home, fixture.teams.away].find(item => Object.values(playerHistoryStore.fixtures)
             .some(record => Number(record.players?.[playerId]?.teamId) === Number(item.id)));
-        if (!team) return res.status(404).json({ erro: "Jogador sem histórico nos times da partida." });
+        if (!team) return res.status(404).json({ erro: "Jogador sem histÃ³rico nos times da partida." });
         const payload = buildPlayerRecentPayload(playerId, team.id, fixture.fixture.date, 5);
         const referenceTime = new Date(fixture.fixture.date).getTime();
         const referenceStatus = fixture.fixture.status?.short;
@@ -1728,7 +1757,7 @@ app.get("/api/jogadores/:id/recentes", async (req, res) => {
             source: "persistent-fixture-player-cache"
         });
     } catch (erro) {
-        res.status(502).json({ erro: "Histórico do jogador indisponível.", detalhe: erro.message });
+        res.status(502).json({ erro: "HistÃ³rico do jogador indisponÃ­vel.", detalhe: erro.message });
     }
 });
 
@@ -1741,31 +1770,31 @@ app.get("/api/ligas", async (req, res) => {
         const ligas = [...new Map((dados.response || []).map(item => [item.league.id, item.league])).values()];
         res.json({ response: ligas });
     } catch (erro) {
-        res.status(502).json({ erro: "Não foi possível buscar as ligas.", detalhe: erro.message });
+        res.status(502).json({ erro: "NÃ£o foi possÃ­vel buscar as ligas.", detalhe: erro.message });
     }
 });
 
 app.get("/api/ligas/:id/classificacao", async (req, res) => {
     const league = Number.parseInt(req.params.id, 10);
     const season = Number.parseInt(req.query.season, 10);
-    if (!Number.isInteger(league) || !Number.isInteger(season)) return res.status(400).json({ erro: "Liga ou temporada inválida." });
+    if (!Number.isInteger(league) || !Number.isInteger(season)) return res.status(400).json({ erro: "Liga ou temporada invÃ¡lida." });
     try {
         const dados = await football(`/standings?league=${league}&season=${season}`, 3_600_000);
         res.json(dados);
     } catch (erro) {
-        res.status(502).json({ erro: "Classificação indisponível para esta liga.", detalhe: erro.message });
+        res.status(502).json({ erro: "ClassificaÃ§Ã£o indisponÃ­vel para esta liga.", detalhe: erro.message });
     }
 });
 
 app.get("/api/ligas/:id/artilheiros", async (req, res) => {
     const league = Number.parseInt(req.params.id, 10);
     const season = Number.parseInt(req.query.season, 10);
-    if (!Number.isInteger(league) || !Number.isInteger(season)) return res.status(400).json({ erro: "Liga ou temporada inválida." });
+    if (!Number.isInteger(league) || !Number.isInteger(season)) return res.status(400).json({ erro: "Liga ou temporada invÃ¡lida." });
     try {
         const dados = await football(`/players/topscorers?league=${league}&season=${season}`, 3_600_000);
         res.json(dados);
     } catch (erro) {
-        res.status(502).json({ erro: "Artilheiros indisponíveis para esta liga.", detalhe: erro.message });
+        res.status(502).json({ erro: "Artilheiros indisponÃ­veis para esta liga.", detalhe: erro.message });
     }
 });
 
@@ -1780,3 +1809,5 @@ function startServer() {
 if (require.main === module) startServer();
 
 module.exports = app;
+
+
