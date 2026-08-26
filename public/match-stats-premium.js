@@ -7,7 +7,31 @@ const json=url=>{if(requestCache.has(url))return requestCache.get(url);const req
 const generalKey=()=>`${id}|${currentSample}|${currentVenue}|${currentScope}`;
 const generalResources=()=>{const f=statisticsInfo.fixture;return{shots:json(`/api/partidas/${id}/estatisticas-avancadas?sample=${currentSample}&venue=${currentVenue}&scope=${currentScope}`),corners:json(`/api/partidas/${id}/escanteios?sample=${currentSample}&home=${f.teams.home.id}&away=${f.teams.away.id}`),cards:json(`/api/partidas/${id}/cartoes`),homePeriods:json(`/api/estatisticas-periodos?team=${f.teams.home.id}&fixture=${f.fixture.id}&limit=${currentSample}`),awayPeriods:json(`/api/estatisticas-periodos?team=${f.teams.away.id}&fixture=${f.fixture.id}&limit=${currentSample}`)}};
 const generalData=()=>{const key=generalKey();if(generalDataCache.has(key))return generalDataCache.get(key);const resources=generalResources(),request=Promise.all([resources.shots,resources.corners,resources.cards,Promise.all([resources.homePeriods,resources.awayPeriods])]).catch(error=>{generalDataCache.delete(key);throw error});generalDataCache.set(key,request);return request};
-function row(label,h,a,percent=false,hn='',an='',track=true,key=''){const max=Math.max(...[h,a].filter(finite),1),bar=v=>finite(v)?Math.min(100,Math.max(0,v/max*100)):0;if(track)metrics.push({label,home:h,away:a,percent});return `<div class="cp-compare-row"${key?` data-general-slot="${key}"`:''}><div class="cp-compare-side home"><b>${percent?pct(h):dec(h)}</b><span><i style="width:${bar(h)}%"></i></span><small>${safe(hn)}</small></div><strong>${safe(label)}</strong><div class="cp-compare-side away"><span><i style="width:${bar(a)}%"></i></span><b>${percent?pct(a):dec(a)}</b><small>${safe(an)}</small></div></div>`}
+function row(label,h,a,percent=false,hn='',an='',track=true,key=''){
+const protectedMetrics=new Set([
+'Finaliza\u00e7\u00f5es',
+'Chutes no gol',
+'Para fora',
+'Bloqueados',
+'Dentro da \u00e1rea',
+'Fora da \u00e1rea',
+'Precis\u00e3o',
+'Escanteios',
+'M\u00e9dia a favor',
+'M\u00e9dia contra',
+'M\u00e9dia total',
+'M\u00e9dia de escanteios'
+]);
+const coverage=text=>{const m=String(text||'').match(/^(\d+)\/(\d+)$/);return m?{n:Number(m[1]),total:Number(m[2])}:null};
+const hc=coverage(hn),ac=coverage(an),protect=protectedMetrics.has(label);
+const state=c=>!protect||!c?null:c.n===0?'Sem dados':c.n<3?'Amostra insuficiente':null;
+const hs=state(hc),as=state(ac);
+const hv=hs?null:h,av=as?null:a;
+const hnote=hs?`${hs} · ${hn}`:hn,anote=as?`${as} · ${an}`:an;
+const max=Math.max(...[hv,av].filter(finite),1),bar=v=>finite(v)?Math.min(100,Math.max(0,v/max*100)):0;
+if(track)metrics.push({label,home:hv,away:av,percent});
+return `<div class="cp-compare-row"${key?` data-general-slot="${key}"`:''}><div class="cp-compare-side home"><b>${hs?'—':percent?pct(hv):dec(hv)}</b><span><i style="width:${bar(hv)}%"></i></span><small>${safe(hnote)}</small></div><strong>${safe(label)}</strong><div class="cp-compare-side away"><span><i style="width:${bar(av)}%"></i></span><b>${as?'—':percent?pct(av):dec(av)}</b><small>${safe(anote)}</small></div></div>`
+}
 function head(){const f=statisticsInfo.fixture;return `<div class="compare-head"><div class="compare-team"><img src="${safe(f.teams.home.logo)}">${safe(f.teams.home.name)}</div><div class="compare-vs">MÉDIAS POR JOGO</div><div class="compare-team">${safe(f.teams.away.name)}<img src="${safe(f.teams.away.logo)}"></div></div>`}
 function block(rows,ok){return ok?`<div class="cp-metric-stack">${rows}</div>`:'<div class="cp-unavailable"><b>Dados reais indisponíveis</b><span>Este período não possui cobertura válida.</span></div>'}
 function panel(label,rows,ok,note=''){return `<section class="cp-period-panel"><header><strong>${label}</strong><span>Médias por jogo</span></header>${block(rows,ok)}${note?`<small class="cp-period-note">${safe(note)}</small>`:''}</section>`}

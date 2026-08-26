@@ -10,7 +10,7 @@ function dashboardSearchText(game){return[game.league?.name,game.league?.country
 function isRelevantSeniorGame(game){return!YOUTH_PATTERN.test(dashboardSearchText(game))}
 function competitionPriority(game){const league=`${game.league?.name||''} ${game.league?.country||''}`;if(CP_MAIN_LEAGUES.has(game.league?.id))return 1000;if(CONTINENTAL_PATTERN.test(league))return 800;if(CUP_PATTERN.test(league))return 600;if(FIRST_DIVISION_PATTERN.test(league))return 500;if(SECOND_DIVISION_PATTERN.test(league))return 350;return 100}
 function dashboardLiveGames(games){return games.filter(cpIsLive).filter(isRelevantSeniorGame).sort((a,b)=>competitionPriority(b)-competitionPriority(a)||new Date(a.fixture.date)-new Date(b.fixture.date))}
-const DASHBOARD_SNAPSHOT_VERSION=2;
+const DASHBOARD_SNAPSHOT_VERSION=3;
 function dashboardSnapshot(date){try{const snapshot=JSON.parse(localStorage.getItem('centralPro.opportunities.v1')),generated=Date.parse(snapshot?.generatedAt),fresh=Number.isFinite(generated)&&Date.now()-generated<172800000;if(snapshot?.version!==DASHBOARD_SNAPSHOT_VERSION||snapshot.date!==date||!fresh||!Array.isArray(snapshot.games))return{version:DASHBOARD_SNAPSHOT_VERSION,date,games:[]};return snapshot}catch{return{version:DASHBOARD_SNAPSHOT_VERSION,date,games:[]}}}
 function dashboardAnalysisIds(snapshot){return new Set(snapshot.games.map(game=>Number(game.fixture?.id)).filter(Number.isFinite))}
 function dashboardOpportunityRows(snapshot){return snapshot.games.flatMap(game=>Object.entries(DASHBOARD_OPPORTUNITY_MARKETS).map(([key,market])=>{const metric=game.metrics?.[key];if(!metric||metric.total<market.minimum||metric.value<70)return null;return{game,key,market,metric,strong:metric.value>=80,sampleQuality:Math.min(metric.total/market.minimum,1)}}).filter(Boolean)).sort((a,b)=>Number(b.strong)-Number(a.strong)||b.metric.value-a.metric.value||b.sampleQuality-a.sampleQuality||b.metric.total-a.metric.total||new Date(a.game.fixture.date)-new Date(b.game.fixture.date))}
@@ -28,6 +28,23 @@ function dashboardParallelGoalMetrics(data){
     }));
   };
   return {l5:build(windows.l5,false),l10:build(windows.l10,true)};
+}
+function dashboardVenueGoalMetrics(data){
+  const windows=data?.venueSamples||{};
+  const buildSide=(games,side,useEvidence=false)=>{
+    if(!Array.isArray(games)||!games.length)return null;
+    const calculated=fixtureGoalMetrics({...data,homeRecent:side==='home'?games:[],awayRecent:side==='away'?games:[]});
+    if(!calculated)return null;
+    return Object.fromEntries(Object.keys(DASHBOARD_OPPORTUNITY_MARKETS).map(key=>{
+      const raw=calculated[key],metric=useEvidence?(raw?.evidence||raw):raw;
+      return [key,metric?{value:metric.value,hits:metric.hits,total:metric.total}:null];
+    }));
+  };
+  const buildWindow=(sample,useEvidence=false)=>({
+    home:buildSide(sample?.homeRecent,'home',useEvidence),
+    away:buildSide(sample?.awayRecent,'away',useEvidence)
+  });
+  return {l5:buildWindow(windows.l5,false),l10:buildWindow(windows.l10,true)};
 }
 function dashboardWindowBadges(game,key){
   const l5=game?.sampleMetrics?.l5?.[key],l10=game?.sampleMetrics?.l10?.[key],parts=[];
@@ -70,7 +87,7 @@ async function hydrateDashboardAnalyses(date,games,snapshot){
         }
         const result=fixtureGoalMetrics(data);
         if(result){
-          existing.set(Number(game.fixture.id),{fixture:{id:game.fixture.id,date:game.fixture.date,status:game.fixture.status},league:game.league,teams:game.teams,metrics:result,sampleMetrics:dashboardParallelGoalMetrics(data),sampleContext:data.sampleContext||null,cornerMetrics:null,analysisStatus:result.coverage>0?'ready':'insufficient'});
+          existing.set(Number(game.fixture.id),{fixture:{id:game.fixture.id,date:game.fixture.date,status:game.fixture.status},league:game.league,teams:game.teams,metrics:result,sampleMetrics:dashboardParallelGoalMetrics(data),venueMetrics:dashboardVenueGoalMetrics(data),sampleContext:data.sampleContext||null,cornerMetrics:null,analysisStatus:result.coverage>0?'ready':'insufficient'});
           // Uma resposta concluída também precisa sair do estado "preparando"
           // quando não houver amostra ou tendência suficiente.
           publishProgress();

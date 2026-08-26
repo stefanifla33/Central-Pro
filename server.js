@@ -1,4 +1,4 @@
-﻿require("dotenv").config();
+require("dotenv").config();
 
 const express = require("express");
 const path = require("path");
@@ -1143,6 +1143,35 @@ app.get("/api/partidas/:id/analise", async (req, res) => {
                 away: selectHistory(response[2] || [], away, awaySide, 10)
             }
         };
+        // Contexto casa/fora independente da amostra principal.
+        // Mandante: somente partidas em casa; visitante: somente partidas fora.
+        const selectVenueHistory = (games, team, side, limit) => {
+            const seen = new Set();
+            return (games || [])
+                .filter(game => game?.fixture?.id !== id)
+                .filter(game => game?.fixture?.id && !seen.has(game.fixture.id) && seen.add(game.fixture.id))
+                .filter(game => ["FT", "AET", "PEN"].includes(game.fixture?.status?.short))
+                .filter(game => scope === "all" || (
+                    Number(game.league?.id) === Number(leagueId)
+                    && [Number(season), Number(season) - 1].includes(Number(game.league?.season))
+                ))
+                .filter(game => {
+                    const isHome = Number(game.teams?.home?.id) === Number(team.id);
+                    return side === "home" ? isHome : !isHome;
+                })
+                .sort((a, b) => new Date(b.fixture.date) - new Date(a.fixture.date))
+                .slice(0, Math.max(1, Number(limit) || 5));
+        };
+        const venueRecent = {
+            l5: {
+                home: selectVenueHistory(response[1] || [], home, "home", 5),
+                away: selectVenueHistory(response[2] || [], away, "away", 5)
+            },
+            l10: {
+                home: selectVenueHistory(response[1] || [], home, "home", 10),
+                away: selectVenueHistory(response[2] || [], away, "away", 10)
+            }
+        };
         if (scannerMode) {
             const auditGame = (game, teamId) => {
                 const isHome = Number(game.teams?.home?.id) === Number(teamId);
@@ -1219,6 +1248,19 @@ app.get("/api/partidas/:id/analise", async (req, res) => {
                         away: parallelRecent.l10.away.length
                     }
                 }
+            },
+            venueSamples: {
+                l5: {
+                    homeRecent: venueRecent.l5.home,
+                    awayRecent: venueRecent.l5.away,
+                    coverage: { home: venueRecent.l5.home.length, away: venueRecent.l5.away.length }
+                },
+                l10: {
+                    homeRecent: venueRecent.l10.home,
+                    awayRecent: venueRecent.l10.away,
+                    coverage: { home: venueRecent.l10.home.length, away: venueRecent.l10.away.length }
+                },
+                rule: "mandante somente em casa; visitante somente fora; mesma competição; temporada atual priorizada e anterior usada apenas para completar a amostra"
             },
             sampleContext: {
                 home: sampleContext(homeRecent),

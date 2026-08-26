@@ -1,7 +1,7 @@
 (function(){
   'use strict';
   const STORAGE_KEY='centralPro.opportunities.v1';
-  const SNAPSHOT_VERSION=2;
+  const SNAPSHOT_VERSION=3;
   const MARKETS={
     over05HT:{label:'+0.5 HT',detail:'Mais de 0.5 gol no 1º tempo',minimum:6},
     over05:{label:'+0.5 gols',detail:'Mais de 0.5 gol na partida',minimum:8},
