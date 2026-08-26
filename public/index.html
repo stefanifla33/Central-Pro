@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="app-shell.css?v=1">
   <link rel="stylesheet" href="dashboard.css?v=2">
   <link rel="stylesheet" href="design-system.css?v=1">
-  <link rel="stylesheet" href="home.css?v=20">
+  <link rel="stylesheet" href="home.css?v=21">
 </head>
 <body class="home-page">
   <button class="menu-button" id="menuButton" aria-label="Abrir menu">☰</button>
@@ -37,7 +37,7 @@
         <article class="summary-card"><span class="summary-icon amber">↗</span><div><small>Melhores oportunidades</small><strong id="dashboardOpportunityCount">—</strong><em id="dashboardStrongLabel">Verificando oportunidades</em></div></article>
       </section>
       <section class="home-primary">
-        <article class="home-stage highlights-section"><div class="home-section-head"><div><p class="eyebrow">DESTAQUES DE HOJE</p></div><a href="games.html">Ver todos <span>→</span></a></div><div id="importantGames" class="highlight-grid"><div class="highlight-skeleton"></div><div class="highlight-skeleton"></div><div class="highlight-skeleton"></div></div><div class="stage-dots" aria-hidden="true"><i></i><i></i><i></i></div></article>
+        <article class="home-stage highlights-section"><div class="home-section-head"><div><p class="eyebrow">DESTAQUES DE HOJE</p></div><a href="games.html">Ver todos <span>→</span></a></div><div id="importantGames" class="highlight-grid"><div class="highlight-skeleton"></div><div class="highlight-skeleton"></div><div class="highlight-skeleton"></div></div><div class="highlight-controls" aria-label="Páginas dos destaques"><button id="highlightsPrev" class="highlight-arrow" type="button" aria-label="Página anterior">←</button><div id="highlightsDots" class="stage-dots"></div><button id="highlightsNext" class="highlight-arrow" type="button" aria-label="Próxima página">→</button></div></article>
         <article class="home-stage home-live"><div class="home-section-head"><div><p class="eyebrow live-text">AO VIVO AGORA</p></div><a href="games.html">Ver todos <span>→</span></a></div><div id="liveList" class="home-live-list"><div class="skeleton-row"></div><div class="skeleton-row"></div></div><a class="home-panel-footer" href="games.html">Ver todos os jogos ao vivo <span>→</span></a><span id="liveBadge" class="count-badge home-live-count">0</span></article>
       </section>
       <section class="home-secondary">
@@ -48,7 +48,7 @@
     </main>
   </div>
   <script>const homeHour=new Date().getHours();document.getElementById('homeGreeting').textContent=`${homeHour>=5&&homeHour<12?'Bom dia':homeHour>=12&&homeHour<18?'Boa tarde':'Boa noite'}, Stefani!`;</script>
-  <script src="competition-config.js?v=1"></script><script src="app-shell.js?v=1"></script><script src="dashboard.js?v=3"></script>
+  <script src="competition-config.js?v=1"></script><script src="app-shell.js?v=1"></script><script src="dashboard.js?v=4"></script>
   <script>const homeMenu=document.getElementById('sidebar'),homeMenuButton=document.getElementById('menuButton'),homeMenuOverlay=document.getElementById('menuOverlay');function syncHomeMenu(){const open=homeMenu.classList.contains('open');homeMenuOverlay.classList.toggle('active',open);homeMenuOverlay.setAttribute('aria-hidden',String(!open));document.body.classList.toggle('menu-open',open)}homeMenuButton.addEventListener('click',()=>requestAnimationFrame(syncHomeMenu));homeMenuOverlay.addEventListener('click',()=>{homeMenu.classList.remove('open');syncHomeMenu()});</script>
 </body>
 </html>

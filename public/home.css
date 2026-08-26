@@ -320,3 +320,16 @@
   .home-page .sidebar-logo{display:block;width:150px;max-width:70%;height:auto;object-fit:contain;margin:0 auto}
   .home-page .sidebar .main-nav{padding-top:8px}
 }
+
+/* Paginação dos destaques: três jogos por página. */
+.home-page .highlight-controls{display:flex;min-height:30px;align-items:center;justify-content:center;gap:12px;padding-top:8px}
+.home-page .highlight-controls .stage-dots{display:flex;height:auto;padding:0;align-items:center;justify-content:center;gap:9px}
+.home-page .highlight-controls .stage-dots button{width:8px;height:8px;padding:0;border:0;border-radius:50%;background:#3c4841;cursor:pointer;transition:background .18s ease,box-shadow .18s ease,transform .18s ease}
+.home-page .highlight-controls .stage-dots button.active{background:#20e887;box-shadow:0 0 9px rgba(32,232,135,.55);transform:scale(1.15)}
+.home-page .highlight-arrow{display:grid;width:28px;height:28px;padding:0;place-items:center;border:1px solid rgba(255,255,255,.08);border-radius:8px;background:rgba(255,255,255,.025);color:#aeb8b2;cursor:pointer;transition:.18s ease}
+.home-page .highlight-arrow:hover:not(:disabled){border-color:rgba(32,232,135,.25);color:#20e887;background:rgba(32,232,135,.06)}
+.home-page .highlight-arrow:disabled{opacity:.25;cursor:default}
+@media(max-width:768px){
+  .home-page .highlight-controls{padding-top:6px}
+  .home-page .highlight-arrow{width:32px;height:32px}
+}
