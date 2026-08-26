@@ -22,13 +22,16 @@
 
   function loadSnapshot(){try{const data=JSON.parse(localStorage.getItem(STORAGE_KEY)),generated=Date.parse(data?.generatedAt),fresh=Number.isFinite(generated)&&Date.now()-generated<172800000;return data?.version===1&&fresh&&/^\d{4}-\d{2}-\d{2}$/.test(data.date||'')&&Array.isArray(data.games)?data:{games:[]}}catch{return{games:[]}}}
   function opportunities(snapshot){
-    return snapshot.games.flatMap(game=>rankingMarkets().map(([key,market])=>{const metric=game.metrics?.[key],minimum=Math.min(market.minimum,4);if(!metric||metric.total<minimum)return null;return{game,key,market,metric,family:'goals',level:confidenceLevel(metric),sampleQuality:metric.total,sampleLabel:`${metric.total} jogos válidos`}}).filter(Boolean));
+    return snapshot.games.flatMap(game=>rankingMarkets().map(([key,market])=>{const metric=game.metrics?.[key],evidence=metric?.evidence||metric,minimum=market.minimum;if(!metric||evidence.total<minimum)return null;return{game,key,market,metric,family:'goals',level:confidenceLevel(metric,game),sampleQuality:evidence.total,sampleLabel:`últimos ${metric.total} válidos · ${evidence.total} analisados`}}).filter(Boolean));
   }
 
-  function confidenceLevel(metric){
-    const value=Number(metric?.value||0),total=Number(metric?.total||0);
-    if(total>=10&&value>=80)return 'strong';
-    if(total>=8&&value>=75)return 'moderate';
+  function confidenceLevel(metric,game){
+    const evidence=metric?.evidence||metric,value=Number(evidence?.value||0),total=Number(evidence?.total||0),source=game?.metrics?.sourceSample||{},context=game?.sampleContext||{};
+    const homeSample=Number(source.displayHome||0),awaySample=Number(source.displayAway||0),complete=homeSample>=5&&awaySample>=5,balanced=Math.min(homeSample,awaySample)>=4&&Math.abs(homeSample-awaySample)<=1;
+    if(!complete||!balanced)return 'cautious';
+    if(context.transitionSeason)return value>=75&&total>=8?'moderate':'cautious';
+    if(total>=8&&value>=80)return 'strong';
+    if(total>=6&&value>=70)return 'moderate';
     return 'cautious';
   }
   function confidenceLabel(item){return item.level==='strong'?'Alta':item.level==='moderate'?'Moderada':'Atenção'}
@@ -37,7 +40,7 @@
     return rankingMarkets()
       .filter(([key])=>key!==item.key)
       .map(([key,market])=>({key,label:market.label,metric:metrics[key]}))
-      .filter(signal=>signal.metric&&signal.metric.total>=4&&signal.metric.value>=60)
+      .filter(signal=>{const evidence=signal.metric?.evidence||signal.metric;return signal.metric&&evidence.total>=(MARKETS[signal.key]?.minimum||8)&&signal.metric.value>=60})
       .sort((a,b)=>b.metric.value-a.metric.value||b.metric.total-a.metric.total)
       .slice(0,3);
   }
@@ -67,7 +70,7 @@
   function recommendationScore(item){
     const levelScore={strong:30,moderate:18,cautious:8};
     const marketWeight={over25:18,btts:17,cornersOver95:18,cornersOver85:16,homeScores:14,awayScores:14,cornersOver75:12,over15:12,over05HT:10,cornersOver65:3,over05:2};
-    const sample=Math.min(Number(item.metric?.total||0),10)*1.6;
+    const evidence=item.metric?.evidence||item.metric,sample=Math.min(Number(evidence?.total||0),15)*1.2;
     const hitRate=Number(item.metric?.value||0)*0.45;
     return (levelScore[item.level]||0)+(marketWeight[item.key]||0)+sample+hitRate;
   }

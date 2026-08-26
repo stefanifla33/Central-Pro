@@ -1048,11 +1048,32 @@ app.get("/api/partidas/:id/analise", async (req, res) => {
         const { home, away } = fixture.teams;
         const { id: leagueId, season } = fixture.league;
         const historySize = venue === "home-away" && scope === "all" ? sample : Math.min(30, sample * 3);
+
+        // No scanner da Home/Oportunidades, a amostra recente precisa continuar
+        // válida quando uma temporada acabou de começar. Buscamos uma janela maior
+        // na MESMA competição: temporada atual primeiro e, se necessário, a anterior.
+        // O cálculo exibido continua usando somente os `sample` jogos mais recentes.
+        const scannerLeagueHistory = async (teamId) => {
+            const candidateLimit = Math.max(15, sample * 3);
+            const seasons = [season, season - 1];
+            const settled = await Promise.allSettled(seasons.map(seasonValue =>
+                football(`/fixtures?team=${teamId}&league=${leagueId}&season=${seasonValue}&last=${candidateLimit}&timezone=${encodeURIComponent(APP_TIMEZONE)}`, 900_000)
+            ));
+            const merged = [];
+            for (const item of settled) {
+                if (item.status === "fulfilled") merged.push(...(item.value.response || []));
+            }
+            if (!merged.length && settled.every(item => item.status === "rejected")) {
+                throw settled.find(item => item.status === "rejected").reason;
+            }
+            return { response: merged };
+        };
+
         const requests = scannerMode
             ? [
                 Promise.resolve({ response: [] }),
-                football(`/fixtures?team=${home.id}&last=${historySize}&timezone=${encodeURIComponent(APP_TIMEZONE)}`, 900_000),
-                football(`/fixtures?team=${away.id}&last=${historySize}&timezone=${encodeURIComponent(APP_TIMEZONE)}`, 900_000),
+                scannerLeagueHistory(home.id),
+                scannerLeagueHistory(away.id),
                 Promise.resolve({ response: [] }),
                 Promise.resolve({ response: null }),
                 Promise.resolve({ response: null })
@@ -1089,19 +1110,76 @@ app.get("/api/partidas/:id/analise", async (req, res) => {
                 diagnostics
             });
         }
-        const selectHistory = (games, team, side) => games
-            .filter(game => game.fixture.id !== id)
-            .filter(game => scope === "all" || game.league.id === leagueId)
-            .filter(game => {
-                if (venue === "home-away") return true;
-                const isHome = game.teams.home.id === team.id;
-                return side === "home" ? isHome : !isHome;
-            })
-            .slice(0, sample);
+        const selectHistory = (games, team, side) => {
+            const seen = new Set();
+            return (games || [])
+                .filter(game => game?.fixture?.id !== id)
+                .filter(game => game?.fixture?.id && !seen.has(game.fixture.id) && seen.add(game.fixture.id))
+                .filter(game => ["FT", "AET", "PEN"].includes(game.fixture?.status?.short))
+                .filter(game => scope === "all" || (
+                    Number(game.league?.id) === Number(leagueId)
+                    && [Number(season), Number(season) - 1].includes(Number(game.league?.season))
+                ))
+                .filter(game => {
+                    if (venue === "home-away") return true;
+                    const isHome = Number(game.teams?.home?.id) === Number(team.id);
+                    return side === "home" ? isHome : !isHome;
+                })
+                .sort((a, b) => new Date(b.fixture.date) - new Date(a.fixture.date))
+                .slice(0, sample);
+        };
         const homeSide = venue === "away" ? "away" : "home";
         const awaySide = venue === "home" ? "home" : "away";
         const homeRecent = selectHistory(response[1] || [], home, homeSide);
         const awayRecent = selectHistory(response[2] || [], away, awaySide);
+        if (scannerMode) {
+            const auditGame = (game, teamId) => {
+                const isHome = Number(game.teams?.home?.id) === Number(teamId);
+                const opponent = isHome ? game.teams?.away?.name : game.teams?.home?.name;
+                const goalsFor = isHome ? game.goals?.home : game.goals?.away;
+                const goalsAgainst = isHome ? game.goals?.away : game.goals?.home;
+                return {
+                    fixtureId: Number(game.fixture?.id),
+                    date: game.fixture?.date || null,
+                    leagueId: Number(game.league?.id),
+                    league: game.league?.name || null,
+                    season: Number(game.league?.season),
+                    opponent: opponent || null,
+                    score: Number.isFinite(Number(goalsFor)) && Number.isFinite(Number(goalsAgainst)) ? `${goalsFor}-${goalsAgainst}` : null
+                };
+            };
+            const auditMarketGame = (game, teamId) => {
+                const base = auditGame(game, teamId);
+                const homeGoals = Number(game.score?.fulltime?.home ?? game.goals?.home);
+                const awayGoals = Number(game.score?.fulltime?.away ?? game.goals?.away);
+                const totalGoals = Number.isFinite(homeGoals) && Number.isFinite(awayGoals) ? homeGoals + awayGoals : null;
+                return {
+                    ...base,
+                    totalGoals,
+                    over05: totalGoals == null ? null : totalGoals > 0.5,
+                    over15: totalGoals == null ? null : totalGoals > 1.5
+                };
+            };
+            const homeAudit = homeRecent.map(game => auditMarketGame(game, home.id));
+            const awayAudit = awayRecent.map(game => auditMarketGame(game, away.id));
+            const combinedByFixture = new Map();
+            [...homeAudit, ...awayAudit].forEach(game => { if (game.fixtureId && !combinedByFixture.has(game.fixtureId)) combinedByFixture.set(game.fixtureId, game); });
+            const combinedAudit = [...combinedByFixture.values()].sort((a,b) => new Date(b.date) - new Date(a.date));
+            const auditHits = key => combinedAudit.filter(game => game[key] === true).length;
+            console.log(`[SAMPLE-AUDIT] fixture=${id} teams=${home.id},${away.id} league=${leagueId} season=${season} home=${JSON.stringify(homeAudit)} away=${JSON.stringify(awayAudit)}`);
+            console.log(`[SAMPLE-AUDIT-SUMMARY] fixture=${id} unique=${combinedAudit.length} over05=${auditHits("over05")}/${combinedAudit.length} over15=${auditHits("over15")}/${combinedAudit.length} seasons=${[...new Set(combinedAudit.map(game => game.season))].join(",")}`);
+        }
+        const sampleContext = (games) => {
+            const seasonsUsed = [...new Set(games.map(game => Number(game.league?.season)).filter(Number.isInteger))].sort((a,b)=>b-a);
+            const currentSeasonGames = games.filter(game => Number(game.league?.season) === Number(season)).length;
+            const previousSeasonGames = games.filter(game => Number(game.league?.season) === Number(season) - 1).length;
+            return {
+                seasonsUsed,
+                currentSeasonGames,
+                previousSeasonGames,
+                transitionSeason: previousSeasonGames > 0
+            };
+        };
 
         res.json({
             fixture,
@@ -1113,6 +1191,14 @@ app.get("/api/partidas/:id/analise", async (req, res) => {
             awayTeamStats: response[5] || null,
             filters: { sample, venue, scope, mode: scannerMode ? "scanner" : "full" },
             coverage: { home: homeRecent.length, away: awayRecent.length },
+            sampleContext: {
+                home: sampleContext(homeRecent),
+                away: sampleContext(awayRecent),
+                transitionSeason: sampleContext(homeRecent).transitionSeason || sampleContext(awayRecent).transitionSeason,
+                currentSeason: season,
+                previousSeason: season - 1,
+                rule: "mesma competição; temporada atual priorizada; anterior apenas para completar os jogos recentes"
+            },
             diagnostics
         });
     } catch (erro) {

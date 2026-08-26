@@ -55,7 +55,7 @@ async function loadAnalysisRows(rows,token){
       render();
       try{
         const params=new URLSearchParams({
-          sample:'5',mode:'scanner',
+          sample:'15',scope:'league',mode:'scanner',
           home:String(game.teams.home.id),away:String(game.teams.away.id),
           league:String(game.league.id),season:String(game.league.season)
         });

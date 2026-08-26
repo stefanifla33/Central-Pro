@@ -48,7 +48,7 @@
     </main>
   </div>
   <script>const homeHour=new Date().getHours();document.getElementById('homeGreeting').textContent=`${homeHour>=5&&homeHour<12?'Bom dia':homeHour>=12&&homeHour<18?'Boa tarde':'Boa noite'}, Stefani!`;</script>
-  <script src="competition-config.js?v=1"></script><script src="app-shell.js?v=1"></script><script src="dashboard.js?v=4"></script>
+  <script src="competition-config.js?v=1"></script><script src="goal-metrics.js?v=2"></script><script src="app-shell.js?v=1"></script><script src="dashboard.js?v=6"></script>
   <script>const homeMenu=document.getElementById('sidebar'),homeMenuButton=document.getElementById('menuButton'),homeMenuOverlay=document.getElementById('menuOverlay');function syncHomeMenu(){const open=homeMenu.classList.contains('open');homeMenuOverlay.classList.toggle('active',open);homeMenuOverlay.setAttribute('aria-hidden',String(!open));document.body.classList.toggle('menu-open',open)}homeMenuButton.addEventListener('click',()=>requestAnimationFrame(syncHomeMenu));homeMenuOverlay.addEventListener('click',()=>{homeMenu.classList.remove('open');syncHomeMenu()});</script>
 </body>
 </html>
