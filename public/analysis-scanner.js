@@ -1,7 +1,17 @@
 const $=id=>document.getElementById(id);
 let fixtures=[],metrics=new Map(),analysisState=new Map(),sortKey=null,sortDirection=-1,loadToken=0;
+let renderTimer=null;
 const priorityRank=id=>{const rank=CP_PRIORITY_ORDER.indexOf(id);return rank<0?999:rank};
 const localDate=offset=>{const date=new Date();date.setDate(date.getDate()+offset);return date.toLocaleDateString('en-CA',{timeZone:'America/Sao_Paulo'})};
+
+function scheduleRender(){
+  if(renderTimer!==null)return;
+  renderTimer=setTimeout(()=>{renderTimer=null;render()},200);
+}
+function flushRender(){
+  if(renderTimer!==null){clearTimeout(renderTimer);renderTimer=null}
+  render();
+}
 
 function metricCell(metric){
   if(!metric)return '<span class="percent-pill none">—</span>';
@@ -10,9 +20,9 @@ function metricCell(metric){
   return `<span class="percent-pill ${tone} sample-${sample.key}"><b>${value}%</b><small class="metric-fraction">${metric.hits}/${metric.total}<i class="sample-indicator ${sample.key}" tabindex="0" role="img" title="${sampleText}" aria-label="${sampleText}" data-tooltip="${sampleText}"></i></small></span>`;
 }
 function filtered(){
-  const competition=$('competition').value,country=$('country').value,query=$('teamSearch').value.trim().toLowerCase(),onlyData=$('withData').checked,onlyLive=$('liveOnly').checked;
+  const competition=$('competition').value,dayCompetition=$('dayCompetition').value,country=$('country').value,query=$('teamSearch').value.trim().toLowerCase(),onlyData=$('withData').checked,onlyLive=$('liveOnly').checked;
   const selectedLeague=game=>cpLeagueMatchesMode(game.league,competition);
-  const rows=fixtures.filter(game=>selectedLeague(game)&&(country==='all'||game.league.country===country)&&(!query||`${game.teams.home.name} ${game.teams.away.name}`.toLowerCase().includes(query))&&(!onlyLive||cpIsLive(game))&&(!onlyData||metrics.get(game.fixture.id)?.coverage));
+  const rows=fixtures.filter(game=>selectedLeague(game)&&(dayCompetition==='all'||game.league.name?.trim()===dayCompetition)&&(country==='all'||game.league.country===country)&&(!query||`${game.teams.home.name} ${game.teams.away.name}`.toLowerCase().includes(query))&&(!onlyLive||cpIsLive(game))&&(!onlyData||metrics.get(game.fixture.id)?.coverage));
   if(sortKey)rows.sort((a,b)=>{const av=metrics.get(a.fixture.id)?.[sortKey]?.value,bv=metrics.get(b.fixture.id)?.[sortKey]?.value;if(av==null&&bv==null)return 0;if(av==null)return 1;if(bv==null)return-1;return(av-bv)*sortDirection});
   else rows.sort((a,b)=>priorityRank(a.league.id)-priorityRank(b.league.id)||a.league.name.localeCompare(b.league.name)||String(a.league.id).localeCompare(String(b.league.id))||(Boolean(metrics.get(b.fixture.id)?.coverage)-Boolean(metrics.get(a.fixture.id)?.coverage))||new Date(a.fixture.date)-new Date(b.fixture.date));
   return rows;
@@ -41,18 +51,25 @@ function fillFilters(){
   const available=fixtures.filter(game=>!cpIsExcludedGame(game)),countries=[...new Set(available.map(game=>game.league.country).filter(Boolean))].sort(),current=$('competition').value;
   $('competition').innerHTML='<option value="featured">Principais + relevantes</option><option value="main">Somente principais</option><option value="all">Todas as competições</option>';
   $('competition').value=['featured','main','all'].includes(current)?current:'all';
+  fillDayCompetitions();
   $('country').innerHTML='<option value="all">Todos os países</option>'+countries.map(country=>`<option>${cpEscape(country)}</option>`).join('');
+}
+function fillDayCompetitions(){
+  const select=$('dayCompetition'),current=select.value,mode=$('competition').value;
+  const names=[...new Set(fixtures.filter(game=>!cpIsExcludedGame(game)&&cpLeagueMatchesMode(game.league,mode)).map(game=>game.league.name?.trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'pt-BR'));
+  select.innerHTML='<option value="all">Todas as competições</option>'+names.map(name=>`<option value="${cpEscape(name)}">${cpEscape(name)}</option>`).join('');
+  select.value=names.includes(current)?current:'all';
 }
 async function loadAnalysisRows(rows,token){
   let completed=0;
   const queue=[...rows];
   rows.forEach(game=>analysisState.set(game.fixture.id,'queued'));
   render();
-  const workers=Array.from({length:2},async()=>{
+  const workers=Array.from({length:5},async()=>{
     while(queue.length&&token===loadToken){
       const game=queue.shift();
       analysisState.set(game.fixture.id,'loading');
-      render();
+      scheduleRender();
       try{
         const params=new URLSearchParams({
           sample:'15',scope:'all',mode:'scanner',
@@ -79,21 +96,22 @@ async function loadAnalysisRows(rows,token){
       }
       completed++;
       $('progressBar').style.width=`${Math.round(completed*100/rows.length)}%`;
-      render();
+      scheduleRender();
     }
   });
   await Promise.all(workers);
-  if(token===loadToken)setTimeout(()=>{$('progressBar').style.width='0'},700);
+  if(token===loadToken){flushRender();setTimeout(()=>{$('progressBar').style.width='0'},700)}
 }
 async function load(){
-  const token=++loadToken;metrics=new Map();analysisState=new Map();window.CornersScanner?.reset();sortKey=null;document.querySelectorAll('[data-sort]').forEach(head=>head.querySelector('.sort-arrow')?.remove());$('scannerBody').innerHTML='<tr class="scanner-loading"><td colspan="9">Carregando jogos do dia…</td></tr>';
+  const token=++loadToken;if(renderTimer!==null){clearTimeout(renderTimer);renderTimer=null}metrics=new Map();analysisState=new Map();window.CornersScanner?.reset();sortKey=null;document.querySelectorAll('[data-sort]').forEach(head=>head.querySelector('.sort-arrow')?.remove());$('scannerBody').innerHTML='<tr class="scanner-loading"><td colspan="9">Carregando jogos do dia…</td></tr>';
   try{const response=await fetch(`/api/jogos?date=${$('analysisDate').value}`),data=await response.json();if(!response.ok)throw Error(data.erro||'Jogos indisponíveis.');fixtures=(data.response||[]).filter(game=>!cpIsExcludedGame(game));fillFilters();render();const targets=fixtures.filter(game=>!cpIsExcludedGame(game)).sort((a,b)=>priorityRank(a.league.id)-priorityRank(b.league.id)||new Date(a.fixture.date)-new Date(b.fixture.date));if(targets.length)loadAnalysisRows(targets,token)}catch(error){$('scannerBody').innerHTML=`<tr><td class="scanner-empty" colspan="9">${cpEscape(error.message)}</td></tr>`}
 }
 function setDate(value,button){$('analysisDate').value=value;[$('todayButton'),$('tomorrowButton')].forEach(item=>item.classList.toggle('active',item===button));load()}
 $('todayButton').onclick=()=>setDate(localDate(0),$('todayButton'));
 $('tomorrowButton').onclick=()=>setDate(localDate(1),$('tomorrowButton'));
 $('analysisDate').onchange=()=>{[$('todayButton'),$('tomorrowButton')].forEach(item=>item.classList.remove('active'));load()};
-['competition','country','withData','liveOnly'].forEach(id=>$(id).onchange=render);$('teamSearch').oninput=render;
+$('competition').onchange=()=>{fillDayCompetitions();render()};
+['dayCompetition','country','withData','liveOnly'].forEach(id=>$(id).onchange=render);$('teamSearch').oninput=render;
 document.querySelectorAll('[data-sort]').forEach(head=>head.onclick=()=>{const key=head.dataset.sort;if(sortKey===key)sortDirection*=-1;else{sortKey=key;sortDirection=-1}document.querySelectorAll('[data-sort]').forEach(item=>item.querySelector('.sort-arrow')?.remove());head.insertAdjacentHTML('beforeend',`<span class="sort-arrow">${sortDirection<0?'↓':'↑'}</span>`);render()});
 document.querySelectorAll('[data-analysis-tab]').forEach(button=>button.onclick=()=>{const tab=button.dataset.analysisTab;document.querySelectorAll('[data-analysis-tab]').forEach(item=>item.classList.toggle('active',item===button));[['goals','goalsScannerView'],['players','playersScannerView'],['corners','cornersScannerView']].forEach(([key,id])=>{const active=tab===key;$(id).hidden=!active;$(id).classList.toggle('active',active)});if(tab==='corners')window.CornersScanner?.activate()});
 $('analysisDate').value=localDate(0);load();

@@ -21,8 +21,9 @@
   .filter-fields>#tomorrowButton{grid-column:2!important;grid-row:1!important}
   .filter-fields>#analysisDate{grid-column:1/-1!important;grid-row:2!important}
   .filter-fields>#competition{grid-column:1/-1!important;grid-row:3!important}
-  .filter-fields>#country{grid-column:1/-1!important;grid-row:4!important}
-  .filter-fields>#teamSearch{grid-column:1/-1!important;grid-row:5!important}
+  .filter-fields>#dayCompetition{grid-column:1/-1!important;grid-row:4!important}
+  .filter-fields>#country{grid-column:1/-1!important;grid-row:5!important}
+  .filter-fields>#teamSearch{grid-column:1/-1!important;grid-row:6!important}
   .filter-fields>button,.filter-fields>input,.filter-fields>select{display:block!important;width:100%!important;max-width:100%!important;min-width:0!important;height:40px!important;margin:0!important;padding-inline:11px!important;box-sizing:border-box!important;font-size:12px!important}
   .filter-fields>#todayButton,.filter-fields>#tomorrowButton{font-weight:750!important;text-align:center}
   .filter-fields>select{overflow:hidden;text-overflow:ellipsis}
