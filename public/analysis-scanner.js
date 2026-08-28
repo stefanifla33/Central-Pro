@@ -1,6 +1,8 @@
 const $=id=>document.getElementById(id);
 let fixtures=[],metrics=new Map(),analysisState=new Map(),sortKey=null,sortDirection=-1,loadToken=0;
 let renderTimer=null;
+let snapshotDetails=new Map(),snapshotTimer=null,snapshotDirty=false;
+const SNAPSHOT_MARKET_KEYS=['over05HT','over05','over15','over25','btts','homeScores','awayScores'];
 const priorityRank=id=>{const rank=CP_PRIORITY_ORDER.indexOf(id);return rank<0?999:rank};
 const localDate=offset=>{const date=new Date();date.setDate(date.getDate()+offset);return date.toLocaleDateString('en-CA',{timeZone:'America/Sao_Paulo'})};
 
@@ -11,6 +13,37 @@ function scheduleRender(){
 function flushRender(){
   if(renderTimer!==null){clearTimeout(renderTimer);renderTimer=null}
   render();
+}
+
+function snapshotParallelGoalMetrics(data){
+  const windows=data?.parallelSamples||{};
+  const build=(sample,useEvidence=false)=>{
+    if(!sample?.homeRecent||!sample?.awayRecent)return null;
+    const calculated=fixtureGoalMetrics({...data,homeRecent:sample.homeRecent,awayRecent:sample.awayRecent});
+    if(!calculated)return null;
+    return Object.fromEntries(SNAPSHOT_MARKET_KEYS.map(key=>{
+      const raw=calculated[key],metric=useEvidence?(raw?.evidence||raw):raw;
+      return [key,metric?{value:metric.value,hits:metric.hits,total:metric.total}:null];
+    }));
+  };
+  return {l5:build(windows.l5,false),l10:build(windows.l10,true)};
+}
+function snapshotVenueGoalMetrics(data){
+  const windows=data?.venueSamples||{};
+  const buildSide=(games,side,useEvidence=false)=>{
+    if(!Array.isArray(games)||!games.length)return null;
+    const calculated=fixtureGoalMetrics({...data,homeRecent:side==='home'?games:[],awayRecent:side==='away'?games:[]});
+    if(!calculated)return null;
+    return Object.fromEntries(SNAPSHOT_MARKET_KEYS.map(key=>{
+      const raw=calculated[key],metric=useEvidence?(raw?.evidence||raw):raw;
+      return [key,metric?{value:metric.value,hits:metric.hits,total:metric.total}:null];
+    }));
+  };
+  const buildWindow=(sample,useEvidence=false)=>({
+    home:buildSide(sample?.homeRecent,'home',useEvidence),
+    away:buildSide(sample?.awayRecent,'away',useEvidence)
+  });
+  return {l5:buildWindow(windows.l5,false),l10:buildWindow(windows.l10,true)};
 }
 
 function metricCell(metric){
@@ -40,12 +73,25 @@ function render(){
   if($('coverageBar')) $('coverageBar').style.width=priorityTotal?`${Math.min(100,Math.round(analyzed*100/priorityTotal))}%`:'0%';
   $('scannerBody').innerHTML=[...groups.values()].map(group=>`${group.league?`<tr class="league-row"><td colspan="9"><div class="league-separator">${group.league.logo?`<img src="${cpEscape(group.league.logo)}" alt="">`:'<span class="league-trophy">♜</span>'}<span><strong>${cpEscape(group.league.name)}</strong><small>${cpEscape(group.league.country)} · ${group.games.length} jogo(s)</small></span></div></td></tr>`:''}${group.games.map(game=>{const data=metrics.get(game.fixture.id),live=cpIsLive(game),match=`<td><div class="scanner-match"><span class="scanner-team home"><img src="${cpEscape(game.teams.home.logo)}" alt=""><b>${cpEscape(game.teams.home.name)}</b></span><i>×</i><span class="scanner-team away"><img src="${cpEscape(game.teams.away.logo)}" alt=""><b>${cpEscape(game.teams.away.name)}</b></span></div></td>`;return `<tr data-match="${game.fixture.id}"><td class="scanner-time ${live?'live':''}">${live?`AO VIVO · ${game.fixture.status.elapsed||0}'`:cpTime(game)}</td>${match}${data?.coverage?['over05HT','over05','over15','over25','btts','homeScores','awayScores'].map(key=>`<td class="percent-cell">${metricCell(data[key])}</td>`).join(''):`<td class="no-analysis-cell status-${analysisState.get(game.fixture.id)||'idle'}" colspan="7"><span>${analysisState.get(game.fixture.id)==='queued'?'Aguardando análise':analysisState.get(game.fixture.id)==='loading'?'Analisando…':analysisState.get(game.fixture.id)==='nodata'?'Dados insuficientes':analysisState.get(game.fixture.id)==='error'?'Falha na análise':'Sem análise'}</span></td>`}</tr>`}).join('')}`).join('')||'<tr><td class="scanner-empty" colspan="9">Nenhuma partida encontrada para estes filtros.</td></tr>';
   document.querySelectorAll('#scannerBody .no-analysis-cell').forEach(cell=>cell.closest('tr')?.classList.add('without-analysis'));
-  saveOpportunitySnapshot();
   cpBindMatches();
 }
 function saveOpportunitySnapshot(){
-  const games=fixtures.filter(game=>CP_FEATURED_LEAGUES.has(game.league.id)&&!cpIsExcludedGame(game)&&metrics.get(game.fixture.id)?.coverage).map(game=>({fixture:{id:game.fixture.id,date:game.fixture.date,status:game.fixture.status},league:game.league,teams:game.teams,metrics:metrics.get(game.fixture.id),cornerMetrics:window.cornerMetricsByFixture?.get(game.fixture.id)||null}));
-  try{localStorage.setItem('centralPro.opportunities.v1',JSON.stringify({version:1,date:$('analysisDate').value,generatedAt:new Date().toISOString(),games}))}catch{}
+  snapshotDirty=true;
+  if(snapshotTimer!==null)return;
+  snapshotTimer=setTimeout(persistOpportunitySnapshot,500);
+}
+function persistOpportunitySnapshot(){
+  if(snapshotTimer!==null){clearTimeout(snapshotTimer);snapshotTimer=null}
+  if(!snapshotDirty)return;
+  snapshotDirty=false;
+  const games=fixtures.filter(game=>CP_FEATURED_LEAGUES.has(game.league.id)&&!cpIsExcludedGame(game)&&metrics.get(game.fixture.id)?.coverage).map(game=>{
+    const details=snapshotDetails.get(game.fixture.id)||{};
+    return{fixture:{id:game.fixture.id,date:game.fixture.date,status:game.fixture.status},league:game.league,teams:game.teams,metrics:metrics.get(game.fixture.id),sampleMetrics:details.sampleMetrics||null,venueMetrics:details.venueMetrics||null,sampleContext:details.sampleContext||null,cornerMetrics:window.cornerMetricsByFixture?.get(game.fixture.id)||null,analysisStatus:details.analysisStatus||'ready'};
+  });
+  try{localStorage.setItem('centralPro.opportunities.v1',JSON.stringify({version:3,date:$('analysisDate').value,generatedAt:new Date().toISOString(),games}))}catch{}
+}
+function flushOpportunitySnapshot(){
+  persistOpportunitySnapshot();
 }
 function fillFilters(){
   const available=fixtures.filter(game=>!cpIsExcludedGame(game)),countries=[...new Set(available.map(game=>game.league.country).filter(Boolean))].sort(),current=$('competition').value;
@@ -89,6 +135,8 @@ async function loadAnalysisRows(rows,token){
         if(!response?.ok) throw lastError||Error('Falha na análise');
         const result=fixtureGoalMetrics(data);
         metrics.set(game.fixture.id,result);
+        snapshotDetails.set(game.fixture.id,{sampleMetrics:snapshotParallelGoalMetrics(data),venueMetrics:snapshotVenueGoalMetrics(data),sampleContext:data.sampleContext||null,analysisStatus:result?.coverage?'ready':'insufficient'});
+        saveOpportunitySnapshot();
         analysisState.set(game.fixture.id,result?.coverage?'done':'nodata');
         window.dispatchEvent(new CustomEvent('centralpro:analysis-ready'));
       }catch(error){
@@ -100,11 +148,11 @@ async function loadAnalysisRows(rows,token){
     }
   });
   await Promise.all(workers);
-  if(token===loadToken){flushRender();setTimeout(()=>{$('progressBar').style.width='0'},700)}
+  if(token===loadToken){flushOpportunitySnapshot();flushRender();setTimeout(()=>{$('progressBar').style.width='0'},700)}
 }
 async function load(){
-  const token=++loadToken;if(renderTimer!==null){clearTimeout(renderTimer);renderTimer=null}metrics=new Map();analysisState=new Map();window.CornersScanner?.reset();sortKey=null;document.querySelectorAll('[data-sort]').forEach(head=>head.querySelector('.sort-arrow')?.remove());$('scannerBody').innerHTML='<tr class="scanner-loading"><td colspan="9">Carregando jogos do dia…</td></tr>';
-  try{const response=await fetch(`/api/jogos?date=${$('analysisDate').value}`),data=await response.json();if(!response.ok)throw Error(data.erro||'Jogos indisponíveis.');fixtures=(data.response||[]).filter(game=>!cpIsExcludedGame(game));fillFilters();render();const targets=fixtures.filter(game=>!cpIsExcludedGame(game)).sort((a,b)=>priorityRank(a.league.id)-priorityRank(b.league.id)||new Date(a.fixture.date)-new Date(b.fixture.date));if(targets.length)loadAnalysisRows(targets,token)}catch(error){$('scannerBody').innerHTML=`<tr><td class="scanner-empty" colspan="9">${cpEscape(error.message)}</td></tr>`}
+  const token=++loadToken;if(renderTimer!==null){clearTimeout(renderTimer);renderTimer=null}if(snapshotTimer!==null){clearTimeout(snapshotTimer);snapshotTimer=null}snapshotDirty=false;metrics=new Map();analysisState=new Map();snapshotDetails=new Map();window.CornersScanner?.reset();sortKey=null;document.querySelectorAll('[data-sort]').forEach(head=>head.querySelector('.sort-arrow')?.remove());$('scannerBody').innerHTML='<tr class="scanner-loading"><td colspan="9">Carregando jogos do dia…</td></tr>';
+  try{const response=await fetch(`/api/jogos?date=${$('analysisDate').value}`),data=await response.json();if(!response.ok)throw Error(data.erro||'Jogos indisponíveis.');fixtures=(data.response||[]).filter(game=>!cpIsExcludedGame(game));fillFilters();render();saveOpportunitySnapshot();const targets=fixtures.filter(game=>!cpIsExcludedGame(game)).sort((a,b)=>priorityRank(a.league.id)-priorityRank(b.league.id)||new Date(a.fixture.date)-new Date(b.fixture.date));if(targets.length)loadAnalysisRows(targets,token);else flushOpportunitySnapshot()}catch(error){$('scannerBody').innerHTML=`<tr><td class="scanner-empty" colspan="9">${cpEscape(error.message)}</td></tr>`}
 }
 function setDate(value,button){$('analysisDate').value=value;[$('todayButton'),$('tomorrowButton')].forEach(item=>item.classList.toggle('active',item===button));load()}
 $('todayButton').onclick=()=>setDate(localDate(0),$('todayButton'));
@@ -114,4 +162,5 @@ $('competition').onchange=()=>{fillDayCompetitions();render()};
 ['dayCompetition','country','withData','liveOnly'].forEach(id=>$(id).onchange=render);$('teamSearch').oninput=render;
 document.querySelectorAll('[data-sort]').forEach(head=>head.onclick=()=>{const key=head.dataset.sort;if(sortKey===key)sortDirection*=-1;else{sortKey=key;sortDirection=-1}document.querySelectorAll('[data-sort]').forEach(item=>item.querySelector('.sort-arrow')?.remove());head.insertAdjacentHTML('beforeend',`<span class="sort-arrow">${sortDirection<0?'↓':'↑'}</span>`);render()});
 document.querySelectorAll('[data-analysis-tab]').forEach(button=>button.onclick=()=>{const tab=button.dataset.analysisTab;document.querySelectorAll('[data-analysis-tab]').forEach(item=>item.classList.toggle('active',item===button));[['goals','goalsScannerView'],['players','playersScannerView'],['corners','cornersScannerView']].forEach(([key,id])=>{const active=tab===key;$(id).hidden=!active;$(id).classList.toggle('active',active)});if(tab==='corners')window.CornersScanner?.activate()});
+window.addEventListener('pagehide',flushOpportunitySnapshot);
 $('analysisDate').value=localDate(0);load();
