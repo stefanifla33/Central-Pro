@@ -1,8 +1,33 @@
 (function(){
   const fixtureRequests=new Map(),fixtureResults=new Map();let playerTabActive=false,refreshQueued=false,allPlayerRows=[];
+  const PLAYER_SNAPSHOT_KEY='centralPro.players.snapshot.v1',PLAYER_SNAPSHOT_VERSION=1;
+  let playerSnapshotDate=null,playerSnapshotTimer=null,playerSnapshotDirty=false;
   const statValue=(statistics,path)=>path.reduce((value,key)=>value?.[key],statistics);
   const number=value=>{if(value==null||value==='')return null;const parsed=Number(value);return Number.isFinite(parsed)?parsed:null};
   const position=item=>({Goalkeeper:'G',Defender:'D',Midfielder:'M',Attacker:'A',Forward:'A',F:'A'}[item.statistics?.games?.position||item.player?.position]||item.statistics?.games?.position||item.player?.position||'—');
+  const analyzedDate=()=>document.getElementById('analysisDate')?.value||'';
+  const compactTeam=team=>team?{id:team.id,name:team.name,logo:team.logo||null}:null;
+  function snapshotPlayer(item){
+    const game=item.game,home=game.teams.home,away=game.teams.away,isHome=Number(item.team.id)===Number(home.id),opponent=isHome?away:Number(item.team.id)===Number(away.id)?home:null,playerPosition=position(item);
+    return{fixture:{id:game.fixture.id,date:game.fixture.date,teams:{home:compactTeam(home),away:compactTeam(away)}},league:{id:game.league.id,name:game.league.name,country:game.league.country||null},team:compactTeam(item.team),opponent:compactTeam(opponent),player:{id:item.player.id,name:item.player.name,photo:item.player.photo||null,position:playerPosition==='—'?null:playerPosition},status:item.status,games:item.games,minutes:item.minutes,shotsOn:item.shotsOn,average:item.average};
+  }
+  function persistPlayerSnapshot(){
+    if(playerSnapshotTimer!==null){clearTimeout(playerSnapshotTimer);playerSnapshotTimer=null}
+    if(!playerSnapshotDirty)return;
+    playerSnapshotDirty=false;
+    const date=playerSnapshotDate||analyzedDate();
+    try{localStorage.setItem(PLAYER_SNAPSHOT_KEY,JSON.stringify({version:PLAYER_SNAPSHOT_VERSION,date,generatedAt:new Date().toISOString(),players:allPlayerRows.map(snapshotPlayer)}))}catch{}
+  }
+  function schedulePlayerSnapshot(){
+    playerSnapshotDate=analyzedDate();playerSnapshotDirty=true;
+    if(playerSnapshotTimer===null)playerSnapshotTimer=setTimeout(persistPlayerSnapshot,500);
+  }
+  function resetPlayerSnapshotForDate(date=analyzedDate()){
+    if(!date||playerSnapshotDate===date)return;
+    if(playerSnapshotTimer!==null){clearTimeout(playerSnapshotTimer);playerSnapshotTimer=null}
+    playerSnapshotDate=date;playerSnapshotDirty=true;allPlayerRows=[];persistPlayerSnapshot();
+  }
+  try{const saved=JSON.parse(localStorage.getItem(PLAYER_SNAPSHOT_KEY));if(saved?.version===PLAYER_SNAPSHOT_VERSION&&typeof saved.date==='string'&&Array.isArray(saved.players))playerSnapshotDate=saved.date}catch{}
   const probableScore=item=>(item.recentScore||0)*100+(Number(item.statistics?.games?.lineups)||0)*10+(Number(item.statistics?.games?.minutes)||0)/90+(Number(item.statistics?.games?.rating)||0);
   function probableIds(team){return new Set([...(team.players||[])].sort((a,b)=>probableScore(b)-probableScore(a)).slice(0,11).map(item=>item.player.id))}
   function normalizedPlayers(result,game){
@@ -42,13 +67,17 @@
   }
   async function requestFixture(game){if(fixtureResults.has(game.fixture.id))return fixtureResults.get(game.fixture.id);if(!fixtureRequests.has(game.fixture.id))fixtureRequests.set(game.fixture.id,fetch(`/api/partidas/${game.fixture.id}/jogadores`).then(async response=>{const data=await response.json();if(!response.ok||data.status==='error')throw Error(data.erro||'Jogadores indisponíveis.');fixtureResults.set(game.fixture.id,data);return data}));return fixtureRequests.get(game.fixture.id)}
   async function loadPlayerPilot(){
-    if(!playerTabActive)return;const games=fixtures.filter(game=>CP_MAIN_LEAGUES.has(game.league.id)&&metrics.get(game.fixture.id)?.coverage),body=document.getElementById('playerScannerBody'),meta=document.getElementById('playerLoadMeta');
+    if(!playerTabActive)return;const loadDate=analyzedDate();resetPlayerSnapshotForDate(loadDate);const games=fixtures.filter(game=>CP_MAIN_LEAGUES.has(game.league.id)&&metrics.get(game.fixture.id)?.coverage),body=document.getElementById('playerScannerBody'),meta=document.getElementById('playerLoadMeta');
     if(!games.length){body.innerHTML='<tr><td class="player-scanner-empty" colspan="7"><span>♙</span><strong>Aguardando partidas prioritárias analisadas</strong><small>Nenhuma chamada de jogadores foi iniciada.</small></td></tr>';meta.textContent='0 partidas processadas';return}
     body.innerHTML='<tr><td class="player-scanner-empty" colspan="7"><span>♙</span><strong>Selecionando jogadores relevantes…</strong><small>Usando somente estatísticas agregadas já disponíveis.</small></td></tr>';
-    const settled=await Promise.allSettled(games.map(async game=>normalizedPlayers(await requestFixture(game),game)));allPlayerRows=settled.filter(item=>item.status==='fulfilled').flatMap(item=>item.value);renderPlayers();
+    const settled=await Promise.allSettled(games.map(async game=>normalizedPlayers(await requestFixture(game),game)));allPlayerRows=settled.filter(item=>item.status==='fulfilled').flatMap(item=>item.value);renderPlayers();if(loadDate===analyzedDate()){schedulePlayerSnapshot();const pending=[...analysisState.values()].some(state=>state==='queued'||state==='loading');if(!pending)persistPlayerSnapshot()}
   }
   document.querySelector('[data-analysis-tab="players"]')?.addEventListener('click',()=>{playerTabActive=true;loadPlayerPilot()});
   document.querySelector('[data-analysis-tab="goals"]')?.addEventListener('click',()=>{playerTabActive=false});
   document.getElementById('playerStatusFilter')?.addEventListener('change',renderPlayers);document.getElementById('showPlayerNoData')?.addEventListener('change',renderPlayers);
   window.addEventListener('centralpro:analysis-ready',()=>{if(!playerTabActive||refreshQueued)return;refreshQueued=true;setTimeout(()=>{refreshQueued=false;loadPlayerPilot()},100)});
+  ['todayButton','tomorrowButton'].forEach(id=>document.getElementById(id)?.addEventListener('click',()=>setTimeout(()=>resetPlayerSnapshotForDate(),0)));
+  document.getElementById('analysisDate')?.addEventListener('change',()=>setTimeout(()=>resetPlayerSnapshotForDate(),0));
+  window.addEventListener('pagehide',persistPlayerSnapshot);
+  resetPlayerSnapshotForDate();
 })();
