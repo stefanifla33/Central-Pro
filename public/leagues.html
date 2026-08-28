@@ -7,7 +7,7 @@ let leagues=[];const esc=v=>{const e=document.createElement('i');e.textContent=v
 :root{--bg:#020403;--card:#080c0a;--line:#19251f;--txt:#f5f7f6;--muted:#7d8984;--green:#00e676}body{background:radial-gradient(circle at 55% -10%,#0b1712,#020403 48%);font-family:Inter,Segoe UI,Arial,sans-serif}.top{height:72px;background:#050706;border-color:#17211c}.brand{color:#f5f7f6;font-weight:900}.brand b{color:var(--green)}main{max-width:1180px;padding-top:32px}.tab{background:#080c0a;border-color:#1b2922;color:#aeb8b3}.tab:hover{border-color:#087d41;color:var(--green)}.tab.active{background:#08351f;color:var(--green);border-color:#087d41}.card{background:linear-gradient(145deg,#0a0f0d,#050806);border-color:#1a2721;box-shadow:0 12px 40px rgba(0,0,0,.2)}.head,.league,.table-head,.row{border-color:#16221c}.league:hover,.row:hover{background:rgba(0,230,118,.045)}.select{background:#050907;border-color:#1b2922}.group-title{padding:10px 16px;background:#07170f;border-top:1px solid #17452e;border-bottom:1px solid #17452e;color:var(--green);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.7px}
 #scorerList .table-head,#scorerList .row{grid-template-columns:40px minmax(260px,1fr) minmax(180px,.55fr) 60px 60px}#scorerList .row>span:nth-child(3){min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 </style>
-<script src="competition-config.js?v=1"></script><script>
+<script src="competition-config.js?v=2"></script><script>
 const featuredLeagueIds=CP_MAIN_LEAGUES;
 const fillEveryLeague=fill;
 fill=function(){leagues=leagues.filter(league=>featuredLeagueIds.has(league.id));fillEveryLeague()};

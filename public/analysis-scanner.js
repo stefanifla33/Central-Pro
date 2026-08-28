@@ -20,11 +20,11 @@ function filtered(){
 function render(){
   const rows=filtered(),groups=new Map;
   rows.forEach(game=>{const key=sortKey?'sorted':game.league.id;if(!groups.has(key))groups.set(key,{league:sortKey?null:game.league,games:[]});groups.get(key).games.push(game)});
-  $('totalCount').textContent=fixtures.filter(game=>!cpIsExcludedLeague(game.league)).length;
-  $('priorityCount').textContent=fixtures.filter(game=>CP_FEATURED_LEAGUES.has(game.league.id)&&!cpIsExcludedLeague(game.league)).length;
+  $('totalCount').textContent=fixtures.filter(game=>!cpIsExcludedGame(game)).length;
+  $('priorityCount').textContent=fixtures.filter(game=>!cpIsExcludedGame(game)).length;
   const analyzed=[...metrics.values()].filter(value=>value.coverage).length;
   $('dataCount').textContent=analyzed;
-  const priorityTotal=fixtures.filter(game=>CP_FEATURED_LEAGUES.has(game.league.id)&&!cpIsExcludedLeague(game.league)).length;
+  const priorityTotal=fixtures.filter(game=>!cpIsExcludedGame(game)).length;
   const loading=[...analysisState.values()].filter(value=>value==='loading'||value==='queued').length;
   if($('analysisStatusMeta')) $('analysisStatusMeta').textContent=loading?`${analyzed}/${priorityTotal} concluídos · ${loading} na fila`:`${analyzed}/${priorityTotal} com dados`;
   if($('coverageBar')) $('coverageBar').style.width=priorityTotal?`${Math.min(100,Math.round(analyzed*100/priorityTotal))}%`:'0%';
@@ -34,13 +34,13 @@ function render(){
   cpBindMatches();
 }
 function saveOpportunitySnapshot(){
-  const games=fixtures.filter(game=>CP_FEATURED_LEAGUES.has(game.league.id)&&!cpIsExcludedLeague(game.league)&&metrics.get(game.fixture.id)?.coverage).map(game=>({fixture:{id:game.fixture.id,date:game.fixture.date,status:game.fixture.status},league:game.league,teams:game.teams,metrics:metrics.get(game.fixture.id),cornerMetrics:window.cornerMetricsByFixture?.get(game.fixture.id)||null}));
+  const games=fixtures.filter(game=>CP_FEATURED_LEAGUES.has(game.league.id)&&!cpIsExcludedGame(game)&&metrics.get(game.fixture.id)?.coverage).map(game=>({fixture:{id:game.fixture.id,date:game.fixture.date,status:game.fixture.status},league:game.league,teams:game.teams,metrics:metrics.get(game.fixture.id),cornerMetrics:window.cornerMetricsByFixture?.get(game.fixture.id)||null}));
   try{localStorage.setItem('centralPro.opportunities.v1',JSON.stringify({version:1,date:$('analysisDate').value,generatedAt:new Date().toISOString(),games}))}catch{}
 }
 function fillFilters(){
-  const available=fixtures.filter(game=>!cpIsExcludedLeague(game.league)),countries=[...new Set(available.map(game=>game.league.country).filter(Boolean))].sort(),current=$('competition').value;
+  const available=fixtures.filter(game=>!cpIsExcludedGame(game)),countries=[...new Set(available.map(game=>game.league.country).filter(Boolean))].sort(),current=$('competition').value;
   $('competition').innerHTML='<option value="featured">Principais + relevantes</option><option value="main">Somente principais</option><option value="all">Todas as competições</option>';
-  $('competition').value=['featured','main','all'].includes(current)?current:'featured';
+  $('competition').value=['featured','main','all'].includes(current)?current:'all';
   $('country').innerHTML='<option value="all">Todos os países</option>'+countries.map(country=>`<option>${cpEscape(country)}</option>`).join('');
 }
 async function loadAnalysisRows(rows,token){
@@ -55,7 +55,7 @@ async function loadAnalysisRows(rows,token){
       render();
       try{
         const params=new URLSearchParams({
-          sample:'15',scope:'league',mode:'scanner',
+          sample:'15',scope:'all',mode:'scanner',
           home:String(game.teams.home.id),away:String(game.teams.away.id),
           league:String(game.league.id),season:String(game.league.season)
         });
@@ -87,7 +87,7 @@ async function loadAnalysisRows(rows,token){
 }
 async function load(){
   const token=++loadToken;metrics=new Map();analysisState=new Map();window.CornersScanner?.reset();sortKey=null;document.querySelectorAll('[data-sort]').forEach(head=>head.querySelector('.sort-arrow')?.remove());$('scannerBody').innerHTML='<tr class="scanner-loading"><td colspan="9">Carregando jogos do dia…</td></tr>';
-  try{const response=await fetch(`/api/jogos?date=${$('analysisDate').value}`),data=await response.json();if(!response.ok)throw Error(data.erro||'Jogos indisponíveis.');fixtures=(data.response||[]).filter(game=>!cpIsExcludedLeague(game.league));fillFilters();render();const targets=fixtures.filter(game=>CP_FEATURED_LEAGUES.has(game.league.id)).sort((a,b)=>priorityRank(a.league.id)-priorityRank(b.league.id)||new Date(a.fixture.date)-new Date(b.fixture.date));if(targets.length)loadAnalysisRows(targets,token)}catch(error){$('scannerBody').innerHTML=`<tr><td class="scanner-empty" colspan="9">${cpEscape(error.message)}</td></tr>`}
+  try{const response=await fetch(`/api/jogos?date=${$('analysisDate').value}`),data=await response.json();if(!response.ok)throw Error(data.erro||'Jogos indisponíveis.');fixtures=(data.response||[]).filter(game=>!cpIsExcludedGame(game));fillFilters();render();const targets=fixtures.filter(game=>!cpIsExcludedGame(game)).sort((a,b)=>priorityRank(a.league.id)-priorityRank(b.league.id)||new Date(a.fixture.date)-new Date(b.fixture.date));if(targets.length)loadAnalysisRows(targets,token)}catch(error){$('scannerBody').innerHTML=`<tr><td class="scanner-empty" colspan="9">${cpEscape(error.message)}</td></tr>`}
 }
 function setDate(value,button){$('analysisDate').value=value;[$('todayButton'),$('tomorrowButton')].forEach(item=>item.classList.toggle('active',item===button));load()}
 $('todayButton').onclick=()=>setDate(localDate(0),$('todayButton'));
