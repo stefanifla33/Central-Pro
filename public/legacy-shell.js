@@ -14,7 +14,7 @@
     'team.html':['teams.html','← Buscar times'],
     'my-teams.html':['teams.html','Explorar times']
   }[path];
-  const header=document.createElement('header');header.className='app-header';header.innerHTML=`<label class="global-search"><span>⌕</span><input id="globalSearch" placeholder="Buscar time, jogador, campeonato..." autocomplete="off"><kbd>Ctrl K</kbd></label><div class="header-actions">${contextual?`<a class="legacy-context-link" href="${contextual[0]}">${contextual[1]}</a>`:''}<span class="header-avatar">S</span></div>`;
+  const header=document.createElement('header');header.className='app-header';header.innerHTML=`<label class="global-search"><span>⌕</span><input id="globalSearch" placeholder="Buscar time, jogador, campeonato..." autocomplete="off"></label><div class="header-actions">${contextual?`<a class="legacy-context-link" href="${contextual[0]}">${contextual[1]}</a>`:''}<span class="header-avatar">S</span></div>`;
   frame.append(header);if(main)frame.append(main);document.body.prepend(menu,sidebar,frame);
   menu.onclick=()=>sidebar.classList.toggle('open');
   document.addEventListener('keydown',event=>{if((event.ctrlKey||event.metaKey)&&event.key.toLowerCase()==='k'){event.preventDefault();document.getElementById('globalSearch')?.focus()}});
