@@ -5,7 +5,10 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "node --watch server.js"
+    "dev": "node --watch server.js",
+    "test:snapshots": "node test/game-snapshot-store.test.js",
+    "test:offline": "node test/offline-mode.test.js",
+    "test:period-monitor": "node test/period-monitor-frequency.test.js"
   },
   "keywords": [],
   "author": "",

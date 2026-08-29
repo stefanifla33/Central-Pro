@@ -129,6 +129,8 @@ async function loadAnalysisRows(rows,token){
             data=await response.json();
             if(response.ok)break;
             lastError=Error(data.erro||'Falha na análise');
+            const transient=data.code!=='API_DAILY_QUOTA'&&(response.status===429||response.status>=500)&&data.code!=='API_PERMANENT';
+            if(!transient)break;
           }catch(error){lastError=error}
           if(attempt<3)await new Promise(resolve=>setTimeout(resolve,700*attempt));
         }
@@ -152,7 +154,7 @@ async function loadAnalysisRows(rows,token){
 }
 async function load(){
   const token=++loadToken;if(renderTimer!==null){clearTimeout(renderTimer);renderTimer=null}if(snapshotTimer!==null){clearTimeout(snapshotTimer);snapshotTimer=null}snapshotDirty=false;metrics=new Map();analysisState=new Map();snapshotDetails=new Map();window.CornersScanner?.reset();sortKey=null;document.querySelectorAll('[data-sort]').forEach(head=>head.querySelector('.sort-arrow')?.remove());$('scannerBody').innerHTML='<tr class="scanner-loading"><td colspan="9">Carregando jogos do dia…</td></tr>';
-  try{const response=await fetch(`/api/jogos?date=${$('analysisDate').value}`),data=await response.json();if(!response.ok)throw Error(data.erro||'Jogos indisponíveis.');fixtures=(data.response||[]).filter(game=>!cpIsExcludedGame(game));fillFilters();render();saveOpportunitySnapshot();const targets=fixtures.filter(game=>!cpIsExcludedGame(game)).sort((a,b)=>priorityRank(a.league.id)-priorityRank(b.league.id)||new Date(a.fixture.date)-new Date(b.fixture.date));if(targets.length)loadAnalysisRows(targets,token);else flushOpportunitySnapshot()}catch(error){$('scannerBody').innerHTML=`<tr><td class="scanner-empty" colspan="9">${cpEscape(error.message)}</td></tr>`}
+  try{const response=await fetch(`/api/jogos?date=${$('analysisDate').value}`),data=await response.json();if(!response.ok)throw Error(data.erro||'Jogos indisponíveis.');fixtures=(data.response||[]).filter(game=>!cpIsExcludedGame(game));window.CENTRAL_PRO_OFFLINE=Boolean(data.offline);fillFilters();render();if(data.offline){if($('analysisStatusMeta'))$('analysisStatusMeta').textContent='Modo offline · análises salvas preservadas';return}saveOpportunitySnapshot();const targets=fixtures.filter(game=>!cpIsExcludedGame(game)).sort((a,b)=>priorityRank(a.league.id)-priorityRank(b.league.id)||new Date(a.fixture.date)-new Date(b.fixture.date));if(targets.length)loadAnalysisRows(targets,token);else flushOpportunitySnapshot()}catch(error){$('scannerBody').innerHTML=`<tr><td class="scanner-empty" colspan="9">${cpEscape(error.message)}</td></tr>`}
 }
 function setDate(value,button){$('analysisDate').value=value;[$('todayButton'),$('tomorrowButton')].forEach(item=>item.classList.toggle('active',item===button));load()}
 $('todayButton').onclick=()=>setDate(localDate(0),$('todayButton'));

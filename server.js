@@ -3,6 +3,9 @@ require("dotenv").config();
 const express = require("express");
 const path = require("path");
 const fs = require("fs");
+const { createConfiguredGameSnapshotStorage } = require("./lib/storage/create-game-snapshot-storage");
+const { resolveGames } = require("./lib/storage/game-snapshot-storage");
+const { assertExternalRequestsAllowed, isCentralProOffline } = require("./lib/central-pro-offline");
 const { CP_MAIN_LEAGUES: MAIN_LEAGUES } = require("./public/competition-config");
 
 const app = express();
@@ -18,10 +21,17 @@ const pending = new Map();
 const lineupRefreshes = new Map();
 const lineupRevalidations = new Map();
 const metrics = { requests: 0, externalRequests: 0, cacheHits: 0, startedAt: Date.now() };
+// API-USAGE-DIAGNOSTIC: instrumentação temporária; remover após a auditoria de cota.
+const apiUsageDiagnostic = { externalTotal: 0, cacheHits: 0, pendingHits: 0, byEndpoint: new Map() };
+const apiQuotaState = { remaining: null, limit: null, blockedUntil: 0, reason: null };
+const API_DAILY_COOLDOWN_MS = 6 * 60 * 60 * 1000;
 let periodStore = { version: 1, fixtures: {} };
 let playerHistoryStore = { version: 1, fixtures: {} };
 let cornerHistoryStore = { version: 1, fixtures: {} };
+const gameSnapshotStorage = createConfiguredGameSnapshotStorage();
 let monitorRunning = false;
+let periodMonitorTimer = null;
+let periodMonitorNextDelay = 300_000;
 let nextCornerRequestAt = 0;
 let cornerRequestQueue = Promise.resolve();
 
@@ -458,7 +468,17 @@ async function collectFinishedPlayerHistory(games, limit = 2) {
             savePlayerHistoryStore();
             console.log(`[PLAYER HISTORY] fixture=${game.fixture.id} complete=${complete} players=${Object.keys(players).length}`);
         } catch (erro) {
+            playerHistoryStore.fixtures[game.fixture.id] = {
+                ...(existing || { fixture: { id: game.fixture.id, date: game.fixture.date, status: game.fixture.status.short, league: game.league, teams: game.teams }, players: {} }),
+                complete: false,
+                updatedAt: new Date().toISOString(),
+                retryAfter: new Date(Date.now() + (erro.code === "API_DAILY_QUOTA" ? (erro.retryAfterMs || API_DAILY_COOLDOWN_MS) : 900_000)).toISOString(),
+                errorType: erro.code || "request",
+                source: "/fixtures/players"
+            };
+            savePlayerHistoryStore();
             console.error(`[PLAYER HISTORY] fixture=${game.fixture.id} error=${erro.message}`);
+            if (erro.code === "API_DAILY_QUOTA") throw erro;
         }
     }
 }
@@ -508,6 +528,8 @@ function applyPeriodSnapshot(store, game, phase, response, capturedAt = new Date
         fixture: { id: fixtureId, date: game.fixture.date, league: game.league, teams: game.teams }
     };
     record.fixture = { ...record.fixture, id: fixtureId, date: game.fixture.date, league: game.league, teams: game.teams, status: game.fixture.status.short };
+    delete record.retryAfter;
+    delete record.errorType;
     if (record[phase] && validPeriodStatistics(record[phase].statistics, game)) return { saved: false, reason: "duplicate", secondHalf: Boolean(record.secondHalf) };
     record[phase] = { capturedAt, elapsed: game.fixture.status.elapsed, status: game.fixture.status.short, statistics };
     let secondHalf = false;
@@ -525,31 +547,96 @@ function applyPeriodSnapshot(store, game, phase, response, capturedAt = new Date
 async function football(endpoint, ttl = 60_000, options = {}) {
     metrics.requests++;
     const cached = cache.get(endpoint);
+    const diagnosticStartedAt = Date.now();
+    const parsedEndpoint = new URL(endpoint, API_BASE);
+    const endpointPath = parsedEndpoint.pathname;
+    const query = parsedEndpoint.searchParams.toString() || "-";
+    const caller = (new Error().stack || "").split("\n").slice(2)
+        .map(line => line.trim())
+        .find(line => !line.includes("footballAllPages") && !line.includes("cornerFootball")) || "unknown";
 
     if (!options.force && cached && Date.now() - cached.createdAt < ttl) {
         metrics.cacheHits++;
+        apiUsageDiagnostic.cacheHits++;
+        console.log(`[API-USAGE-DIAGNOSTIC] ${new Date().toISOString()} CACHE_HIT endpoint=${endpointPath} query="${query}" caller="${caller}" durationMs=${Date.now() - diagnosticStartedAt}`);
         return cached.data;
     }
 
     if (pending.has(endpoint)) {
         metrics.cacheHits++;
+        apiUsageDiagnostic.pendingHits++;
+        console.log(`[API-USAGE-DIAGNOSTIC] ${new Date().toISOString()} PENDING_HIT endpoint=${endpointPath} query="${query}" caller="${caller}" durationMs=${Date.now() - diagnosticStartedAt}`);
         return pending.get(endpoint);
+    }
+
+    // This is the final gate before the only external API-Football fetch.
+    // Cache and in-flight hits above remain available while offline.
+    assertExternalRequestsAllowed(endpoint);
+
+    if (apiQuotaState.blockedUntil > Date.now()) {
+        const retryAfterMs = apiQuotaState.blockedUntil - Date.now();
+        console.warn(`[API-QUOTA] BLOCKED_BY_COOLDOWN endpoint=${endpointPath} remaining=${apiQuotaState.remaining ?? "unknown"} retryAfterMs=${retryAfterMs}`);
+        const quotaError = new Error("Cota diária da API-Football esgotada. Nova tentativa externa bloqueada temporariamente.");
+        quotaError.code = "API_DAILY_QUOTA";
+        quotaError.status = 429;
+        quotaError.retryAfterMs = retryAfterMs;
+        throw quotaError;
     }
 
     const request = (async () => {
         metrics.externalRequests++;
-        const resposta = await fetch(`${API_BASE}${endpoint}`, {
-            headers: { "x-apisports-key": process.env.API_FOOTBALL_KEY },
-            signal: AbortSignal.timeout(12_000)
-        });
-
-        const dados = await resposta.json();
+        apiUsageDiagnostic.externalTotal++;
+        const sequence = apiUsageDiagnostic.externalTotal;
+        apiUsageDiagnostic.byEndpoint.set(endpointPath, (apiUsageDiagnostic.byEndpoint.get(endpointPath) || 0) + 1);
+        let resposta;
+        let dados;
+        try {
+            resposta = await fetch(`${API_BASE}${endpoint}`, {
+                headers: { "x-apisports-key": process.env.API_FOOTBALL_KEY },
+                signal: AbortSignal.timeout(12_000)
+            });
+            dados = await resposta.json();
+            const dailyLimitHeader = resposta.headers.get("x-ratelimit-requests-limit");
+            const dailyRemainingHeader = resposta.headers.get("x-ratelimit-requests-remaining");
+            if (dailyLimitHeader != null) apiQuotaState.limit = Number(dailyLimitHeader);
+            if (dailyRemainingHeader != null) apiQuotaState.remaining = Number(dailyRemainingHeader);
+            console.log(`[API-QUOTA] remaining=${Number.isFinite(apiQuotaState.remaining) ? apiQuotaState.remaining : "unknown"} limit=${Number.isFinite(apiQuotaState.limit) ? apiQuotaState.limit : "unknown"}`);
+        } finally {
+            const dailyLimit = resposta?.headers.get("x-ratelimit-requests-limit") ?? "unknown";
+            const dailyRemaining = resposta?.headers.get("x-ratelimit-requests-remaining") ?? "unknown";
+            const minuteLimit = resposta?.headers.get("x-ratelimit-limit") ?? "unknown";
+            const minuteRemaining = resposta?.headers.get("x-ratelimit-remaining") ?? "unknown";
+            console.log(`[API-USAGE] #${sequence} ${new Date().toISOString()} endpoint=${endpointPath} query="${query}" status=${resposta?.status ?? "NETWORK_ERROR"} dailyLimit=${dailyLimit} dailyRemaining=${dailyRemaining} minuteLimit=${minuteLimit} minuteRemaining=${minuteRemaining} caller="${caller}" external=true durationMs=${Date.now() - diagnosticStartedAt}`);
+        }
 
         if (!resposta.ok || dados.errors?.length || Object.keys(dados.errors || {}).length) {
-            throw new Error(dados.message || JSON.stringify(dados.errors) || "Erro na API-Football");
+            const apiMessage = dados.message || JSON.stringify(dados.errors) || "Erro na API-Football";
+            const dailyLimitReached = /request limit for the day|daily.{0,20}(?:limit|quota)|quota.{0,20}daily/i.test(apiMessage);
+            const requestError = new Error(apiMessage);
+            requestError.status = resposta.status;
+            if (dailyLimitReached) {
+                apiQuotaState.remaining = 0;
+                apiQuotaState.blockedUntil = Date.now() + API_DAILY_COOLDOWN_MS;
+                apiQuotaState.reason = "daily-limit";
+                requestError.code = "API_DAILY_QUOTA";
+                requestError.retryAfterMs = API_DAILY_COOLDOWN_MS;
+                console.error(`[API-QUOTA] DAILY_LIMIT_REACHED blockedUntil=${new Date(apiQuotaState.blockedUntil).toISOString()}`);
+            } else if (resposta.status === 429) {
+                requestError.code = "API_RATE_LIMIT";
+            } else if (resposta.status >= 500) {
+                requestError.code = "API_TRANSIENT";
+            } else if (resposta.status >= 400) {
+                requestError.code = "API_PERMANENT";
+            }
+            throw requestError;
         }
 
         cache.set(endpoint, { data: dados, createdAt: Date.now() });
+        if (apiQuotaState.remaining === 0) {
+            apiQuotaState.blockedUntil = Date.now() + API_DAILY_COOLDOWN_MS;
+            apiQuotaState.reason = "remaining-zero";
+            console.error(`[API-QUOTA] DAILY_LIMIT_REACHED blockedUntil=${new Date(apiQuotaState.blockedUntil).toISOString()}`);
+        }
         return dados;
     })();
 
@@ -560,6 +647,17 @@ async function football(endpoint, ttl = 60_000, options = {}) {
         pending.delete(endpoint);
     }
 }
+
+function printApiUsageDiagnosticSummary() {
+    console.log("[API-USAGE-SUMMARY] API-USAGE-DIAGNOSTIC");
+    console.log(`[API-USAGE-SUMMARY] total externas: ${apiUsageDiagnostic.externalTotal}`);
+    console.log(`[API-USAGE-SUMMARY] cache hits: ${apiUsageDiagnostic.cacheHits}`);
+    console.log(`[API-USAGE-SUMMARY] pending hits: ${apiUsageDiagnostic.pendingHits}`);
+    [...apiUsageDiagnostic.byEndpoint.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+        .forEach(([name, count]) => console.log(`[API-USAGE-SUMMARY] ${name}: ${count}`));
+}
+
+setInterval(printApiUsageDiagnosticSummary, 60_000).unref();
 
 async function footballAllPages(endpoint, ttl) {
     const separator = endpoint.includes("?") ? "&" : "?";
@@ -597,6 +695,7 @@ function selectPlayerStatistics(response, { teamId, leagueId, season }) {
 async function capturePeriodStatistics(game, phase) {
     const fixtureId = game.fixture.id;
     const existing = periodStore.fixtures[fixtureId];
+    if (existing?.retryAfter && new Date(existing.retryAfter).getTime() > Date.now()) return false;
     if (existing?.[phase] && validPeriodStatistics(existing[phase].statistics, game)) return false;
     try {
         const data = await cornerFootball(`/fixtures/statistics?fixture=${fixtureId}`, 10_000);
@@ -611,35 +710,56 @@ async function capturePeriodStatistics(game, phase) {
         else if (phase === "fulltime" && !periodStore.fixtures[fixtureId]?.halftime) console.warn(`[PERIOD-STATS] fixture=${fixtureId} status=${game.fixture.status.short} secondHalf=skipped_missing_ht`);
         return true;
     } catch (erro) {
+        const retryMs = erro.code === "API_DAILY_QUOTA" ? (erro.retryAfterMs || API_DAILY_COOLDOWN_MS) : 900_000;
+        periodStore.fixtures[fixtureId] = {
+            ...(existing || { fixture: { id: fixtureId, date: game.fixture.date, league: game.league, teams: game.teams } }),
+            retryAfter: new Date(Date.now() + retryMs).toISOString(),
+            errorType: erro.code || "request"
+        };
+        savePeriodStore();
         console.warn(`[PERIOD-STATS] fixture=${fixtureId} status=${game.fixture.status.short} snapshot=${phase === "halftime" ? "ht" : "ft"} failed=${erro.message}`);
+        if (erro.code === "API_DAILY_QUOTA") throw erro;
         return false;
     }
 }
 
 async function monitorMainLeagues() {
+    if (isCentralProOffline()) {
+        if (!monitorMainLeagues.offlineLogged) {
+            console.log("[PERIOD-MONITOR] disabled: offline mode");
+            monitorMainLeagues.offlineLogged = true;
+        }
+        return { disabled: true, reason: "offline" };
+    }
     if (monitorRunning || !process.env.API_FOOTBALL_KEY) return;
     monitorRunning = true;
     try {
         const date = new Intl.DateTimeFormat("en-CA", { timeZone: APP_TIMEZONE }).format(new Date());
         const schedule = await football(`/fixtures?date=${date}&timezone=${encodeURIComponent(APP_TIMEZONE)}`, 45_000);
         const games = (schedule.response || []).filter(game => MAIN_LEAGUES.has(game.league.id));
+        const active = games.some(game => ["1H", "HT", "2H", "ET", "BT", "P", "LIVE", "INT"].includes(game.fixture.status.short));
+        periodMonitorNextDelay = active ? 300_000 : 300_000;
         const halftime = games.filter(game => game.fixture.status.short === "HT");
         const finished = games.filter(game => ["FT", "AET", "PEN"].includes(game.fixture.status.short));
         for (const game of halftime) {
             try { await capturePeriodStatistics(game, "halftime"); }
-            catch (erro) { console.warn(`[PERIOD-STATS] fixture=${game.fixture.id} status=HT failed=${erro.message}`); }
+            catch (erro) { if (erro.code === "API_DAILY_QUOTA") throw erro;console.warn(`[PERIOD-STATS] fixture=${game.fixture.id} status=HT failed=${erro.message}`); }
         }
         for (const game of finished) {
             try {
                 const record = periodStore.fixtures[game.fixture.id];
-                if (!record?.fulltime || !validPeriodStatistics(record.fulltime.statistics, game)) await capturePeriodStatistics(game, "fulltime");
-            } catch (erro) { console.warn(`[PERIOD-STATS] fixture=${game.fixture.id} status=${game.fixture.status.short} failed=${erro.message}`); }
+                if ((!record?.fulltime || !validPeriodStatistics(record.fulltime.statistics, game)) && !(record?.retryAfter && new Date(record.retryAfter).getTime() > Date.now())) await capturePeriodStatistics(game, "fulltime");
+            } catch (erro) { if (erro.code === "API_DAILY_QUOTA") throw erro;console.warn(`[PERIOD-STATS] fixture=${game.fixture.id} status=${game.fixture.status.short} failed=${erro.message}`); }
         }
         await collectFinishedPlayerHistory(finished, 2);
     } catch (erro) {
+        periodMonitorNextDelay = erro.code === "API_DAILY_QUOTA" ? (erro.retryAfterMs || API_DAILY_COOLDOWN_MS) : 300_000;
         console.error("Monitor de períodos:", erro.message);
     } finally {
         monitorRunning = false;
+        clearTimeout(periodMonitorTimer);
+        periodMonitorTimer = setTimeout(monitorMainLeagues, periodMonitorNextDelay);
+        periodMonitorTimer.unref();
     }
 }
 
@@ -882,18 +1002,19 @@ app.get("/api/explorer", async (req, res) => {
 });
 
 app.get("/api/jogos", async (req, res) => {
+    const date = /^\d{4}-\d{2}-\d{2}$/.test(req.query.date)
+        ? req.query.date
+        : new Intl.DateTimeFormat("en-CA", { timeZone: APP_TIMEZONE }).format(new Date());
     try {
-        const date = /^\d{4}-\d{2}-\d{2}$/.test(req.query.date)
-            ? req.query.date
-            : new Intl.DateTimeFormat("en-CA", { timeZone: APP_TIMEZONE }).format(new Date());
-
         // Placar e status ao vivo precisam de cache curto. Cinco minutos fazia
         // jogos iniciados demorarem demais para aparecer como "ao vivo".
-        res.json(await football(`/fixtures?date=${date}&timezone=${encodeURIComponent(APP_TIMEZONE)}`, 30_000));
+        res.json(await resolveGames(date,
+            () => football(`/fixtures?date=${date}&timezone=${encodeURIComponent(APP_TIMEZONE)}`, 30_000),
+            gameSnapshotStorage));
 
     } catch (erro) {
         console.error(erro);
-        res.status(502).json({ erro: "Não foi possível buscar os jogos.", detalhe: erro.message });
+        res.status(erro.status === 429 ? 429 : 502).json({ erro: "Não foi possível buscar os jogos.", detalhe: erro.message, code: erro.code || "API_ERROR", retryAfterMs: erro.retryAfterMs || null });
     }
 });
 
@@ -1024,8 +1145,27 @@ app.get("/api/partidas/:id/jogadores", async (req, res) => {
     if (!/^\d+$/.test(req.params.id)) return res.status(400).json({ status: "error", erro: "ID da partida inválido." });
     const id = Number(req.params.id);
     if (!Number.isSafeInteger(id) || id <= 0) return res.status(400).json({ status: "error", erro: "ID da partida inválido." });
+    const playerExternalStart = metrics.externalRequests;
+    const maxPlayerExternalRequests = 80;
+    const playerFootball = (endpoint, ttl, options = {}) => {
+        const cached = cache.get(endpoint);
+        const cacheUsable = !options.force && cached && Date.now() - cached.createdAt < ttl;
+        if (!cacheUsable && !pending.has(endpoint) && metrics.externalRequests - playerExternalStart >= maxPlayerExternalRequests) {
+            const budgetError = new Error("Limite preventivo de chamadas externas da fixture atingido.");
+            budgetError.code = "PLAYER_FIXTURE_BUDGET";
+            throw budgetError;
+        }
+        return football(endpoint, ttl, options);
+    };
+    const playerFootballAllPages = async (endpoint, ttl) => {
+        const separator = endpoint.includes("?") ? "&" : "?";
+        const first = await playerFootball(`${endpoint}${separator}page=1`, ttl);
+        const total = Math.max(1, Number(first.paging?.total) || 1);
+        const remaining = await Promise.all(Array.from({ length: total - 1 }, (_, index) => playerFootball(`${endpoint}${separator}page=${index + 2}`, ttl)));
+        return { ...first, response: [first, ...remaining].flatMap(page => page.response || []) };
+    };
     try {
-        const fixtureData = await football(`/fixtures?id=${id}`, 30_000);
+        const fixtureData = await playerFootball(`/fixtures?id=${id}`, 30_000);
         const fixture = fixtureData.response?.[0];
         if (!fixture || fixture.fixture?.id !== id) return res.status(404).json({ status: "error", erro: "Partida não encontrada." });
 
@@ -1046,7 +1186,7 @@ app.get("/api/partidas/:id/jogadores", async (req, res) => {
         const cacheHit = !force && Boolean(existing && now - existing.createdAt < ttl);
         console.log(`[LINEUP] fixture=${id} endpoint=${endpoint} cache=${cacheHit ? "HIT" : "MISS"} ttl=${ttl}`);
 
-        let official = await football(endpoint, ttl, { force });
+        let official = await playerFootball(endpoint, ttl, { force });
         let lineups = Array.isArray(official.response) ? official.response : [];
         let lineupSource = cacheHit ? "cache" : "api";
         let lineupCacheState = cacheHit ? "hit" : force ? "refresh" : "miss";
@@ -1056,7 +1196,7 @@ app.get("/api/partidas/:id/jogadores", async (req, res) => {
             const lastRevalidation = lineupRevalidations.get(id) || 0;
             if (closeToKickoff && now - lastRevalidation >= revalidationInterval) {
                 lineupRevalidations.set(id, now);
-                official = await football(endpoint, ttl, { force: true });
+                official = await playerFootball(endpoint, ttl, { force: true });
                 lineups = Array.isArray(official.response) ? official.response : [];
                 lineupSource = "api";
                 lineupCacheState = "refresh";
@@ -1072,15 +1212,15 @@ app.get("/api/partidas/:id/jogadores", async (req, res) => {
             const teamList = [fixture.teams.home, fixture.teams.away];
             probableTeams = await Promise.all(teamList.map(async team => {
                 const [squadResult, statsResult, recentResult] = await Promise.all([
-                    football(`/players/squads?team=${team.id}`, 21_600_000).catch(() => ({ response: [] })),
-                    footballAllPages(`/players?team=${team.id}&season=${fixture.league.season}`, 3_600_000).catch(() => ({ response: [] })),
-                    football(`/fixtures?team=${team.id}&last=5&timezone=${encodeURIComponent(APP_TIMEZONE)}`, 900_000).catch(() => ({ response: [] }))
+                    playerFootball(`/players/squads?team=${team.id}`, 86_400_000).catch(() => ({ response: [] })),
+                    playerFootballAllPages(`/players?team=${team.id}&season=${fixture.league.season}`, 21_600_000).catch(() => ({ response: [] })),
+                    playerFootball(`/fixtures?team=${team.id}&last=5&timezone=${encodeURIComponent(APP_TIMEZONE)}`, 3_600_000).catch(() => ({ response: [] }))
                 ]);
                 const squad = squadResult.response?.[0]?.players || [];
                 const currentIds = new Set(squad.map(player => player.id));
                 const statsById = new Map((statsResult.response || []).map(item => [item.player.id, selectPlayerStatistics([item], { teamId: team.id, leagueId: fixture.league.id, season: fixture.league.season })]));
                 const recentFixtures = (recentResult.response || []).filter(game => game.fixture?.id !== id).slice(0, 3);
-                const recentLineups = await Promise.all(recentFixtures.map(game => football(`/fixtures/lineups?fixture=${game.fixture.id}`, 21_600_000).catch(() => ({ response: [] }))));
+                const recentLineups = await Promise.all(recentFixtures.map(game => playerFootball(`/fixtures/lineups?fixture=${game.fixture.id}`, 86_400_000).catch(() => ({ response: [] }))));
                 const usage = new Map();
                 let recentFormation = null;
                 recentLineups.forEach((result, matchIndex) => {
@@ -1099,8 +1239,8 @@ app.get("/api/partidas/:id/jogadores", async (req, res) => {
         } else {
             playerStatsTeams = await Promise.all([fixture.teams.home, fixture.teams.away].map(async team => {
                 const [squadResult, statsResult] = await Promise.all([
-                    football(`/players/squads?team=${team.id}`, 21_600_000).catch(() => ({ response: [] })),
-                    footballAllPages(`/players?team=${team.id}&season=${fixture.league.season}`, 3_600_000).catch(() => ({ response: [] }))
+                    playerFootball(`/players/squads?team=${team.id}`, 86_400_000).catch(() => ({ response: [] })),
+                    playerFootballAllPages(`/players?team=${team.id}&season=${fixture.league.season}`, 21_600_000).catch(() => ({ response: [] }))
                 ]);
                 const squad = squadResult.response?.[0]?.players || [];
                 const statsById = new Map((statsResult.response || []).map(item => [item.player.id, selectPlayerStatistics([item], { teamId: team.id, leagueId: fixture.league.id, season: fixture.league.season })]));
@@ -1113,11 +1253,11 @@ app.get("/api/partidas/:id/jogadores", async (req, res) => {
                 ...(lineup.substitutes || []).map(item => ({ team: lineup.team, player: item.player }))
             ]);
             const statsIndex = new Map(playerStatsTeams.flatMap(team => team.players.filter(item => item.statistics).map(item => [`${team.team.id}:${item.player.id}`, item.statistics])));
-            const missing = official.filter(item => !statsIndex.has(`${item.team.id}:${item.player.id}`));
+            const missing = [...new Map(official.filter(item => !statsIndex.has(`${item.team.id}:${item.player.id}`)).map(item => [`${item.team.id}:${item.player.id}`,item])).values()];
             additionalStatsCalls = missing.length;
             playerStatsDiagnostics = await Promise.all(missing.map(async item => {
                 const endpoint = `/players?id=${item.player.id}&season=${fixture.league.season}`;
-                const result = await football(endpoint, 21_600_000).catch(() => ({ response: [] }));
+                const result = await playerFootball(endpoint, 86_400_000).catch(() => ({ response: [] }));
                 const blocks = (result.response || []).flatMap(row => row.statistics || []);
                 const selected = selectPlayerStatistics(result.response, { teamId: item.team.id, leagueId: fixture.league.id, season: fixture.league.season });
                 const targetTeam = playerStatsTeams.find(team => team.team.id === item.team.id);
@@ -1139,7 +1279,7 @@ app.get("/api/partidas/:id/jogadores", async (req, res) => {
             : ["FT", "AET", "PEN"].includes(fixtureStatus) ? 21_600_000
             : 60_000;
         const matchPlayers = matchHasStarted
-            ? await football(`/fixtures/players?fixture=${id}`, fixturePlayerTtl, { force }).catch(() => ({ response: [] }))
+            ? await playerFootball(`/fixtures/players?fixture=${id}`, fixturePlayerTtl, { force }).catch(() => ({ response: [] }))
             : { response: [] };
         const tablePlayers = lineups.length
             ? lineups.reduce((total, lineup) => total + (lineup.startXI?.length || 0) + (lineup.substitutes?.length || 0), 0)
@@ -1224,7 +1364,7 @@ app.get("/api/partidas/:id/analise", async (req, res) => {
         const diagnostics = Object.fromEntries(result.map((item, index) => {
             const name = requestNames[index];
             if (notApplicable.has(name)) return [name, { status: "not_applicable" }];
-            if (item.status === "rejected") return [name, { status: "error", error: "Falha na consulta externa." }];
+            if (item.status === "rejected") return [name, { status: "error", error: "Falha na consulta externa.", code: item.reason?.code || "API_ERROR", httpStatus: item.reason?.status || null }];
             const value = item.value.response;
             const empty = value == null || (Array.isArray(value) && value.length === 0);
             return [name, { status: empty ? "empty" : "ok" }];
@@ -1236,9 +1376,11 @@ app.get("/api/partidas/:id/analise", async (req, res) => {
         });
         const rejectedHistory = ["homeRecent", "awayRecent"].filter(name => diagnostics[name].status === "error");
         if (rejectedHistory.length) {
+            const quotaFailure = rejectedHistory.some(name => diagnostics[name].code === "API_DAILY_QUOTA");
             console.warn(`[MATCH-ANALYSIS] fixture=${id} failed=${rejectedHistory.join(",")}`);
-            return res.status(502).json({
+            return res.status(quotaFailure ? 429 : 502).json({
                 erro: "Histórico recente indisponível. Tente novamente em instantes.",
+                code: quotaFailure ? "API_DAILY_QUOTA" : "API_TRANSIENT",
                 diagnostics
             });
         }
@@ -1406,7 +1548,7 @@ app.get("/api/partidas/:id/analise", async (req, res) => {
         });
     } catch (erro) {
         console.error(erro);
-        res.status(502).json({ erro: "Não foi possível gerar a análise da partida.", detalhe: erro.message });
+        res.status(erro.status === 429 ? 429 : 502).json({ erro: "Não foi possível gerar a análise da partida.", detalhe: erro.message, code: erro.code || "API_ERROR", retryAfterMs: erro.retryAfterMs || null });
     }
 });
 
@@ -1975,13 +2117,17 @@ app.get("/api/ligas/:id/artilheiros", async (req, res) => {
 function startServer() {
     return app.listen(PORT, () => {
         console.log(`Servidor iniciado na porta ${PORT}`);
+        if (isCentralProOffline()) {
+            console.log("====================================");
+            console.log("CENTRAL PRO — OFFLINE MODE");
+            console.log("External API requests: BLOCKED");
+            console.log("====================================");
+        }
         monitorMainLeagues();
-        setInterval(monitorMainLeagues, 60_000).unref();
     });
 }
 
 if (require.main === module) startServer();
 
 module.exports = app;
-
-
+app.locals.offlineTest = { football, monitorMainLeagues, metrics };

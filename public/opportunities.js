@@ -2,21 +2,8 @@
   'use strict';
   const STORAGE_KEY='centralPro.opportunities.v1';
   const SNAPSHOT_VERSION=3;
-  const MARKETS={
-    over05HT:{label:'+0.5 HT',detail:'Mais de 0.5 gol no 1º tempo',minimum:6},
-    over05:{label:'+0.5 gols',detail:'Mais de 0.5 gol na partida',minimum:8},
-    over15:{label:'+1.5 gols',detail:'Mais de 1.5 gols na partida',minimum:8},
-    over25:{label:'+2.5 gols',detail:'Mais de 2.5 gols na partida',minimum:8},
-    btts:{label:'Ambas marcam',detail:'As duas equipes marcam',minimum:8},
-    homeScores:{label:'Casa marca',detail:'Mandante marca pelo menos um gol',minimum:4},
-    awayScores:{label:'Fora marca',detail:'Visitante marca pelo menos um gol',minimum:4},
-    cornersOver65:{label:'+6.5 escanteios',detail:'Mais de 6.5 escanteios na partida',minimum:6,family:'corners',metricKey:'over65'},
-    cornersOver75:{label:'+7.5 escanteios',detail:'Mais de 7.5 escanteios na partida',minimum:6,family:'corners',metricKey:'over75'},
-    cornersOver85:{label:'+8.5 escanteios',detail:'Mais de 8.5 escanteios na partida',minimum:6,family:'corners',metricKey:'over85'},
-    cornersOver95:{label:'+9.5 escanteios',detail:'Mais de 9.5 escanteios na partida',minimum:6,family:'corners',metricKey:'over95'}
-  };
-  const RANKING_MARKET_KEYS=['over05HT','over05','over15','over25','btts','homeScores','awayScores'];
-  const rankingMarkets=()=>RANKING_MARKET_KEYS.map(key=>[key,MARKETS[key]]);
+  const {MARKETS,rankingMarkets,confidenceLevel,opportunities,recommendationScore,compareRecommendations,entryFields}=window.CPOpportunityEngine;
+  const displayRankingMarkets=()=>rankingMarkets().filter(([key])=>key!=='over05');
   let level='all';
   const $=id=>document.getElementById(id);
   const escape=value=>{const node=document.createElement('i');node.textContent=value??'—';return node.innerHTML};
@@ -28,23 +15,10 @@
   }
 
   function loadSnapshot(){try{const data=JSON.parse(localStorage.getItem(STORAGE_KEY)),generated=Date.parse(data?.generatedAt),fresh=Number.isFinite(generated)&&Date.now()-generated<172800000;return data?.version===SNAPSHOT_VERSION&&fresh&&/^\d{4}-\d{2}-\d{2}$/.test(data.date||'')&&Array.isArray(data.games)?data:{games:[]}}catch{return{games:[]}}}
-  function opportunities(snapshot){
-    return snapshot.games.flatMap(game=>rankingMarkets().map(([key,market])=>{const metric=game.metrics?.[key],evidence=metric?.evidence||metric,minimum=market.minimum;if(!metric||evidence.total<minimum)return null;return{game,key,market,metric,family:'goals',level:confidenceLevel(metric,game),sampleQuality:evidence.total,sampleLabel:`últimos ${metric.total} válidos · ${evidence.total} analisados`}}).filter(Boolean));
-  }
-
-  function confidenceLevel(metric,game){
-    const evidence=metric?.evidence||metric,value=Number(evidence?.value||0),total=Number(evidence?.total||0),source=game?.metrics?.sourceSample||{},context=game?.sampleContext||{};
-    const homeSample=Number(source.displayHome||0),awaySample=Number(source.displayAway||0),complete=homeSample>=5&&awaySample>=5,balanced=Math.min(homeSample,awaySample)>=4&&Math.abs(homeSample-awaySample)<=1;
-    if(!complete||!balanced)return 'cautious';
-    if(context.transitionSeason)return value>=75&&total>=8?'moderate':'cautious';
-    if(total>=8&&value>=80)return 'strong';
-    if(total>=6&&value>=70)return 'moderate';
-    return 'cautious';
-  }
   function confidenceLabel(item){return item.level==='strong'?'Alta':item.level==='moderate'?'Moderada':'Atenção'}
   function secondarySignals(item){
     const metrics=item.game.metrics||{};
-    return rankingMarkets()
+    return displayRankingMarkets()
       .filter(([key])=>key!==item.key)
       .map(([key,market])=>({key,label:market.label,metric:metrics[key]}))
       .filter(signal=>{const evidence=signal.metric?.evidence||signal.metric;return signal.metric&&evidence.total>=(MARKETS[signal.key]?.minimum||8)&&signal.metric.value>=60})
@@ -60,32 +34,21 @@
   }
   function hour(game){return Number(new Date(game.fixture.date).toLocaleTimeString('pt-BR',{hour:'2-digit',hour12:false,timeZone:'America/Sao_Paulo'}).slice(0,2))}
   function timeLabel(game){return new Date(game.fixture.date).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit',timeZone:'America/Sao_Paulo'})}
-  function entryFields(item){
-    const game=item.game,selections={over05HT:['Gols no 1º tempo','+0.5 gol no 1º tempo'],over05:['Total de gols','+0.5 gols'],over15:['Total de gols','+1.5 gols'],over25:['Total de gols','+2.5 gols'],btts:['Ambas marcam','Sim'],homeScores:['Time marca',`${game.teams.home.name} marca`],awayScores:['Time marca',`${game.teams.away.name} marca`],cornersOver65:['Total de escanteios','+6.5 escanteios'],cornersOver75:['Total de escanteios','+7.5 escanteios'],cornersOver85:['Total de escanteios','+8.5 escanteios'],cornersOver95:['Total de escanteios','+9.5 escanteios']},[market,selection]=selections[item.key];
-    return{date:new Date(game.fixture.date).toLocaleDateString('en-CA',{timeZone:'America/Sao_Paulo'}),competition:game.league.name,match:`${game.teams.home.name} x ${game.teams.away.name}`,market,selection};
-  }
   function normalized(value){return String(value||'').trim().toLocaleLowerCase('pt-BR')}
   function pendingDuplicate(fields){return window.BankrollStore.load().entries.some(entry=>entry.result==='pending'&&normalized(entry.match)===normalized(fields.match)&&normalized(entry.market)===normalized(fields.market)&&normalized(entry.selection)===normalized(fields.selection))}
   function showToast(message){$('toastMessage').textContent=message;$('opportunityToast').hidden=false;clearTimeout(showToast.timer);showToast.timer=setTimeout(()=>$('opportunityToast').hidden=true,6000)}
   function openEntry(item){const fields=entryFields(item);if(pendingDuplicate(fields)){showToast('Esta oportunidade já está na sua banca.');return}$('opportunityEntryForm').reset();$('entryFixtureId').value=item.game.fixture.id;Object.entries(fields).forEach(([key,value])=>$(`entry${key[0].toUpperCase()}${key.slice(1)}`).value=value);$('opportunityEntryDialog').showModal();setTimeout(()=>$('entryOdd').focus(),50)}
   function filtered(items){const market=$('marketFilter').value,league=$('leagueFilter').value,time=$('timeFilter').value;return items.filter(item=>(level==='all'||item.level===level)&&(market==='all'||item.key===market)&&(league==='all'||String(item.game.league.id)===league)&&(time==='all'||time==='morning'&&hour(item.game)<12||time==='afternoon'&&hour(item.game)>=12&&hour(item.game)<18||time==='night'&&hour(item.game)>=18)).sort((a,b)=>(b.level==='strong')-(a.level==='strong')||b.metric.value-a.metric.value||b.sampleQuality-a.sampleQuality||b.metric.total-a.metric.total||new Date(a.game.fixture.date)-new Date(b.game.fixture.date));}
   function fillFilters(snapshot){
-    $('marketFilter').innerHTML='<option value="all">Todos os mercados</option>'+rankingMarkets().map(([key,item])=>`<option value="${key}">${item.label}</option>`).join('');
+    $('marketFilter').innerHTML='<option value="all">Todos os mercados</option>'+displayRankingMarkets().map(([key,item])=>`<option value="${key}">${item.label}</option>`).join('');
     const leagues=[...new Map(snapshot.games.map(game=>[game.league.id,game.league])).values()].sort((a,b)=>a.name.localeCompare(b.name));
     $('leagueFilter').innerHTML='<option value="all">Todos os campeonatos</option>'+leagues.map(item=>`<option value="${item.id}">${escape(item.name)}</option>`).join('');
   }
-  function recommendationScore(item){
-    const levelScore={strong:30,moderate:18,cautious:8};
-    const marketWeight={over25:18,btts:17,cornersOver95:18,cornersOver85:16,homeScores:14,awayScores:14,cornersOver75:12,over15:12,over05HT:10,cornersOver65:3,over05:2};
-    const evidence=item.metric?.evidence||item.metric,sample=Math.min(Number(evidence?.total||0),15)*1.2;
-    const hitRate=Number(item.metric?.value||0)*0.45;
-    return (levelScore[item.level]||0)+(marketWeight[item.key]||0)+sample+hitRate;
-  }
   function topItems(items,limit=3){
-    const sorted=[...items].sort((a,b)=>recommendationScore(b)-recommendationScore(a)||b.metric.value-a.metric.value||b.metric.total-a.metric.total),chosen=[],families={};for(const item of sorted){if((families[item.family]||0)>=2)continue;chosen.push(item);families[item.family]=(families[item.family]||0)+1;if(chosen.length===limit)return chosen}for(const item of sorted){if(!chosen.includes(item))chosen.push(item);if(chosen.length===limit)break}return chosen;
+    const sorted=[...items].sort(compareRecommendations),chosen=[],families={};for(const item of sorted){if((families[item.family]||0)>=2)continue;chosen.push(item);families[item.family]=(families[item.family]||0)+1;if(chosen.length===limit)return chosen}for(const item of sorted){if(!chosen.includes(item))chosen.push(item);if(chosen.length===limit)break}return chosen;
   }
   function render(){
-    const snapshot=loadSnapshot(),all=opportunities(snapshot),items=filtered(all),groups=new Map;
+    const snapshot=loadSnapshot(),all=opportunities(snapshot).filter(item=>item.key!=='over05'),items=filtered(all),groups=new Map;
     items.forEach(item=>{const id=item.game.fixture.id;if(!groups.has(id))groups.set(id,{game:item.game,items:[]});groups.get(id).items.push(item)});
     const cards=[...groups.values()].map(group=>({...group,recommendations:topItems(group.items,3)}));
     const allGames=new Set(all.map(item=>item.game.fixture.id));
