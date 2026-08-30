@@ -1,83 +1,73 @@
 (function(){
-  const fixtureRequests=new Map(),fixtureResults=new Map();let playerTabActive=false,refreshQueued=false,allPlayerRows=[];
-  const PLAYER_SNAPSHOT_KEY='centralPro.players.snapshot.v1',PLAYER_SNAPSHOT_VERSION=1;
-  let playerSnapshotDate=null,playerSnapshotTimer=null,playerSnapshotDirty=false;
-  const statValue=(statistics,path)=>path.reduce((value,key)=>value?.[key],statistics);
-  const number=value=>{if(value==null||value==='')return null;const parsed=Number(value);return Number.isFinite(parsed)?parsed:null};
-  const position=item=>({Goalkeeper:'G',Defender:'D',Midfielder:'M',Attacker:'A',Forward:'A',F:'A'}[item.statistics?.games?.position||item.player?.position]||item.statistics?.games?.position||item.player?.position||'—');
+  const fixtureRequests=new Map();
+  let playerTabActive=false,runToken=0,activeRows=[],activeDate='',lastCompleteSnapshot=null;
+  const snapshot=window.CPPlayerSnapshot;
   const analyzedDate=()=>document.getElementById('analysisDate')?.value||'';
-  const compactTeam=team=>team?{id:team.id,name:team.name,logo:team.logo||null}:null;
-  function snapshotPlayer(item){
-    const game=item.game,home=game.teams.home,away=game.teams.away,isHome=Number(item.team.id)===Number(home.id),opponent=isHome?away:Number(item.team.id)===Number(away.id)?home:null,playerPosition=position(item);
-    return{fixture:{id:game.fixture.id,date:game.fixture.date,teams:{home:compactTeam(home),away:compactTeam(away)}},league:{id:game.league.id,name:game.league.name,country:game.league.country||null},team:compactTeam(item.team),opponent:compactTeam(opponent),player:{id:item.player.id,name:item.player.name,photo:item.player.photo||null,position:playerPosition==='—'?null:playerPosition},status:item.status,games:item.games,minutes:item.minutes,shotsOn:item.shotsOn,average:item.average};
+  const position=row=>row.playerPosition||'—';
+
+  async function json(url){
+    const response=await fetch(url),data=await response.json();
+    if(!response.ok||data?.status==='error')throw Error(data?.erro||'Jogadores indisponíveis.');
+    return data;
   }
-  function persistPlayerSnapshot(){
-    if(playerSnapshotTimer!==null){clearTimeout(playerSnapshotTimer);playerSnapshotTimer=null}
-    if(!playerSnapshotDirty)return;
-    playerSnapshotDirty=false;
-    const date=playerSnapshotDate||analyzedDate();
-    try{localStorage.setItem(PLAYER_SNAPSHOT_KEY,JSON.stringify({version:PLAYER_SNAPSHOT_VERSION,date,generatedAt:new Date().toISOString(),players:allPlayerRows.map(snapshotPlayer)}))}catch{}
+  function requestFixture(game){
+    if(!cpIsScannerEligibleGame(game))return Promise.resolve(null);
+    const key=`${game.fixture.id}:${game.fixture.date}`;
+    if(!fixtureRequests.has(key))fixtureRequests.set(key,(async()=>{
+      const scannerQuery=`mode=scanner&league=${encodeURIComponent(game.league.id)}`;
+      const confirmation=await json(`/api/partidas/${game.fixture.id}/jogadores?confirmationOnly=1&${scannerQuery}`);
+      const confirmationStatus=confirmation?.lineupStatus==='official'||confirmation?.status==='available'?'official':confirmation?.lineupStatus==='probable'||confirmation?.status==='probable'?'probable':null;
+      if(!confirmationStatus)return null;
+      const ids=team=>{const lineup=(confirmation.lineups||[]).find(item=>Number(item.team?.id)===Number(team.id)),probable=(confirmation.probableTeams||[]).find(item=>Number(item.team?.id)===Number(team.id));return [...(lineup?.startXI||[]),...(lineup?.substitutes||[])].map(item=>item.player?.id).concat((probable?.players||[]).map(item=>item.player?.id)).filter(Number.isSafeInteger)};
+      const recent=await json(`/api/partidas/${game.fixture.id}/jogadores-recentes?${scannerQuery}&confirmation=${confirmationStatus}&homePlayers=${ids(game.teams.home).join(',')}&awayPlayers=${ids(game.teams.away).join(',')}`);
+      return snapshot.rowsFromResponses(game,confirmation,recent);
+    })());
+    return fixtureRequests.get(key);
   }
-  function schedulePlayerSnapshot(){
-    playerSnapshotDate=analyzedDate();playerSnapshotDirty=true;
-    if(playerSnapshotTimer===null)playerSnapshotTimer=setTimeout(persistPlayerSnapshot,500);
-  }
-  function resetPlayerSnapshotForDate(date=analyzedDate()){
-    if(!date||playerSnapshotDate===date)return;
-    if(playerSnapshotTimer!==null){clearTimeout(playerSnapshotTimer);playerSnapshotTimer=null}
-    playerSnapshotDate=date;playerSnapshotDirty=true;allPlayerRows=[];persistPlayerSnapshot();
-  }
-  try{const saved=JSON.parse(localStorage.getItem(PLAYER_SNAPSHOT_KEY));if(saved?.version===PLAYER_SNAPSHOT_VERSION&&typeof saved.date==='string'&&Array.isArray(saved.players))playerSnapshotDate=saved.date}catch{}
-  const probableScore=item=>(item.recentScore||0)*100+(Number(item.statistics?.games?.lineups)||0)*10+(Number(item.statistics?.games?.minutes)||0)/90+(Number(item.statistics?.games?.rating)||0);
-  function probableIds(team){return new Set([...(team.players||[])].sort((a,b)=>probableScore(b)-probableScore(a)).slice(0,11).map(item=>item.player.id))}
-  function normalizedPlayers(result,game){
-    const statsById=new Map((result.playerStatsTeams||[]).flatMap(team=>(team.players||[]).map(item=>[`${team.team.id}:${item.player.id}`,{...item,team:team.team}]))),rows=[];
-    if(result.status==='available'&&(result.lineups||[]).length){for(const lineup of result.lineups){const starters=new Set((lineup.startXI||[]).map(item=>item.player.id));for(const item of [...(lineup.startXI||[]),...(lineup.substitutes||[])]){const stats=statsById.get(`${lineup.team.id}:${item.player.id}`);rows.push({team:lineup.team,player:{...(stats?.player||{}),...item.player},statistics:stats?.statistics||null,status:starters.has(item.player.id)?'OFICIAL':'SEM CONFIRMAÇÃO'})}}}
-    else if(result.status==='probable'){for(const team of result.probableTeams||[]){const likely=probableIds(team);for(const item of team.players||[])rows.push({...item,team:team.team,status:likely.has(item.player.id)?'PROVÁVEL':'SEM CONFIRMAÇÃO'})}}
-    else for(const team of result.playerStatsTeams||[])for(const item of team.players||[])rows.push({...item,team:team.team,status:'SEM CONFIRMAÇÃO'});
-    return rows.map(item=>{const games=number(statValue(item.statistics,['games','appearences'])),minutes=number(statValue(item.statistics,['games','minutes'])),shotsOn=number(statValue(item.statistics,['shots','on']));return{...item,game,games,minutes,shotsOn,average:games&&shotsOn!=null?shotsOn/games:null}});
-  }
-  function balancedTop(rows,limit=8){
-    const byTeam=new Map;for(const item of rows){if(!byTeam.has(item.team.id))byTeam.set(item.team.id,[]);byTeam.get(item.team.id).push(item)}
-    for(const teamRows of byTeam.values())teamRows.sort((a,b)=>(b.average??-1)-(a.average??-1));
-    const selected=[];for(const teamRows of byTeam.values())selected.push(...teamRows.slice(0,4));
-    if(selected.length<limit){const chosen=new Set(selected),remaining=rows.filter(item=>!chosen.has(item)).sort((a,b)=>(b.average??-1)-(a.average??-1));selected.push(...remaining.slice(0,limit-selected.length))}
-    return selected.sort((a,b)=>(b.average??-1)-(a.average??-1)).slice(0,limit);
-  }
-  function selectRelevant(){
-    const includeUnconfirmed=document.getElementById('playerStatusFilter').value==='all',showNoData=document.getElementById('showPlayerNoData').checked,selected=[];
-    const byFixture=new Map;for(const item of allPlayerRows){if(!byFixture.has(item.game.fixture.id))byFixture.set(item.game.fixture.id,[]);byFixture.get(item.game.fixture.id).push(item)}
-    for(const rows of byFixture.values()){
-      const statusRows=rows.filter(item=>includeUnconfirmed||item.status==='OFICIAL'||item.status==='PROVÁVEL');
-      const relevant=statusRows.filter(item=>item.games>=5&&item.minutes>=270&&item.shotsOn!=null&&item.average>=.2);
-      const missing=showNoData?statusRows.filter(item=>item.games==null||item.minutes==null||item.shotsOn==null):[];
-      selected.push(...balancedTop([...relevant,...missing],8));
-    }
-    return selected;
+  function selectedRows(){
+    const includeUnconfirmed=document.getElementById('playerStatusFilter')?.value==='all';
+    return snapshot.selectQualified(activeRows).filter(row=>includeUnconfirmed||snapshot.confirmedStatus(row.status));
   }
   function row(item){
-    const statusClass=item.status==='OFICIAL'?'official':item.status==='PROVÁVEL'?'probable':'unconfirmed',game=item.game,tone=item.average==null?'low':item.average>=.7?'high':item.average>=.35?'mid':'low';
-    const bankrollData=encodeURIComponent(JSON.stringify({date:document.getElementById('analysisDate').value,competition:game.league.name,match:`${game.teams.home.name} x ${game.teams.away.name}`,market:'Chutes no gol',selection:`${item.player.name} +0.5`}));
-    return `<tr class="player-row" data-match="${game.fixture.id}"><td><div class="player-person"><img src="${cpEscape(item.player.photo||'')}" alt=""><span><strong>${cpEscape(item.player.name)}</strong><small>${cpEscape(position(item))}</small></span></div></td><td><span class="player-team-name">${cpEscape(item.team.name)}</span><span class="player-match-name">${cpEscape(game.teams.home.name)} × ${cpEscape(game.teams.away.name)}</span></td><td><span class="player-status ${statusClass}">${item.status}</span></td><td><span class="player-season-number">${item.games??'—'}</span></td><td><span class="player-season-number">${item.shotsOn??'—'}</span></td><td>${item.average==null?'<span class="player-no-data">Sem dados</span>':`<span class="player-average ${tone}">${item.average.toFixed(2)}</span>`}</td><td><button class="bankroll-add" data-bankroll="${bankrollData}" type="button">+ Minha Banca</button></td></tr>`;
+    const game=fixtures.find(value=>Number(value.fixture.id)===Number(item.fixtureId));
+    const statusClass=item.status==='OFICIAL'?'official':'probable',tone=item.average>=.7?'high':item.average>=.35?'mid':'low';
+    const bankrollData=encodeURIComponent(JSON.stringify({date:activeDate,competition:item.leagueName,match:`${item.teamName} x ${item.opponentName}`,market:'Chutes no gol',selection:`${item.playerName} +0.5`}));
+    return `<tr class="player-row" data-match="${item.fixtureId}"><td><div class="player-person"><img src="${cpEscape(item.playerPhoto||'')}" alt=""><span><strong>${cpEscape(item.playerName)}</strong><small>${cpEscape(position(item))}</small></span></div></td><td><span class="player-team-name">${cpEscape(item.teamName)}</span><span class="player-match-name">${cpEscape(game?.teams.home.name||item.teamName)} × ${cpEscape(game?.teams.away.name||item.opponentName)}</span></td><td><span class="player-status ${statusClass}">${item.status}</span></td><td><span class="player-season-number">${item.games}</span></td><td><span class="player-season-number">${item.shotsOn}</span></td><td><span class="player-average ${tone}">${item.average.toFixed(2)}</span></td><td><button class="bankroll-add" data-bankroll="${bankrollData}" type="button">+ Minha Banca</button></td></tr>`;
   }
   function renderPlayers(){
-    const body=document.getElementById('playerScannerBody'),meta=document.getElementById('playerLoadMeta'),selected=selectRelevant(),sample=allPlayerRows.filter(item=>item.games>=5&&item.minutes>=270&&item.shotsOn!=null),confirmed=sample.filter(item=>item.status==='OFICIAL'||item.status==='PROVÁVEL');
-    meta.textContent=`${allPlayerRows.length} encontrados · ${sample.length} com amostra · ${confirmed.length} oficiais/prováveis · ${selected.length} relevantes`;
-    body.innerHTML=selected.length?selected.map(row).join(''):'<tr><td class="player-scanner-empty" colspan="7"><span>♙</span><strong>Nenhum jogador atingiu os critérios</strong><small>Mínimo de 5 jogos, 270 minutos e média de 0,20 chute no gol por jogo.</small></td></tr>';body.querySelectorAll('[data-bankroll]').forEach(button=>button.onclick=event=>{event.preventDefault();event.stopPropagation();const data=JSON.parse(decodeURIComponent(button.dataset.bankroll)),params=new URLSearchParams({newEntry:'1',...data});location.href=`bankroll.html?${params}`});cpBindMatches();
+    const body=document.getElementById('playerScannerBody'),meta=document.getElementById('playerLoadMeta'),selected=selectedRows();
+    meta.textContent=`${activeRows.length} encontrados · ${selected.length} classificados por SOG L5`;
+    body.innerHTML=selected.length?selected.map(row).join(''):'<tr><td class="player-scanner-empty" colspan="7"><span>♙</span><strong>Nenhum jogador atingiu os critérios</strong><small>Exige confirmação oficial/provável, 5 jogos válidos, 270 minutos e média mínima de 0,20 SOG.</small></td></tr>';
+    body.querySelectorAll('[data-bankroll]').forEach(button=>button.onclick=event=>{event.preventDefault();event.stopPropagation();const data=JSON.parse(decodeURIComponent(button.dataset.bankroll)),params=new URLSearchParams({newEntry:'1',...data});location.href=`bankroll.html?${params}`});
+    cpBindMatches();
   }
-  async function requestFixture(game){if(fixtureResults.has(game.fixture.id))return fixtureResults.get(game.fixture.id);if(!fixtureRequests.has(game.fixture.id))fixtureRequests.set(game.fixture.id,fetch(`/api/partidas/${game.fixture.id}/jogadores`).then(async response=>{const data=await response.json();if(!response.ok||data.status==='error')throw Error(data.erro||'Jogadores indisponíveis.');fixtureResults.set(game.fixture.id,data);return data}));return fixtureRequests.get(game.fixture.id)}
-  async function loadPlayerPilot(){
-    if(!playerTabActive)return;const body=document.getElementById('playerScannerBody'),meta=document.getElementById('playerLoadMeta');if(window.CENTRAL_PRO_OFFLINE){body.innerHTML='<tr><td class="player-scanner-empty" colspan="7"><strong>Modo offline</strong><small>Nenhuma consulta de jogadores foi iniciada. O snapshot anterior foi preservado.</small></td></tr>';meta.textContent='Consultas externas bloqueadas';return}const loadDate=analyzedDate();resetPlayerSnapshotForDate(loadDate);const games=fixtures.filter(game=>CP_MAIN_LEAGUES.has(game.league.id)&&metrics.get(game.fixture.id)?.coverage);
-    if(!games.length){body.innerHTML='<tr><td class="player-scanner-empty" colspan="7"><span>♙</span><strong>Aguardando partidas prioritárias analisadas</strong><small>Nenhuma chamada de jogadores foi iniciada.</small></td></tr>';meta.textContent='0 partidas processadas';return}
-    body.innerHTML='<tr><td class="player-scanner-empty" colspan="7"><span>♙</span><strong>Selecionando jogadores relevantes…</strong><small>Usando somente estatísticas agregadas já disponíveis.</small></td></tr>';
-    const settled=await Promise.allSettled(games.map(async game=>normalizedPlayers(await requestFixture(game),game)));allPlayerRows=settled.filter(item=>item.status==='fulfilled').flatMap(item=>item.value);renderPlayers();if(loadDate===analyzedDate()){schedulePlayerSnapshot();const pending=[...analysisState.values()].some(state=>state==='queued'||state==='loading');if(!pending)persistPlayerSnapshot()}
+  function persistComplete(date,rows,token){
+    if(token!==runToken||date!==analyzedDate())return false;
+    const value=snapshot.createSnapshot(date,rows);
+    const saved=snapshot.persist(localStorage,value,date);if(saved)lastCompleteSnapshot=value;return saved;
   }
-  document.querySelector('[data-analysis-tab="players"]')?.addEventListener('click',()=>{playerTabActive=true;loadPlayerPilot()});
-  document.querySelector('[data-analysis-tab="goals"]')?.addEventListener('click',()=>{playerTabActive=false});
-  document.getElementById('playerStatusFilter')?.addEventListener('change',renderPlayers);document.getElementById('showPlayerNoData')?.addEventListener('change',renderPlayers);
-  window.addEventListener('centralpro:analysis-ready',()=>{if(!playerTabActive||refreshQueued)return;refreshQueued=true;setTimeout(()=>{refreshQueued=false;loadPlayerPilot()},100)});
-  ['todayButton','tomorrowButton'].forEach(id=>document.getElementById(id)?.addEventListener('click',()=>setTimeout(()=>resetPlayerSnapshotForDate(),0)));
-  document.getElementById('analysisDate')?.addEventListener('change',()=>setTimeout(()=>resetPlayerSnapshotForDate(),0));
-  window.addEventListener('pagehide',persistPlayerSnapshot);
-  resetPlayerSnapshotForDate();
-})();
+  async function loadPlayerScanner(){
+    if(!playerTabActive)return;
+    const body=document.getElementById('playerScannerBody'),meta=document.getElementById('playerLoadMeta');
+    if(window.CENTRAL_PRO_OFFLINE){body.innerHTML='<tr><td class="player-scanner-empty" colspan="7"><strong>Modo offline</strong><small>Nenhuma consulta foi iniciada; o snapshot válido anterior foi preservado.</small></td></tr>';meta.textContent='Consultas externas bloqueadas';return}
+    const token=++runToken,date=analyzedDate();
+    try{const cached=JSON.parse(localStorage.getItem(snapshot.KEY));if(snapshot.validSnapshot(cached)&&cached.date===date){activeDate=date;activeRows=cached.players;renderPlayers();return}}catch{}
+    const games=cpSelectScannerFixtures(fixtures);
+    activeDate=date;activeRows=[];
+    if(!games.length){body.innerHTML='<tr><td class="player-scanner-empty" colspan="7"><strong>Nenhuma partida elegível</strong><small>Nenhuma chamada de jogadores foi iniciada.</small></td></tr>';meta.textContent='0 partidas processadas';return}
+    body.innerHTML='<tr><td class="player-scanner-empty" colspan="7"><strong>Carregando jogadores elegíveis…</strong><small>Histórico L5 compartilhado e cacheado pelo servidor.</small></td></tr>';
+    let cursor=0,failed=0,completed=0;
+    const workers=Array.from({length:3},async()=>{while(cursor<games.length&&token===runToken){const game=games[cursor++];try{const rows=await requestFixture(game);if(rows)activeRows.push(...rows)}catch{failed++}completed++;meta.textContent=`${completed}/${games.length} partidas · ${failed} falhas`;renderPlayers()}});
+    await Promise.all(workers);
+    if(token!==runToken||date!==analyzedDate())return;
+    renderPlayers();
+    if(failed===0)persistComplete(date,activeRows,token);
+    else meta.textContent+=` · snapshot anterior preservado`;
+  }
+  document.querySelector('[data-analysis-tab="players"]')?.addEventListener('click',()=>{playerTabActive=true;loadPlayerScanner()});
+  document.querySelector('[data-analysis-tab="goals"]')?.addEventListener('click',()=>{playerTabActive=false;runToken++});
+  document.getElementById('playerStatusFilter')?.addEventListener('change',renderPlayers);
+  ['todayButton','tomorrowButton'].forEach(id=>document.getElementById(id)?.addEventListener('click',()=>{runToken++;activeRows=[]}));
+  document.getElementById('analysisDate')?.addEventListener('change',()=>{runToken++;activeRows=[]});
+  window.addEventListener('pagehide',()=>{if(lastCompleteSnapshot?.date===analyzedDate())snapshot.persist(localStorage,lastCompleteSnapshot,analyzedDate())});
+}());

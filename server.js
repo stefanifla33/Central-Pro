@@ -6,7 +6,9 @@ const fs = require("fs");
 const { createConfiguredGameSnapshotStorage } = require("./lib/storage/create-game-snapshot-storage");
 const { resolveGames } = require("./lib/storage/game-snapshot-storage");
 const { assertExternalRequestsAllowed, isCentralProOffline } = require("./lib/central-pro-offline");
-const { CP_MAIN_LEAGUES: MAIN_LEAGUES } = require("./public/competition-config");
+const { createPlayerRateLimiter } = require("./lib/player-rate-limiter");
+const { createSerializedJsonPersister } = require("./lib/serialized-json-persister");
+const { CP_MAIN_LEAGUES: MAIN_LEAGUES, cpIsScannerEligibleLeagueId } = require("./public/competition-config");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -25,15 +27,24 @@ const metrics = { requests: 0, externalRequests: 0, cacheHits: 0, startedAt: Dat
 const apiUsageDiagnostic = { externalTotal: 0, cacheHits: 0, pendingHits: 0, byEndpoint: new Map() };
 const apiQuotaState = { remaining: null, limit: null, blockedUntil: 0, reason: null };
 const API_DAILY_COOLDOWN_MS = 6 * 60 * 60 * 1000;
+const API_MINUTE_COOLDOWN_MS = 60_000;
+const playerRateLimiter = createPlayerRateLimiter({ limit: 240, windowMs: 60_000 });
 let periodStore = { version: 1, fixtures: {} };
 let playerHistoryStore = { version: 1, fixtures: {} };
 let cornerHistoryStore = { version: 1, fixtures: {} };
 const gameSnapshotStorage = createConfiguredGameSnapshotStorage();
+const playerHistoryPersister = createSerializedJsonPersister({
+    fileSystem: fs.promises,
+    file: PLAYER_HISTORY_FILE,
+    directory: path.dirname(PLAYER_HISTORY_FILE),
+    label: "PLAYER-HISTORY-PERSIST"
+});
 let monitorRunning = false;
 let periodMonitorTimer = null;
 let periodMonitorNextDelay = 300_000;
 let nextCornerRequestAt = 0;
 let cornerRequestQueue = Promise.resolve();
+const teamPlayerHistoryBuilds = new Map();
 
 try {
     periodStore = JSON.parse(fs.readFileSync(SNAPSHOT_FILE, "utf8"));
@@ -72,7 +83,8 @@ function savePeriodStore() {
 }
 
 function savePlayerHistoryStore() {
-    return persistStore(PLAYER_HISTORY_FILE, playerHistoryStore, "player-history");
+    if (IS_SERVERLESS) return Promise.resolve(true);
+    return playerHistoryPersister.enqueue(playerHistoryStore).catch(() => false);
 }
 
 function saveCornerHistoryStore() {
@@ -367,9 +379,36 @@ function selectPlayerMarketLeaders(players, market, maximum = 5) {
         .map(({ player, summary }) => ({ player: player.player, average: summary.average, frequency: summary.frequency, games: summary.games }));
 }
 
-async function ensureTeamPlayerHistory(fixture, team, relevantPlayerIds = new Set(), target = 5, maximumCandidates = 30) {
+function cachedPlayerCoverage(teamId, relevantPlayerIds, before, target) {
+    return new Map([...relevantPlayerIds].map(playerId => [Number(playerId), new Set(
+        getPlayerRecentGames(playerId, { teamId, before, limit: target }).map(game => Number(game.fixtureId))
+    )]));
+}
+
+function coverageComplete(coverage, relevantPlayerIds, target) {
+    return relevantPlayerIds.size > 0 && [...relevantPlayerIds].every(playerId => (coverage.get(Number(playerId))?.size || 0) >= target);
+}
+
+function qualifiedConfirmedPlayers(teamId, relevantPlayerIds, before, target = 5) {
+    return [...relevantPlayerIds].filter(playerId => {
+        const games = getPlayerRecentGames(playerId, { teamId, before, limit: target });
+        if (games.length < target) return false;
+        const minutes = games.reduce((sum, game) => sum + Number(game.minutes || 0), 0);
+        const shots = games.map(game => Number(game.shots?.on)).filter(Number.isFinite);
+        return minutes >= 270 && shots.length === target && shots.reduce((sum, value) => sum + value, 0) / target >= 0.20;
+    }).length;
+}
+
+async function buildTeamPlayerHistory(fixture, team, relevantPlayerIds = new Set(), target = 5, maximumCandidates = 30) {
+    const maximumQualified = 4;
+    const maximumNewFixtureRequests = 8;
     const beforeTime = new Date(fixture.fixture.date).getTime();
-    const history = await football(`/fixtures?team=${team.id}&last=${maximumCandidates}&timezone=${encodeURIComponent(APP_TIMEZONE)}`, 900_000);
+    const coverage = cachedPlayerCoverage(team.id, relevantPlayerIds, fixture.fixture.date, target);
+    const reusedFixtures = new Set([...coverage.values()].flatMap(ids => [...ids]));
+    if (coverageComplete(coverage, relevantPlayerIds, target) || qualifiedConfirmedPlayers(team.id, relevantPlayerIds, fixture.fixture.date, target) >= maximumQualified) {
+        return { teamId: team.id, candidates: 0, inspected: 0, requested: 0, cacheHits: reusedFixtures.size, valid: reusedFixtures.size, empty: 0, failed: 0, acceptedPlayers: 0, discardedZeroMinutes: 0, reusedHistory: true, fixtures: [] };
+    }
+    const history = await rateLimitedPlayerFootball(`/fixtures?team=${team.id}&last=${maximumCandidates}&timezone=${encodeURIComponent(APP_TIMEZONE)}`, 900_000);
     const candidates = [...new Map((history.response || [])
         .filter(game => game.fixture?.id !== fixture.fixture.id)
         .filter(game => new Date(game.fixture?.date).getTime() < beforeTime)
@@ -377,8 +416,7 @@ async function ensureTeamPlayerHistory(fixture, team, relevantPlayerIds = new Se
         .map(game => [game.fixture.id, game])).values()]
         .sort((a, b) => new Date(b.fixture.date) - new Date(a.fixture.date))
         .slice(0, maximumCandidates);
-    const diagnostics = { teamId: team.id, candidates: candidates.length, inspected: 0, requested: 0, cacheHits: 0, valid: 0, empty: 0, failed: 0, acceptedPlayers: 0, discardedZeroMinutes: 0, fixtures: [] };
-    const coverage = new Map();
+    const diagnostics = { teamId: team.id, candidates: candidates.length, inspected: 0, requested: 0, cacheHits: reusedFixtures.size, valid: reusedFixtures.size, empty: 0, failed: 0, acceptedPlayers: 0, discardedZeroMinutes: 0, reusedHistory: reusedFixtures.size > 0, fixtures: [] };
     let dirty = false;
     for (const game of candidates) {
         diagnostics.inspected++;
@@ -386,12 +424,16 @@ async function ensureTeamPlayerHistory(fixture, team, relevantPlayerIds = new Se
         let source = "cache";
         let requestStatus = "cached";
         if (record?.complete || record?.retryAfter && new Date(record.retryAfter) > new Date()) {
-            diagnostics.cacheHits++;
+            if (!reusedFixtures.has(Number(game.fixture.id))) diagnostics.cacheHits++;
         } else {
+            if (diagnostics.requested >= maximumNewFixtureRequests) {
+                diagnostics.budgetReached = true;
+                break;
+            }
             source = "api";
             diagnostics.requested++;
             try {
-                const response = await football(`/fixtures/players?fixture=${game.fixture.id}`, 21_600_000);
+                const response = await rateLimitedPlayerFootball(`/fixtures/players?fixture=${game.fixture.id}`, 21_600_000);
                 const players = normalizeFixturePlayers(response.response);
                 const complete = Object.keys(players).length > 0;
                 requestStatus = complete ? "ok" : "empty";
@@ -421,6 +463,10 @@ async function ensureTeamPlayerHistory(fixture, team, relevantPlayerIds = new Se
                 };
                 playerHistoryStore.fixtures[game.fixture.id] = record;
                 dirty = true;
+                if (["API_DAILY_QUOTA", "API_MINUTE_QUOTA"].includes(erro.code)) {
+                    if (dirty) await savePlayerHistoryStore();
+                    throw erro;
+                }
             }
         }
         const teamPlayers = Object.values(record?.players || {}).filter(player => Number(player.teamId) === Number(team.id));
@@ -432,16 +478,37 @@ async function ensureTeamPlayerHistory(fixture, team, relevantPlayerIds = new Se
         } else {
             diagnostics.valid++;
             for (const player of participating) {
-                if (!relevantPlayerIds.size || relevantPlayerIds.has(Number(player.playerId))) coverage.set(player.playerId, (coverage.get(player.playerId) || 0) + 1);
+                if (relevantPlayerIds.has(Number(player.playerId))) {
+                    if (!coverage.has(Number(player.playerId))) coverage.set(Number(player.playerId), new Set());
+                    coverage.get(Number(player.playerId)).add(Number(game.fixture.id));
+                }
             }
         }
         diagnostics.fixtures.push({ fixtureId: game.fixture.id, date: game.fixture.date, status: game.fixture.status.short, leagueId: game.league?.id || null, season: game.league?.season ?? null, source, result: requestStatus, returnedPlayers: Object.keys(record?.players || {}).length, participatingPlayers: participating.length });
-        const coveredRelevant = [...coverage.values()].filter(count => count >= target).length;
-        if (diagnostics.valid >= target && coveredRelevant >= Math.min(3, relevantPlayerIds.size || 3)) break;
+        if (coverageComplete(coverage, relevantPlayerIds, target) || qualifiedConfirmedPlayers(team.id, relevantPlayerIds, fixture.fixture.date, target) >= maximumQualified) break;
     }
-    if (dirty) savePlayerHistoryStore();
-    console.log(`[PLAYER-HISTORY] fixture=${fixture.fixture.id} team=${team.id} candidates=${diagnostics.candidates} inspected=${diagnostics.inspected} valid=${diagnostics.valid} empty=${diagnostics.empty} failed=${diagnostics.failed}`);
+    if (dirty && !await savePlayerHistoryStore()) {
+        const error = new Error("Histórico atualizado em memória, mas ainda não foi persistido em disco.");
+        error.code = "PLAYER_HISTORY_PERSIST";
+        throw error;
+    }
+    if (diagnostics.failed > 0) {
+        const error = new Error(`Histórico do time ${team.id} ficou incompleto em ${diagnostics.failed} fixture(s).`);
+        error.code = "API_TRANSIENT";
+        throw error;
+    }
+    console.log(`[PLAYER-HISTORY] fixture=${fixture.fixture.id} team=${team.id} candidates=${diagnostics.candidates} inspected=${diagnostics.inspected} valid=${diagnostics.valid} requested=${diagnostics.requested} qualified=${qualifiedConfirmedPlayers(team.id, relevantPlayerIds, fixture.fixture.date, target)} empty=${diagnostics.empty} failed=${diagnostics.failed}`);
     return diagnostics;
+}
+
+function ensureTeamPlayerHistory(fixture, team, relevantPlayerIds = new Set(), target = 5, maximumCandidates = 30) {
+    const day = String(fixture.fixture.date || "").slice(0, 10);
+    const key = `${Number(team.id)}:${day}`;
+    if (teamPlayerHistoryBuilds.has(key)) return teamPlayerHistoryBuilds.get(key);
+    const build = buildTeamPlayerHistory(fixture, team, relevantPlayerIds, target, maximumCandidates)
+        .catch(error => { teamPlayerHistoryBuilds.delete(key); throw error; });
+    teamPlayerHistoryBuilds.set(key, build);
+    return build;
 }
 
 async function collectFinishedPlayerHistory(games, limit = 2) {
@@ -453,7 +520,7 @@ async function collectFinishedPlayerHistory(games, limit = 2) {
         if (existing?.complete || existing?.retryAfter && new Date(existing.retryAfter) > new Date()) continue;
         requested++;
         try {
-            const response = await football(`/fixtures/players?fixture=${game.fixture.id}`, 21_600_000);
+            const response = await rateLimitedPlayerFootball(`/fixtures/players?fixture=${game.fixture.id}`, 21_600_000);
             const players = normalizeFixturePlayers(response.response);
             const complete = Object.keys(players).length > 0;
             playerHistoryStore.fixtures[game.fixture.id] = {
@@ -465,7 +532,7 @@ async function collectFinishedPlayerHistory(games, limit = 2) {
                 attempts: (existing?.attempts || 0) + 1,
                 source: "/fixtures/players"
             };
-            savePlayerHistoryStore();
+            await savePlayerHistoryStore();
             console.log(`[PLAYER HISTORY] fixture=${game.fixture.id} complete=${complete} players=${Object.keys(players).length}`);
         } catch (erro) {
             playerHistoryStore.fixtures[game.fixture.id] = {
@@ -476,9 +543,9 @@ async function collectFinishedPlayerHistory(games, limit = 2) {
                 errorType: erro.code || "request",
                 source: "/fixtures/players"
             };
-            savePlayerHistoryStore();
+            await savePlayerHistoryStore();
             console.error(`[PLAYER HISTORY] fixture=${game.fixture.id} error=${erro.message}`);
-            if (erro.code === "API_DAILY_QUOTA") throw erro;
+            if (["API_DAILY_QUOTA", "API_MINUTE_QUOTA"].includes(erro.code)) throw erro;
         }
     }
 }
@@ -622,7 +689,14 @@ async function football(endpoint, ttl = 60_000, options = {}) {
                 requestError.retryAfterMs = API_DAILY_COOLDOWN_MS;
                 console.error(`[API-QUOTA] DAILY_LIMIT_REACHED blockedUntil=${new Date(apiQuotaState.blockedUntil).toISOString()}`);
             } else if (resposta.status === 429) {
-                requestError.code = "API_RATE_LIMIT";
+                const retryAfter = resposta.headers.get("retry-after");
+                const retrySeconds = retryAfter == null ? NaN : Number(retryAfter);
+                const retryDateMs = retryAfter && !Number.isFinite(retrySeconds) ? new Date(retryAfter).getTime() - Date.now() : NaN;
+                requestError.code = "API_MINUTE_QUOTA";
+                requestError.retryAfterMs = Number.isFinite(retrySeconds)
+                    ? Math.max(1_000, retrySeconds * 1_000)
+                    : Number.isFinite(retryDateMs) && retryDateMs > 0 ? retryDateMs : API_MINUTE_COOLDOWN_MS;
+                console.warn(`[API-MINUTE-QUOTA] PAUSED retryAfterMs=${requestError.retryAfterMs} dailyRemaining=${Number.isFinite(apiQuotaState.remaining) ? apiQuotaState.remaining : "unknown"}`);
             } else if (resposta.status >= 500) {
                 requestError.code = "API_TRANSIENT";
             } else if (resposta.status >= 400) {
@@ -646,6 +720,25 @@ async function football(endpoint, ttl = 60_000, options = {}) {
     } finally {
         pending.delete(endpoint);
     }
+}
+
+function playerRequestWouldBeExternal(endpoint, ttl, options = {}) {
+    const cached = cache.get(endpoint);
+    return apiQuotaState.blockedUntil <= Date.now()
+        && Boolean(options.force || !cached || Date.now() - cached.createdAt >= ttl)
+        && !pending.has(endpoint);
+}
+
+function rateLimitedPlayerFootball(endpoint, ttl = 60_000, options = {}) {
+    if (!playerRequestWouldBeExternal(endpoint, ttl, options)) return football(endpoint, ttl, options);
+    return playerRateLimiter.schedule(
+        () => football(endpoint, ttl, options),
+        { shouldConsume: () => playerRequestWouldBeExternal(endpoint, ttl, options) }
+    );
+}
+
+function shouldRevalidatePlayerLineup({ lineups, force, cacheHit }) {
+    return !lineups.length && !force && cacheHit;
 }
 
 function printApiUsageDiagnosticSummary() {
@@ -1144,6 +1237,9 @@ app.get("/api/partidas/:id", async (req, res) => {
 app.get("/api/partidas/:id/jogadores", async (req, res) => {
     if (!/^\d+$/.test(req.params.id)) return res.status(400).json({ status: "error", erro: "ID da partida inválido." });
     const id = Number(req.params.id);
+    const confirmationOnly = req.query.confirmationOnly === "1";
+    const scannerLeagueId = Number(req.query.league);
+    if (req.query.mode === "scanner" && (!Number.isSafeInteger(scannerLeagueId) || !cpIsScannerEligibleLeagueId(scannerLeagueId))) return res.status(403).json({ status: "error", erro: "Competição fora da whitelist do scanner." });
     if (!Number.isSafeInteger(id) || id <= 0) return res.status(400).json({ status: "error", erro: "ID da partida inválido." });
     const playerExternalStart = metrics.externalRequests;
     const maxPlayerExternalRequests = 80;
@@ -1155,7 +1251,7 @@ app.get("/api/partidas/:id/jogadores", async (req, res) => {
             budgetError.code = "PLAYER_FIXTURE_BUDGET";
             throw budgetError;
         }
-        return football(endpoint, ttl, options);
+        return rateLimitedPlayerFootball(endpoint, ttl, options);
     };
     const playerFootballAllPages = async (endpoint, ttl) => {
         const separator = endpoint.includes("?") ? "&" : "?";
@@ -1164,6 +1260,10 @@ app.get("/api/partidas/:id/jogadores", async (req, res) => {
         const remaining = await Promise.all(Array.from({ length: total - 1 }, (_, index) => playerFootball(`${endpoint}${separator}page=${index + 2}`, ttl)));
         return { ...first, response: [first, ...remaining].flatMap(page => page.response || []) };
     };
+    const playerOptional = promise => promise.catch(error => {
+        if (["API_DAILY_QUOTA", "API_MINUTE_QUOTA"].includes(error.code)) throw error;
+        return { response: [] };
+    });
     try {
         const fixtureData = await playerFootball(`/fixtures?id=${id}`, 30_000);
         const fixture = fixtureData.response?.[0];
@@ -1190,7 +1290,9 @@ app.get("/api/partidas/:id/jogadores", async (req, res) => {
         let lineups = Array.isArray(official.response) ? official.response : [];
         let lineupSource = cacheHit ? "cache" : "api";
         let lineupCacheState = cacheHit ? "hit" : force ? "refresh" : "miss";
-        if (!lineups.length && !force) {
+        // Revalidate only an older cached empty response. A fresh cache miss has
+        // just called /fixtures/lineups and must not be forced a second time.
+        if (shouldRevalidatePlayerLineup({ lineups, force, cacheHit })) {
             const closeToKickoff = hoursUntilKickoff <= 24;
             const revalidationInterval = finished ? 900_000 : hoursUntilKickoff <= 3 ? 60_000 : 300_000;
             const lastRevalidation = lineupRevalidations.get(id) || 0;
@@ -1212,15 +1314,15 @@ app.get("/api/partidas/:id/jogadores", async (req, res) => {
             const teamList = [fixture.teams.home, fixture.teams.away];
             probableTeams = await Promise.all(teamList.map(async team => {
                 const [squadResult, statsResult, recentResult] = await Promise.all([
-                    playerFootball(`/players/squads?team=${team.id}`, 86_400_000).catch(() => ({ response: [] })),
-                    playerFootballAllPages(`/players?team=${team.id}&season=${fixture.league.season}`, 21_600_000).catch(() => ({ response: [] })),
-                    playerFootball(`/fixtures?team=${team.id}&last=5&timezone=${encodeURIComponent(APP_TIMEZONE)}`, 3_600_000).catch(() => ({ response: [] }))
+                    playerOptional(playerFootball(`/players/squads?team=${team.id}`, 86_400_000)),
+                    confirmationOnly ? Promise.resolve({ response: [] }) : playerOptional(playerFootballAllPages(`/players?team=${team.id}&season=${fixture.league.season}`, 21_600_000)),
+                    playerOptional(playerFootball(`/fixtures?team=${team.id}&last=5&timezone=${encodeURIComponent(APP_TIMEZONE)}`, 3_600_000))
                 ]);
                 const squad = squadResult.response?.[0]?.players || [];
                 const currentIds = new Set(squad.map(player => player.id));
                 const statsById = new Map((statsResult.response || []).map(item => [item.player.id, selectPlayerStatistics([item], { teamId: team.id, leagueId: fixture.league.id, season: fixture.league.season })]));
                 const recentFixtures = (recentResult.response || []).filter(game => game.fixture?.id !== id).slice(0, 3);
-                const recentLineups = await Promise.all(recentFixtures.map(game => playerFootball(`/fixtures/lineups?fixture=${game.fixture.id}`, 86_400_000).catch(() => ({ response: [] }))));
+                const recentLineups = await Promise.all(recentFixtures.map(game => playerOptional(playerFootball(`/fixtures/lineups?fixture=${game.fixture.id}`, 86_400_000))));
                 const usage = new Map();
                 let recentFormation = null;
                 recentLineups.forEach((result, matchIndex) => {
@@ -1237,16 +1339,18 @@ app.get("/api/partidas/:id/jogadores", async (req, res) => {
             if (probableTeams.every(team => team.players.length >= 11)) status = "probable";
             playerStatsTeams = probableTeams;
         } else {
+            if (confirmationOnly) return res.json({ fixture, fixtureId: id, status: "available", lineupStatus: "official", lineups, probableTeams: [], playerStatsTeams: [], updatedAt, cached: lineupCacheState === "hit" });
             playerStatsTeams = await Promise.all([fixture.teams.home, fixture.teams.away].map(async team => {
                 const [squadResult, statsResult] = await Promise.all([
-                    playerFootball(`/players/squads?team=${team.id}`, 86_400_000).catch(() => ({ response: [] })),
-                    playerFootballAllPages(`/players?team=${team.id}&season=${fixture.league.season}`, 21_600_000).catch(() => ({ response: [] }))
+                    playerOptional(playerFootball(`/players/squads?team=${team.id}`, 86_400_000)),
+                    playerOptional(playerFootballAllPages(`/players?team=${team.id}&season=${fixture.league.season}`, 21_600_000))
                 ]);
                 const squad = squadResult.response?.[0]?.players || [];
                 const statsById = new Map((statsResult.response || []).map(item => [item.player.id, selectPlayerStatistics([item], { teamId: team.id, leagueId: fixture.league.id, season: fixture.league.season })]));
                 return { team, players: squad.map(player => ({ player, statistics: statsById.get(player.id) || null })) };
             }));
         }
+        if (confirmationOnly) return res.json({ fixture, fixtureId: id, status, lineupStatus: status === "probable" ? "probable" : "unavailable", lineups, probableTeams, playerStatsTeams: [], updatedAt, cached: lineupCacheState === "hit" });
         if (lineups.length) {
             const official = lineups.flatMap(lineup => [
                 ...(lineup.startXI || []).map(item => ({ team: lineup.team, player: item.player })),
@@ -1257,7 +1361,7 @@ app.get("/api/partidas/:id/jogadores", async (req, res) => {
             additionalStatsCalls = missing.length;
             playerStatsDiagnostics = await Promise.all(missing.map(async item => {
                 const endpoint = `/players?id=${item.player.id}&season=${fixture.league.season}`;
-                const result = await playerFootball(endpoint, 86_400_000).catch(() => ({ response: [] }));
+                const result = await playerOptional(playerFootball(endpoint, 86_400_000));
                 const blocks = (result.response || []).flatMap(row => row.statistics || []);
                 const selected = selectPlayerStatistics(result.response, { teamId: item.team.id, leagueId: fixture.league.id, season: fixture.league.season });
                 const targetTeam = playerStatsTeams.find(team => team.team.id === item.team.id);
@@ -1279,7 +1383,7 @@ app.get("/api/partidas/:id/jogadores", async (req, res) => {
             : ["FT", "AET", "PEN"].includes(fixtureStatus) ? 21_600_000
             : 60_000;
         const matchPlayers = matchHasStarted
-            ? await playerFootball(`/fixtures/players?fixture=${id}`, fixturePlayerTtl, { force }).catch(() => ({ response: [] }))
+            ? await playerOptional(playerFootball(`/fixtures/players?fixture=${id}`, fixturePlayerTtl, { force }))
             : { response: [] };
         const tablePlayers = lineups.length
             ? lineups.reduce((total, lineup) => total + (lineup.startXI?.length || 0) + (lineup.substitutes?.length || 0), 0)
@@ -1902,7 +2006,7 @@ app.get("/api/historico-jogadores/piloto", async (req, res) => {
             stoppedByLimit = true;
             return null;
         }
-        return football(endpoint, ttl);
+        return rateLimitedPlayerFootball(endpoint, ttl);
     };
     try {
         const currentData = await budgetedFootball(`/fixtures?id=${fixtureId}`, 30_000);
@@ -1940,7 +2044,7 @@ app.get("/api/historico-jogadores/piloto", async (req, res) => {
                     retryAfter: new Date(Date.now() + 21_600_000).toISOString(),
                     source: "/fixtures/players"
                 };
-                savePlayerHistoryStore();
+                await savePlayerHistoryStore();
                 continue;
             }
             playerHistoryStore.fixtures[game.fixture.id] = {
@@ -1951,10 +2055,10 @@ app.get("/api/historico-jogadores/piloto", async (req, res) => {
                 source: "/fixtures/players"
             };
             stored.push(game.fixture.id);
-            savePlayerHistoryStore();
+            await savePlayerHistoryStore();
         }
         const relevantTeamIds = new Set([current.teams.home.id, current.teams.away.id]);
-        savePlayerHistoryStore();
+        await savePlayerHistoryStore();
         const allRelevantPlayers = Object.values(playerHistoryStore.fixtures).flatMap(record => Object.values(record.players || {})).filter(player => relevantTeamIds.has(Number(player.teamId)));
         const playerIds = new Set(allRelevantPlayers.map(player => player.playerId));
         const coverage = [...playerIds].map(playerId => {
@@ -1985,23 +2089,28 @@ app.get("/api/historico-jogadores/piloto", async (req, res) => {
 
 app.get("/api/partidas/:id/jogadores-recentes", async (req, res) => {
     const fixtureId = Number(req.params.id);
+    const scannerLeagueId = Number(req.query.league);
     const externalStart = metrics.externalRequests;
     const cacheStart = metrics.cacheHits;
     let stage = "validation";
     if (!Number.isSafeInteger(fixtureId) || fixtureId <= 0) return res.status(400).json({ erro: "Partida inválida." });
+    if (req.query.mode === "scanner" && (!Number.isSafeInteger(scannerLeagueId) || !cpIsScannerEligibleLeagueId(scannerLeagueId))) return res.status(403).json({ erro: "Competição fora da whitelist do scanner." });
+    const confirmation = String(req.query.confirmation || "");
+    if (req.query.mode === "scanner" && !["official", "probable"].includes(confirmation)) return res.status(409).json({ erro: "Fixture sem confirmação oficial ou provável.", code: "PLAYER_CONFIRMATION_REQUIRED" });
     try {
         stage = "fixture";
-        const fixtureData = await football(`/fixtures?id=${fixtureId}`, 30_000);
+        const fixtureData = await rateLimitedPlayerFootball(`/fixtures?id=${fixtureId}`, 30_000);
         const fixture = fixtureData.response?.[0];
         if (!fixture) return res.status(404).json({ erro: "Partida não encontrada." });
         const before = fixture.fixture.date;
         const beforeTime = new Date(before).getTime();
-        stage = "lineups";
-        const lineupData = await football(`/fixtures/lineups?fixture=${fixtureId}`, 300_000).catch(() => ({ response: [] }));
-        const relevantByTeam = new Map([fixture.teams.home, fixture.teams.away].map(team => {
-            const lineup = (lineupData.response || []).find(item => Number(item.team?.id) === Number(team.id));
-            return [team.id, new Set([...(lineup?.startXI || []), ...(lineup?.substitutes || [])].map(item => Number(item.player?.id)).filter(Number.isSafeInteger))];
-        }));
+        stage = "confirmed-players";
+        const parsePlayerIds = value => new Set(String(value || "").split(",").map(Number).filter(Number.isSafeInteger));
+        const relevantByTeam = new Map([
+            [fixture.teams.home.id, parsePlayerIds(req.query.homePlayers)],
+            [fixture.teams.away.id, parsePlayerIds(req.query.awayPlayers)]
+        ]);
+        if ([...relevantByTeam.values()].some(ids => ids.size === 0)) return res.status(409).json({ erro: "Confirmação sem jogadores utilizáveis.", code: "PLAYER_CONFIRMATION_EMPTY" });
         const diagnostics = [];
         for (const team of [fixture.teams.home, fixture.teams.away]) {
             stage = `history-team-${team.id}`;
@@ -2042,7 +2151,8 @@ app.get("/api/partidas/:id/jogadores-recentes", async (req, res) => {
         });
     } catch (erro) {
         console.error(`[PLAYER-HISTORY-ERROR] fixture=${fixtureId} stage=${stage} error=${erro.message}\n${erro.stack || ""}`);
-        res.status(502).json({ erro: "Histórico recente de jogadores indisponível.", detalhe: erro.message });
+        const quota = ["API_DAILY_QUOTA", "API_MINUTE_QUOTA"].includes(erro.code);
+        res.status(quota ? 429 : 502).json({ erro: "Histórico recente de jogadores indisponível.", detalhe: erro.message, code: erro.code || "API_TRANSIENT", retryAfterMs: erro.retryAfterMs || null });
     }
 });
 
@@ -2130,4 +2240,4 @@ function startServer() {
 if (require.main === module) startServer();
 
 module.exports = app;
-app.locals.offlineTest = { football, monitorMainLeagues, metrics };
+app.locals.offlineTest = { football, rateLimitedPlayerFootball, playerRateLimiter, apiQuotaState, shouldRevalidatePlayerLineup, ensureTeamPlayerHistory, teamPlayerHistoryBuilds, playerHistoryStore, playerHistoryPersister, monitorMainLeagues, metrics };

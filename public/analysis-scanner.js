@@ -1,5 +1,5 @@
 const $=id=>document.getElementById(id);
-let fixtures=[],metrics=new Map(),analysisState=new Map(),sortKey=null,sortDirection=-1,loadToken=0;
+let fixtures=[],agendaTotal=0,metrics=new Map(),analysisState=new Map(),sortKey=null,sortDirection=-1,loadToken=0;
 let renderTimer=null;
 let snapshotDetails=new Map(),snapshotTimer=null,snapshotDirty=false;
 const SNAPSHOT_MARKET_KEYS=['over05HT','over05','over15','over25','btts','homeScores','awayScores'];
@@ -63,11 +63,11 @@ function filtered(){
 function render(){
   const rows=filtered(),groups=new Map;
   rows.forEach(game=>{const key=sortKey?'sorted':game.league.id;if(!groups.has(key))groups.set(key,{league:sortKey?null:game.league,games:[]});groups.get(key).games.push(game)});
-  $('totalCount').textContent=fixtures.filter(game=>!cpIsExcludedGame(game)).length;
-  $('priorityCount').textContent=fixtures.filter(game=>!cpIsExcludedGame(game)).length;
+  $('totalCount').textContent=agendaTotal;
+  $('priorityCount').textContent=fixtures.length;
   const analyzed=[...metrics.values()].filter(value=>value.coverage).length;
   $('dataCount').textContent=analyzed;
-  const priorityTotal=fixtures.filter(game=>!cpIsExcludedGame(game)).length;
+  const priorityTotal=fixtures.length;
   const loading=[...analysisState.values()].filter(value=>value==='loading'||value==='queued').length;
   if($('analysisStatusMeta')) $('analysisStatusMeta').textContent=loading?`${analyzed}/${priorityTotal} concluídos · ${loading} na fila`:`${analyzed}/${priorityTotal} com dados`;
   if($('coverageBar')) $('coverageBar').style.width=priorityTotal?`${Math.min(100,Math.round(analyzed*100/priorityTotal))}%`:'0%';
@@ -154,7 +154,7 @@ async function loadAnalysisRows(rows,token){
 }
 async function load(){
   const token=++loadToken;if(renderTimer!==null){clearTimeout(renderTimer);renderTimer=null}if(snapshotTimer!==null){clearTimeout(snapshotTimer);snapshotTimer=null}snapshotDirty=false;metrics=new Map();analysisState=new Map();snapshotDetails=new Map();window.CornersScanner?.reset();sortKey=null;document.querySelectorAll('[data-sort]').forEach(head=>head.querySelector('.sort-arrow')?.remove());$('scannerBody').innerHTML='<tr class="scanner-loading"><td colspan="9">Carregando jogos do dia…</td></tr>';
-  try{const response=await fetch(`/api/jogos?date=${$('analysisDate').value}`),data=await response.json();if(!response.ok)throw Error(data.erro||'Jogos indisponíveis.');fixtures=(data.response||[]).filter(game=>!cpIsExcludedGame(game));window.CENTRAL_PRO_OFFLINE=Boolean(data.offline);fillFilters();render();if(data.offline){if($('analysisStatusMeta'))$('analysisStatusMeta').textContent='Modo offline · análises salvas preservadas';return}saveOpportunitySnapshot();const targets=fixtures.filter(game=>!cpIsExcludedGame(game)).sort((a,b)=>priorityRank(a.league.id)-priorityRank(b.league.id)||new Date(a.fixture.date)-new Date(b.fixture.date));if(targets.length)loadAnalysisRows(targets,token);else flushOpportunitySnapshot()}catch(error){$('scannerBody').innerHTML=`<tr><td class="scanner-empty" colspan="9">${cpEscape(error.message)}</td></tr>`}
+  try{const response=await fetch(`/api/jogos?date=${$('analysisDate').value}`),data=await response.json();if(!response.ok)throw Error(data.erro||'Jogos indisponíveis.');const schedule=data.response||[];agendaTotal=schedule.length;fixtures=cpSelectScannerFixtures(schedule);window.CENTRAL_PRO_OFFLINE=Boolean(data.offline);fillFilters();render();if(data.offline){if($('analysisStatusMeta'))$('analysisStatusMeta').textContent='Modo offline · análises salvas preservadas';return}saveOpportunitySnapshot();const targets=[...fixtures].sort((a,b)=>priorityRank(a.league.id)-priorityRank(b.league.id)||new Date(a.fixture.date)-new Date(b.fixture.date));if(targets.length)loadAnalysisRows(targets,token);else flushOpportunitySnapshot()}catch(error){$('scannerBody').innerHTML=`<tr><td class="scanner-empty" colspan="9">${cpEscape(error.message)}</td></tr>`}
 }
 function setDate(value,button){$('analysisDate').value=value;[$('todayButton'),$('tomorrowButton')].forEach(item=>item.classList.toggle('active',item===button));load()}
 $('todayButton').onclick=()=>setDate(localDate(0),$('todayButton'));

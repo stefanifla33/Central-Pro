@@ -24,18 +24,29 @@
     { id: 143, name: "Copa del Rey", category: "main" },
     { id: 848, name: "UEFA Conference League", category: "main" },
     { id: 40, name: "Championship", category: "relevant" },
+    { id: 62, name: "Ligue 2", category: "relevant" },
     { id: 79, name: "2. Bundesliga", category: "relevant" },
     { id: 88, name: "Eredivisie", category: "relevant" },
+    { id: 89, name: "Eerste Divisie", category: "relevant" },
     { id: 90, name: "KNVB Beker", category: "relevant" },
     { id: 94, name: "Primeira Liga", category: "relevant" },
+    { id: 95, name: "Segunda Liga", category: "relevant" },
     { id: 96, name: "Taça de Portugal", category: "relevant" },
     { id: 98, name: "J1 League", category: "relevant" },
+    { id: 106, name: "Ekstraklasa", category: "relevant" },
+    { id: 113, name: "Allsvenskan", category: "relevant" },
     { id: 128, name: "Liga Profesional Argentina", category: "relevant" },
+    { id: 136, name: "Serie B", category: "relevant" },
+    { id: 141, name: "Segunda División", category: "relevant" },
     { id: 144, name: "Jupiler Pro League", category: "relevant" },
     { id: 179, name: "Scottish Premiership", category: "relevant" },
+    { id: 197, name: "Super League 1", category: "relevant" },
     { id: 203, name: "Süper Lig", category: "relevant" },
+    { id: 207, name: "Super League", category: "relevant" },
+    { id: 218, name: "Bundesliga", category: "relevant" },
     { id: 253, name: "Major League Soccer", category: "relevant" },
     { id: 262, name: "Liga MX", category: "relevant" },
+    { id: 292, name: "K League 1", category: "relevant" },
     { id: 307, name: "Saudi Pro League", category: "relevant" }
   ]);
   const CP_MAIN_LEAGUES = new Set(CP_COMPETITIONS.filter(item => item.category === "main").map(item => item.id));
@@ -50,10 +61,13 @@
     return CP_YOUTH_LEAGUE_PATTERN.test(label) || CP_NON_TARGET_LEAGUE_PATTERN.test(label);
   };
   const cpIsExcludedGame = game => cpIsExcludedLeague(game?.league) || CP_RESERVE_TEAM_PATTERN.test(game?.teams?.home?.name || "") || CP_RESERVE_TEAM_PATTERN.test(game?.teams?.away?.name || "");
+  const cpIsScannerEligibleLeagueId = leagueId => CP_FEATURED_LEAGUES.has(Number(leagueId));
+  const cpIsScannerEligibleGame = game => cpIsScannerEligibleLeagueId(game?.league?.id) && !cpIsExcludedGame(game);
+  const cpSelectScannerFixtures = fixtures => Array.isArray(fixtures) ? fixtures.filter(cpIsScannerEligibleGame) : [];
   const cpLeagueMatchesMode = (league, mode) => !cpIsExcludedLeague(league) && (
     mode === "all" ||
     mode === "main" && CP_MAIN_LEAGUES.has(league?.id) ||
     mode === "featured" && CP_FEATURED_LEAGUES.has(league?.id)
   );
-  return { CP_COMPETITIONS, CP_MAIN_LEAGUES, CP_RELEVANT_LEAGUES, CP_FEATURED_LEAGUES, CP_PRIORITY_ORDER, CP_YOUTH_LEAGUE_PATTERN, CP_NON_TARGET_LEAGUE_PATTERN, CP_RESERVE_TEAM_PATTERN, cpIsExcludedLeague, cpIsExcludedGame, cpLeagueMatchesMode };
+  return { CP_COMPETITIONS, CP_MAIN_LEAGUES, CP_RELEVANT_LEAGUES, CP_FEATURED_LEAGUES, CP_PRIORITY_ORDER, CP_YOUTH_LEAGUE_PATTERN, CP_NON_TARGET_LEAGUE_PATTERN, CP_RESERVE_TEAM_PATTERN, cpIsExcludedLeague, cpIsExcludedGame, cpIsScannerEligibleLeagueId, cpIsScannerEligibleGame, cpSelectScannerFixtures, cpLeagueMatchesMode };
 }));

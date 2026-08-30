@@ -8,7 +8,14 @@
     "dev": "node --watch server.js",
     "test:snapshots": "node test/game-snapshot-store.test.js",
     "test:offline": "node test/offline-mode.test.js",
-    "test:period-monitor": "node test/period-monitor-frequency.test.js"
+    "test:period-monitor": "node test/period-monitor-frequency.test.js",
+    "test:scanner-whitelist": "node test/scanner-competition-whitelist.test.js",
+    "test:player-snapshot": "node test/player-snapshot.test.js",
+    "test:player-api-dedup": "node test/player-api-dedup.test.js",
+    "test:player-rate-limit": "node test/player-rate-limiter.test.js && node test/api-quota-classification.test.js",
+    "test:player-optimization": "node test/player-history-optimization.test.js",
+    "test:player-persistence": "node test/player-history-persistence.test.js",
+    "test:top-day": "node test/top-day-goals-only.test.js"
   },
   "keywords": [],
   "author": "",
