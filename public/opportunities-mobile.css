@@ -346,3 +346,59 @@
     transform: none;
   }
 }
+
+@media (max-width: 760px) {
+  .opportunities-page .fixture-head {
+    gap: 6px !important;
+    padding: 11px !important;
+  }
+
+  .opportunities-page .recommendation-row,
+  .opportunities-page .best-opportunity {
+    gap: 8px;
+    padding: 11px !important;
+  }
+
+  .opportunities-page .recommendation-row .best-score {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 6px 8px;
+    width: 100%;
+    min-width: 0;
+    padding: 7px 8px;
+  }
+
+  .opportunities-page .recommendation-row .opportunity-percent {
+    justify-self: stretch;
+    font-size: inherit !important;
+  }
+
+  .opportunities-page .recommendation-row .opportunity-percent b {
+    font-size: 23px;
+  }
+
+  .opportunities-page .recommendation-row .frequency {
+    justify-self: stretch;
+    padding: 0;
+  }
+
+  .opportunities-page .recommendation-row .confidence,
+  .opportunities-page .recommendation-row .best-score .add-bankroll {
+    grid-column: 1 / -1;
+  }
+
+  .opportunities-page .recommendation-row .best-score .add-bankroll {
+    min-height: 36px;
+  }
+
+  .opportunities-page .fixture-teams {
+    grid-template-columns: 24px minmax(0, 1fr) auto minmax(0, 1fr) 24px;
+    gap: 6px !important;
+  }
+
+  .opportunities-page .fixture-teams img {
+    width: 24px !important;
+    height: 24px !important;
+    min-width: 24px !important;
+    max-width: 24px !important;
+  }
+}

@@ -70,13 +70,13 @@
       const profit = store.profit(entry);
       const profitClass = profit > 0 ? 'profit-positive' : profit < 0 ? 'profit-negative' : '';
       return `<tr>
-        <td>${dateLabel(entry.date)}</td>
-        <td class="match-cell"><strong>${escapeHtml(entry.match)}</strong><small>${escapeHtml(entry.competition)}</small></td>
-        <td>${escapeHtml(entry.market)}</td><td>${escapeHtml(entry.selection)}</td>
-        <td class="odd-value">${decimal.format(entry.odd)}</td><td class="money-value">${currency.format(entry.stake)}</td>
-        <td><span class="result-badge ${entry.result}">${resultLabels[entry.result]}</span></td>
-        <td class="money-value ${profitClass}">${entry.result === 'pending' ? '—' : currency.format(profit)}</td>
-        <td><div class="row-actions"><button class="row-action" data-edit="${entry.id}" type="button">Editar</button><button class="row-action delete" data-delete="${entry.id}" type="button">Excluir</button></div></td>
+        <td data-label="Data">${dateLabel(entry.date)}</td>
+        <td class="match-cell" data-label="Partida"><strong>${escapeHtml(entry.match)}</strong><small><b>Competição</b>${escapeHtml(entry.competition)}</small></td>
+        <td data-label="Mercado">${escapeHtml(entry.market)}</td><td data-label="Seleção">${escapeHtml(entry.selection)}</td>
+        <td class="odd-value" data-label="Odd">${decimal.format(entry.odd)}</td><td class="money-value" data-label="Stake">${currency.format(entry.stake)}</td>
+        <td data-label="Resultado"><span class="result-badge ${entry.result}">${resultLabels[entry.result]}</span></td>
+        <td class="money-value ${profitClass}" data-label="Lucro/Prejuízo">${entry.result === 'pending' ? '—' : currency.format(profit)}</td>
+        <td class="entry-actions-cell" data-label="Ações"><div class="row-actions"><button class="row-action" data-edit="${entry.id}" type="button">Editar</button><button class="row-action delete" data-delete="${entry.id}" type="button">Excluir</button></div></td>
       </tr>`;
     }).join('');
     byId('emptyState').hidden = entries.length > 0;
