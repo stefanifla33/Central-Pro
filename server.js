@@ -2104,13 +2104,23 @@ app.get("/api/partidas/:id/jogadores-recentes", async (req, res) => {
         if (!fixture) return res.status(404).json({ erro: "Partida não encontrada." });
         const before = fixture.fixture.date;
         const beforeTime = new Date(before).getTime();
-        stage = "confirmed-players";
-        const parsePlayerIds = value => new Set(String(value || "").split(",").map(Number).filter(Number.isSafeInteger));
-        const relevantByTeam = new Map([
-            [fixture.teams.home.id, parsePlayerIds(req.query.homePlayers)],
-            [fixture.teams.away.id, parsePlayerIds(req.query.awayPlayers)]
-        ]);
-        if ([...relevantByTeam.values()].some(ids => ids.size === 0)) return res.status(409).json({ erro: "Confirmação sem jogadores utilizáveis.", code: "PLAYER_CONFIRMATION_EMPTY" });
+        const scannerMode = req.query.mode === "scanner";
+        stage = scannerMode ? "confirmed-players" : "lineups";
+        const parsePlayerIds = value => new Set(String(value || "").split(",").map(Number).filter(id => Number.isSafeInteger(id) && id > 0));
+        let relevantByTeam;
+        if (scannerMode) {
+            relevantByTeam = new Map([
+                [fixture.teams.home.id, parsePlayerIds(req.query.homePlayers)],
+                [fixture.teams.away.id, parsePlayerIds(req.query.awayPlayers)]
+            ]);
+            if ([...relevantByTeam.values()].some(ids => ids.size === 0)) return res.status(409).json({ erro: "Confirmação sem jogadores utilizáveis.", code: "PLAYER_CONFIRMATION_EMPTY" });
+        } else {
+            const lineupData = await rateLimitedPlayerFootball(`/fixtures/lineups?fixture=${fixtureId}`, 300_000).catch(() => ({ response: [] }));
+            relevantByTeam = new Map([fixture.teams.home, fixture.teams.away].map(team => {
+                const lineup = (lineupData.response || []).find(item => Number(item.team?.id) === Number(team.id));
+                return [team.id, new Set([...(lineup?.startXI || []), ...(lineup?.substitutes || [])].map(item => Number(item.player?.id)).filter(Number.isSafeInteger))];
+            }));
+        }
         const diagnostics = [];
         for (const team of [fixture.teams.home, fixture.teams.away]) {
             stage = `history-team-${team.id}`;
