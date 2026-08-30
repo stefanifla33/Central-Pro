@@ -37,7 +37,7 @@
   function compareRecommendations(a,b){return recommendationScore(b)-recommendationScore(a)||b.metric.value-a.metric.value||b.metric.total-a.metric.total}
   function entryFields(item){
     const game=item.game,selections={over05HT:['Gols no 1º tempo','+0.5 gol no 1º tempo'],over05:['Total de gols','+0.5 gols'],over15:['Total de gols','+1.5 gols'],over25:['Total de gols','+2.5 gols'],btts:['Ambas marcam','Sim'],homeScores:['Time marca',`${game.teams.home.name} marca`],awayScores:['Time marca',`${game.teams.away.name} marca`],cornersOver65:['Total de escanteios','+6.5 escanteios'],cornersOver75:['Total de escanteios','+7.5 escanteios'],cornersOver85:['Total de escanteios','+8.5 escanteios'],cornersOver95:['Total de escanteios','+9.5 escanteios']},[market,selection]=selections[item.key];
-    return{date:new Date(game.fixture.date).toLocaleDateString('en-CA',{timeZone:'America/Sao_Paulo'}),competition:game.league.name,match:`${game.teams.home.name} x ${game.teams.away.name}`,market,selection};
+    return{date:new Date(game.fixture.date).toLocaleDateString('en-CA',{timeZone:'America/Sao_Paulo'}),competition:typeof cpLeagueDisplayName==='function'?cpLeagueDisplayName(game.league):game.league.name,match:`${game.teams.home.name} x ${game.teams.away.name}`,market,selection};
   }
   window.CPOpportunityEngine={MARKETS,RANKING_MARKET_KEYS,rankingMarkets,confidenceLevel,opportunities,recommendationScore,compareRecommendations,entryFields};
 }());

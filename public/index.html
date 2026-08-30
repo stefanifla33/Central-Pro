@@ -14,7 +14,7 @@
   <aside class="sidebar" id="sidebar">
     <a class="brand" href="index.html" aria-label="Central Pro — Inteligência Esportiva"><img class="sidebar-logo" src="assets/central-pro-logo.png" alt="Central Pro — Inteligência Esportiva"></a>
     <div class="user-card"><span class="avatar">S</span><span><strong>Stefani</strong><small>Analista</small></span><span class="status-dot"></span></div>
-    <nav class="main-nav"><a class="active" href="index.html"><span>⌂</span>Início</a><a href="games.html"><span>◫</span>Jogos</a><a href="analysis.html"><span>⌁</span>Análises</a><a href="players.html"><span>♙</span>Jogadores</a><a href="opportunities.html"><span>↗</span>Melhores Oportunidades</a><a href="bankroll.html"><span>◈</span>Minha Banca</a><a href="bankroll.html#history"><span>↺</span>Histórico</a><a href="leagues.html"><span>♜</span>Competições</a></nav>
+    <nav class="main-nav"><a class="active" href="index.html"><span>⌂</span>Início</a><a href="games.html"><span>◫</span>Jogos</a><a href="analysis.html"><span>⌁</span>Análises</a><a href="opportunities.html"><span>↗</span>Melhores Oportunidades</a><a href="bankroll.html"><span>◈</span>Minha Banca</a><a href="bankroll.html#history"><span>↺</span>Histórico</a><a href="leagues.html"><span>♜</span>Competições</a></nav>
     <div class="sidebar-insight"><strong>CENTRAL PRO</strong><p>Inteligência em cada detalhe, vantagem em cada aposta.</p><span aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></span></div>
     <div class="sidebar-footer"><span>© 2026 Central Pro</span><small>Todos os direitos reservados.</small></div>
   </aside>
@@ -41,13 +41,13 @@
       </section>
       <section class="home-secondary">
         <article class="home-stage home-opportunities"><div class="home-section-head"><div><p class="eyebrow opportunity-title">★ &nbsp; MELHORES OPORTUNIDADES</p></div><a href="opportunities.html">Ver todas <span>→</span></a></div><div id="dashboardOpportunities" class="home-opportunity-list"><div class="skeleton-row"></div><div class="skeleton-row"></div></div><a class="home-panel-footer" href="opportunities.html">Ver todas as oportunidades <span>→</span></a></article>
-        <article class="home-stage explore-section"><div class="home-section-head"><div><p class="eyebrow">NAVEGAÇÃO RÁPIDA</p></div></div><div class="quick-grid"><a href="games.html"><span>◫</span><b>Todos os jogos</b><small>Explore a agenda completa com filtros por data e competição.</small><em>Acessar →</em></a><a href="analysis.html"><span>⌁</span><b>Análise Rápida</b><small>Encontre tendências e dados pré-jogo em um só lugar.</small><em>Analisar →</em></a><a href="players.html"><span>♙</span><b>Jogadores</b><small>Consulte desempenhos e estatísticas individuais.</small><em>Pesquisar →</em></a><a href="leagues.html"><span>♜</span><b>Competições</b><small>Acompanhe tabelas, campeonatos e artilheiros.</small><em>Explorar →</em></a></div></article>
+        <article class="home-stage explore-section"><div class="home-section-head"><div><p class="eyebrow">NAVEGAÇÃO RÁPIDA</p></div></div><div class="quick-grid"><a href="games.html"><span>◫</span><b>Todos os jogos</b><small>Explore a agenda completa com filtros por data e competição.</small><em>Acessar →</em></a><a href="analysis.html"><span>⌁</span><b>Análise Rápida</b><small>Encontre tendências e dados pré-jogo em um só lugar.</small><em>Analisar →</em></a><a href="leagues.html"><span>♜</span><b>Competições</b><small>Acompanhe tabelas, campeonatos e artilheiros.</small><em>Explorar →</em></a></div></article>
       </section>
       <footer class="home-status"><span><i>ϟ</i> Dados atualizados em tempo real com inteligência e precisão.</span><span><i>♢</i> Confiável. Rápido. Completo.</span></footer>
     </main>
   </div>
   <script>const homeHour=new Date().getHours();document.getElementById('homeGreeting').textContent=`${homeHour>=5&&homeHour<12?'Bom dia':homeHour>=12&&homeHour<18?'Boa tarde':'Boa noite'}, Stefani!`;</script>
-  <script src="competition-config.js?v=2"></script><script src="goal-metrics.js?v=2"></script><script src="app-shell.js?v=1"></script><script src="dashboard.js?v=8"></script>
+  <script src="competition-config.js?v=3"></script><script src="goal-metrics.js?v=2"></script><script src="app-shell.js?v=3"></script><script src="dashboard.js?v=9"></script>
   <script>const homeMenu=document.getElementById('sidebar'),homeMenuButton=document.getElementById('menuButton'),homeMenuOverlay=document.getElementById('menuOverlay');function syncHomeMenu(){const open=homeMenu.classList.contains('open');homeMenuOverlay.classList.toggle('active',open);homeMenuOverlay.setAttribute('aria-hidden',String(!open));document.body.classList.toggle('menu-open',open)}homeMenuButton.addEventListener('click',()=>requestAnimationFrame(syncHomeMenu));homeMenuOverlay.addEventListener('click',()=>{homeMenu.classList.remove('open');syncHomeMenu()});</script>
 </body>
 </html>

@@ -53,6 +53,12 @@
   const CP_RELEVANT_LEAGUES = new Set(CP_COMPETITIONS.filter(item => item.category === "relevant").map(item => item.id));
   const CP_FEATURED_LEAGUES = new Set(CP_COMPETITIONS.map(item => item.id));
   const CP_PRIORITY_ORDER = CP_COMPETITIONS.map(item => item.id);
+  const CP_LEAGUE_DISPLAY_NAMES = Object.freeze({
+    71: "Brasileirão Série A",
+    72: "Brasileirão Série B",
+    135: "Serie A — Itália"
+  });
+  const cpLeagueDisplayName = league => CP_LEAGUE_DISPLAY_NAMES[Number(league?.id)] || league?.name || "";
   const CP_YOUTH_LEAGUE_PATTERN = /\b(?:U[\s-]?(?:17|18|19|20|21|23)|SUB[\s-]?(?:17|18|19|20|21|23)|YOUTH|RESERVES?|RESERVAS?|JUNIORS?|JUVENIL(?:ES)?|DEVELOPMENT|ACADEMY)\b/i;
   const CP_NON_TARGET_LEAGUE_PATTERN = /\b(?:AMATEURS?|AMADOR(?:ES)?|WOMEN(?:\'S)?|WOMENS|FEMININ[AE]|FEMENIN[AO]S?|FRAUEN|INTERNATIONAL\s+AMATEUR|FRIENDL(?:Y|IES)|CLUB\s+FRIENDLIES)\b/i;
   const CP_RESERVE_TEAM_PATTERN = /(?:\b(?:RESERVES?|RESERVAS?|DEVELOPMENT|ACADEMY|U[\s-]?(?:17|18|19|20|21|23)|SUB[\s-]?(?:17|18|19|20|21|23))\b|\s(?:II|III|B)\s*$)/i;
@@ -69,5 +75,5 @@
     mode === "main" && CP_MAIN_LEAGUES.has(league?.id) ||
     mode === "featured" && CP_FEATURED_LEAGUES.has(league?.id)
   );
-  return { CP_COMPETITIONS, CP_MAIN_LEAGUES, CP_RELEVANT_LEAGUES, CP_FEATURED_LEAGUES, CP_PRIORITY_ORDER, CP_YOUTH_LEAGUE_PATTERN, CP_NON_TARGET_LEAGUE_PATTERN, CP_RESERVE_TEAM_PATTERN, cpIsExcludedLeague, cpIsExcludedGame, cpIsScannerEligibleLeagueId, cpIsScannerEligibleGame, cpSelectScannerFixtures, cpLeagueMatchesMode };
+  return { CP_COMPETITIONS, CP_MAIN_LEAGUES, CP_RELEVANT_LEAGUES, CP_FEATURED_LEAGUES, CP_PRIORITY_ORDER, CP_LEAGUE_DISPLAY_NAMES, CP_YOUTH_LEAGUE_PATTERN, CP_NON_TARGET_LEAGUE_PATTERN, CP_RESERVE_TEAM_PATTERN, cpLeagueDisplayName, cpIsExcludedLeague, cpIsExcludedGame, cpIsScannerEligibleLeagueId, cpIsScannerEligibleGame, cpSelectScannerFixtures, cpLeagueMatchesMode };
 }));

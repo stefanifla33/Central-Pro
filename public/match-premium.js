@@ -8,7 +8,7 @@
   const display = value => value == null ? '—' : Number(value).toFixed(Number.isInteger(value) ? 0 : 1);
   const pair = (label, home, away, fixture) => `<article class="premium-metric"><small>${label}</small><div class="premium-pair"><span><b>${display(home)}</b><em>${safe(fixture.teams.home.name)}</em></span><i></i><span><b>${display(away)}</b><em>${safe(fixture.teams.away.name)}</em></span></div></article>`;
   const venueText = fixture => [fixture.fixture.venue?.name, fixture.fixture.venue?.city].filter(Boolean).map(safe).join(' · ');
-  const leagueText = fixture => String(fixture.league.name || '').replace(/^Serie A$/i, 'Série A').replace(/^Serie B$/i, 'Série B');
+  const leagueText = fixture => cpLeagueDisplayName(fixture.league);
   const roundText = fixture => String(fixture.league.round || '').replace(/^Regular Season\s*-?\s*(\d+)$/i, 'Temporada Regular · Rodada $1').replace(/^Round\s*(\d+)$/i, 'Rodada $1');
   const confidenceBadge = value => `<span class="quick-confidence" title="Classificação baseada na quantidade de estatísticas recentes disponíveis.">Confiança: <b>${value}</b></span>`;
 
@@ -18,7 +18,7 @@
     const away = d.statistics[1]?.statistics || [];
     const date = new Date(fixture.fixture.date);
     const active = liveS.includes(fixture.fixture.status.short);
-    document.querySelector('.top')?.insertAdjacentHTML('afterend', `<nav class="match-breadcrumb" aria-label="Navegação estrutural"><span>Partidas</span><i>›</i><span>${safe(fixture.league.name)}</span><i>›</i><strong>${safe(fixture.teams.home.name)} x ${safe(fixture.teams.away.name)}</strong></nav>`);
+    document.querySelector('.top')?.insertAdjacentHTML('afterend', `<nav class="match-breadcrumb" aria-label="Navegação estrutural"><span>Partidas</span><i>›</i><span>${safe(cpLeagueDisplayName(fixture.league))}</span><i>›</i><strong>${safe(fixture.teams.home.name)} x ${safe(fixture.teams.away.name)}</strong></nav>`);
     const statusLabel = active ? `AO VIVO ${fixture.fixture.status.elapsed || ''}'` : fixture.fixture.status.short === 'FT' ? 'ENCERRADO' : 'PRÉ-JOGO';
     document.getElementById('hero').innerHTML = `<div class="hero-kicker"><div class="comp">${safe(leagueText(fixture))} · ${safe(roundText(fixture))}</div><span class="match-status ${active ? 'live' : ''}">${statusLabel}</span></div><div class="teams"><div class="team"><img src="${safe(fixture.teams.home.logo)}" alt="Escudo ${safe(fixture.teams.home.name)}"><div>${safe(fixture.teams.home.name)}</div></div><div><div class="score">${active || fixture.fixture.status.short === 'FT' ? `${fixture.goals.home ?? 0} — ${fixture.goals.away ?? 0}` : '—'}</div><div class="state">${date.toLocaleDateString('pt-BR')} · ${date.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}</div></div><div class="team"><img src="${safe(fixture.teams.away.logo)}" alt="Escudo ${safe(fixture.teams.away.name)}"><div>${safe(fixture.teams.away.name)}</div></div></div><div class="hero-meta">${venueText(fixture) ? `<span>⌖ ${venueText(fixture)}</span>` : ''}${fixture.league.country ? `<span>${safe(fixture.league.country)}</span>` : ''}</div>`;
     const metrics = [
