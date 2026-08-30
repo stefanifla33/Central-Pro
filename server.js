@@ -859,6 +859,15 @@ async function monitorMainLeagues() {
 app.get("/vendor/exceljs/exceljs.min.js", (req, res) => {
     res.sendFile(path.join(__dirname, "node_modules", "exceljs", "dist", "exceljs.min.js"));
 });
+
+app.get("/api/auth/config", (req, res) => {
+    const url = String(process.env.SUPABASE_URL || "").trim();
+    const publishableKey = String(process.env.SUPABASE_PUBLISHABLE_KEY || process.env.SUPABASE_ANON_KEY || "").trim();
+    res.set("Cache-Control", "no-store");
+    if (!url || !publishableKey) return res.json({ configured: false });
+    res.json({ configured: true, url, publishableKey });
+});
+
 app.use(express.static(path.join(__dirname, "public")));
 
 app.get("/api/status", (req, res) => {
