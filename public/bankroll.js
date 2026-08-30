@@ -8,7 +8,6 @@
   const resultLabels = { pending: 'Pendente', green: 'Green', red: 'Red', void: 'Void' };
   const byId = (id) => document.getElementById(id);
 
-  byId('menuButton').addEventListener('click', () => byId('sidebar').classList.toggle('open'));
   document.addEventListener('keydown', (event) => {
     if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') {
       event.preventDefault(); byId('globalSearch').focus();
