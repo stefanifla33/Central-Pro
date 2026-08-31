@@ -10,10 +10,10 @@
     lifetime: 'Acesso permanente ao Central Pro.'
   };
   const descriptions = {
-    trial: 'Você está usando o período gratuito de 24 horas.',
-    expired: 'Seu período gratuito terminou. Este espaço receberá as opções de assinatura futuramente.',
+    trial: 'Você está usando o período gratuito de 24 horas e já pode escolher seu plano.',
+    expired: 'Seu período gratuito terminou. Escolha um plano para continuar.',
     active: 'Seu acesso ao Central Pro está ativo.',
-    canceled: 'Seu acesso foi cancelado. As opções de renovação serão exibidas aqui futuramente.',
+    canceled: 'Seu acesso foi cancelado. Escolha um plano para voltar a acessar.',
     lifetime: 'Seu acesso ao Central Pro é permanente.'
   };
   const planHeadlines = {
@@ -24,10 +24,10 @@
     lifetime: 'Central Pro — Proprietária'
   };
   const planSupporting = {
-    trial: 'Você ainda não possui um plano ativo. Assinaturas e renovações estarão disponíveis em breve.',
-    expired: 'As opções de assinatura serão disponibilizadas aqui futuramente.',
+    trial: 'Você não precisa esperar o fim do teste para assinar.',
+    expired: 'Assine para reativar seu acesso ao Central Pro.',
     active: 'Os detalhes do seu plano serão exibidos aqui quando estiverem disponíveis.',
-    canceled: 'As opções de renovação serão disponibilizadas aqui futuramente.',
+    canceled: 'Assine para reativar seu acesso ao Central Pro.',
     lifetime: 'Acesso permanente, sem necessidade de renovação.'
   };
 
@@ -67,7 +67,7 @@
     byId('planHeadline').textContent = planHeadlines[status];
     if (status === 'active' && access.planName) byId('planHeadline').textContent = `Plano ${access.planName}`;
     byId('planSupporting').textContent = planSupporting[status];
-    byId('futurePlan').hidden = status === 'lifetime';
+    byId('purchasePlans').hidden = !['trial', 'expired', 'canceled'].includes(status);
     byId('renewPlan').hidden = status !== 'active';
     if (status === 'trial') {
       byId('remainingRow').hidden = false;
@@ -85,19 +85,45 @@
     }
   }
 
+  let currentSession = null;
+
   try {
     const auth = await waitForAuth();
     const { data, error } = await auth.getSession();
     if (error || !data.session?.user) return location.replace('/login.html');
-    const user = data.session.user;
+    currentSession = data.session;
+    const user = currentSession.user;
     const name = auth.userName(user);
     byId('accountName').textContent = name;
     byId('accountEmail').textContent = user.email || 'E-mail não informado';
     byId('accountAvatar').textContent = name.charAt(0).toUpperCase();
-    renderAccess(await auth.getAccess(data.session));
+    renderAccess(await auth.getAccess(currentSession));
   } catch (_error) {
     byId('accountMessage').textContent = 'Não foi possível carregar os dados da conta agora.';
   }
+
+  const checkoutButtons = [...document.querySelectorAll('[data-plan]')];
+  checkoutButtons.forEach((button) => button.addEventListener('click', async () => {
+    if (!currentSession?.access_token || button.disabled) return;
+    const originalLabel = button.textContent;
+    checkoutButtons.forEach((item) => { item.disabled = true; });
+    button.textContent = 'Carregando…';
+    byId('accountMessage').textContent = 'Preparando checkout seguro…';
+    try {
+      const response = await fetch('/api/payments/asaas/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${currentSession.access_token}` },
+        body: JSON.stringify({ planId: button.dataset.plan })
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok || !result.checkoutUrl) throw new Error('checkout_unavailable');
+      location.assign(result.checkoutUrl);
+    } catch (_error) {
+      button.textContent = originalLabel;
+      checkoutButtons.forEach((item) => { item.disabled = false; });
+      byId('accountMessage').textContent = 'Não foi possível iniciar o pagamento agora. Tente novamente.';
+    }
+  }));
 
   byId('logoutButton').addEventListener('click', async () => {
     const button = byId('logoutButton');

@@ -899,13 +899,13 @@ function asaasPaymentService() {
 app.post("/api/payments/asaas/checkout", express.json({ limit: "16kb" }), async (req, res) => {
     res.set("Cache-Control", "no-store");
     try {
-        const callbackBase = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : `http://localhost:${PORT}`;
+        const callbackBase = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "https://central-pro.vercel.app";
         const result = await asaasPaymentService().createCheckout({
             authorization: req.get("Authorization"), planId: req.body?.planId, callbackBase
         });
         res.status(result.httpStatus).json(result.body);
-    } catch (_error) {
-        console.error("[ASAAS-CHECKOUT] request failed");
+    } catch (error) {
+        console.error("[ASAAS-CHECKOUT] request failed", { code: String(error?.code || "unexpected_error"), status: Number.isInteger(error?.status) ? error.status : null });
         res.status(502).json({ error: "checkout_unavailable" });
     }
 });

@@ -15,6 +15,7 @@ function scenario({ rpcResult = { duplicate: false }, accessStatus = 'trial' } =
     if (url.endsWith('/auth/v1/user')) return response(true, { id: 'server-user-id', email: 'user@test.local', user_metadata: { name: 'Pessoa' } });
     if (url.includes('/user_access?')) return response(true, [{ user_id: 'server-user-id', access_status: accessStatus, asaas_customer_id: null }]);
     if (url.endsWith('/payment_orders?select=id')) return response(true, [{ id: '11111111-1111-4111-8111-111111111111' }]);
+    if (url.includes('/payment_orders?asaas_checkout_id=eq.')) return response(true, [{ id: '11111111-1111-4111-8111-111111111111' }]);
     if (url.includes('/payment_orders?id=eq.')) return response(true, {});
     if (url.endsWith('/rpc/process_asaas_payment_event')) return response(true, rpcResult);
     if (url.endsWith('/checkouts')) return response(true, { id: 'checkout-1', link: 'https://sandbox.asaas.com/checkout/test' });
@@ -50,6 +51,11 @@ function scenario({ rpcResult = { duplicate: false }, accessStatus = 'trial' } =
   const asaasCall = checkoutScenario.calls.find((call) => call.url.endsWith('/checkouts'));
   assert.deepStrictEqual(asaasCall.body.billingTypes, ['PIX', 'CREDIT_CARD']);
   assert.strictEqual(asaasCall.body.items[0].value, 19.90);
+  assert.deepStrictEqual(asaasCall.body.callback, {
+    successUrl: 'http://localhost:3000/minha-conta.html',
+    cancelUrl: 'http://localhost:3000/planos.html',
+    expiredUrl: 'http://localhost:3000/planos.html'
+  });
 
   const invalidPlan = scenario();
   assert.strictEqual((await invalidPlan.service.createCheckout({ authorization: 'Bearer token', planId: 'annual', callbackBase: 'http://localhost:3000' })).httpStatus, 400);
@@ -62,6 +68,22 @@ function scenario({ rpcResult = { duplicate: false }, accessStatus = 'trial' } =
   const rpcCall = webhookScenario.calls.find((call) => call.url.endsWith('/rpc/process_asaas_payment_event'));
   assert.strictEqual(rpcCall.body.p_event_type, 'PAYMENT_CONFIRMED');
   assert.strictEqual(rpcCall.body.p_external_reference, payload.payment.externalReference);
+
+  const receivedScenario = scenario();
+  const receivedPayload = {
+    id: 'evt_d26e303b238e509335ac9ba210e51b0f&18590916',
+    event: 'PAYMENT_RECEIVED',
+    payment: { id: 'pay_staf553a3rkdzi0v', checkoutSession: '164b23dc-9f04-4a53-892a-6351c1b7d1d9', externalReference: null, status: 'RECEIVED', value: 19.9 }
+  };
+  const received = await receivedScenario.service.processWebhook({ token: 'webhook-secret-token-with-more-than-32-chars', payload: receivedPayload });
+  assert.strictEqual(received.httpStatus, 200, 'PAYMENT_RECEIVED aceita checkoutSession persistida quando externalReference é null');
+  const checkoutLookup = receivedScenario.calls.find((call) => call.url.includes('/payment_orders?asaas_checkout_id=eq.'));
+  assert.ok(checkoutLookup, 'checkoutSession localiza o pedido persistido no servidor');
+  const receivedRpc = receivedScenario.calls.find((call) => call.url.endsWith('/rpc/process_asaas_payment_event'));
+  assert.strictEqual(receivedRpc.body.p_event_id, receivedPayload.id, 'event.id é preservado integralmente, inclusive com &');
+  assert.strictEqual(receivedRpc.body.p_event_type, 'PAYMENT_RECEIVED');
+  assert.strictEqual(receivedRpc.body.p_payment_id, receivedPayload.payment.id);
+  assert.strictEqual(receivedRpc.body.p_external_reference, '11111111-1111-4111-8111-111111111111', 'RPC recebe o UUID obtido do pedido persistido');
 
   const migration = fs.readFileSync('supabase/user-access-subscriptions.sql', 'utf8');
   assert.match(migration, /event_id text primary key/, 'eventos são idempotentes');
@@ -80,6 +102,7 @@ function scenario({ rpcResult = { duplicate: false }, accessStatus = 'trial' } =
 
   const serverSource = fs.readFileSync('server.js', 'utf8');
   assert.match(serverSource, /req\.body\?\.planId/, 'checkout recebe somente planId útil');
+  assert.match(serverSource, /"https:\/\/central-pro\.vercel\.app"/, 'localhost usa retorno público aceito pelo Asaas');
   assert.match(serverSource, /req\.get\("asaas-access-token"\)/, 'header oficial do webhook é validado');
   const plansSource = fs.readFileSync('public/planos.js', 'utf8');
   assert.doesNotMatch(plansSource, /19\.90|49\.90|userId|price/, 'frontend não envia preço ou userId');
