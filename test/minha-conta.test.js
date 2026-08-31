@@ -13,7 +13,7 @@ function element() {
 }
 
 async function accountScenario(access) {
-  const ids = ['accountAvatar', 'accountName', 'accountEmail', 'accessBadge', 'accessTitle', 'accessSummaryDescription', 'accessStatus', 'accessValidity', 'remainingRow', 'accessRemaining', 'trialProgress', 'trialProgressBar', 'trialStart', 'trialStartText', 'planHeadline', 'planDescription', 'planSupporting', 'futurePlan', 'accountMessage', 'logoutButton'];
+  const ids = ['accountAvatar', 'accountName', 'accountEmail', 'accessBadge', 'accessTitle', 'accessSummaryDescription', 'accessStatus', 'accessValidity', 'remainingRow', 'accessRemaining', 'trialProgress', 'trialProgressBar', 'trialStart', 'trialStartText', 'planHeadline', 'planDescription', 'planSupporting', 'futurePlan', 'renewPlan', 'accountMessage', 'logoutButton'];
   const elements = Object.fromEntries(ids.map((id) => [id, element()]));
   elements.remainingRow.hidden = true;
   elements.trialProgress.hidden = true;
@@ -66,7 +66,13 @@ async function accountScenario(access) {
   assert.strictEqual(lifetime.elements.remainingRow.hidden, true, 'lifetime não mostra horas restantes');
   assert.strictEqual(lifetime.elements.trialProgress.hidden, true, 'lifetime não mostra barra de trial');
   assert.strictEqual(lifetime.elements.futurePlan.hidden, true, 'lifetime não mostra renovação');
-  assert.match(guardSource, /!access\.allowed && !accountPage/, 'páginas premium continuam bloqueando expirados');
+
+  const active = await accountScenario({ status: 'active', allowed: true, planId: 'monthly', planName: 'Mensal', accessExpiresAt: '2026-10-01T17:32:00Z', remainingSeconds: null });
+  assert.strictEqual(active.elements.accessStatus.textContent, 'Acesso ativo');
+  assert.strictEqual(active.elements.planHeadline.textContent, 'Plano Mensal');
+  assert.match(active.elements.accessValidity.textContent, /^Acesso válido até /);
+  assert.strictEqual(active.elements.renewPlan.hidden, false);
+  assert.match(guardSource, /!access\.allowed && !accessManagementPage/, 'páginas premium continuam bloqueando expirados');
   assert.match(fs.readFileSync('public/auth.js', 'utf8'), /destination\.origin !== global\.location\.origin/, 'open redirect permanece protegido');
   assert.doesNotMatch(`${pageSource}\n${accountSource}`, /api-football|api-sports|\/api\/jogos/i, 'Minha Conta não chama API-Football');
   console.log('Minha Conta scenarios: OK');

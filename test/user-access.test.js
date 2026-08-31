@@ -88,6 +88,8 @@ async function runGuard({ session, access, pathname = '/games.html' }) {
   assert.deepStrictEqual(await runGuard({ session: user, access: expired.body, pathname: '/minha-conta.html' }), [], 'expired account page allowed');
   assert.deepStrictEqual(await runGuard({ session: user, access: created.body, pathname: '/minha-conta.html' }), [], 'active trial account page allowed');
   assert.deepStrictEqual(await runGuard({ session: user, access: lifetime.body }), [], 'premium aceita lifetime');
+  assert.deepStrictEqual(await runGuard({ session: user, access: expired.body, pathname: '/planos.html' }), [], 'expirado autenticado acessa planos');
+  assert.deepStrictEqual(await runGuard({ session: null, access: expired.body, pathname: '/planos.html' }), ['/login.html?next=%2Fplanos.html'], 'deslogado não acessa planos');
   assert.deepStrictEqual(await runGuard({ session: user, access: expired.body }), ['/trial-expired.html?ended=2026-09-01T17%3A32%3A00.000Z'], 'expirado vai à tela pública');
 
   const invalid = createUserAccessService({

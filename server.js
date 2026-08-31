@@ -9,6 +9,7 @@ const { assertExternalRequestsAllowed, isCentralProOffline } = require("./lib/ce
 const { createPlayerRateLimiter } = require("./lib/player-rate-limiter");
 const { createSerializedJsonPersister } = require("./lib/serialized-json-persister");
 const { createUserAccessService } = require("./lib/user-access");
+const { createAsaasPaymentService } = require("./lib/asaas-payments");
 const { CP_MAIN_LEAGUES: MAIN_LEAGUES, cpIsScannerEligibleLeagueId } = require("./public/competition-config");
 
 const app = express();
@@ -881,6 +882,44 @@ app.get("/api/auth/access", async (req, res) => {
     } catch (_error) {
         console.error("[AUTH-ACCESS] unexpected failure");
         res.status(503).json({ error: "access_unavailable" });
+    }
+});
+
+function asaasPaymentService() {
+    return createAsaasPaymentService({
+        supabaseUrl: process.env.SUPABASE_URL,
+        publishableKey: process.env.SUPABASE_PUBLISHABLE_KEY || process.env.SUPABASE_ANON_KEY,
+        serviceRoleKey: process.env.SUPABASE_SERVICE_ROLE_KEY,
+        asaasApiKey: process.env.ASAAS_API_KEY,
+        asaasEnvironment: process.env.ASAAS_ENV,
+        webhookToken: process.env.ASAAS_WEBHOOK_TOKEN
+    });
+}
+
+app.post("/api/payments/asaas/checkout", express.json({ limit: "16kb" }), async (req, res) => {
+    res.set("Cache-Control", "no-store");
+    try {
+        const callbackBase = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : `http://localhost:${PORT}`;
+        const result = await asaasPaymentService().createCheckout({
+            authorization: req.get("Authorization"), planId: req.body?.planId, callbackBase
+        });
+        res.status(result.httpStatus).json(result.body);
+    } catch (_error) {
+        console.error("[ASAAS-CHECKOUT] request failed");
+        res.status(502).json({ error: "checkout_unavailable" });
+    }
+});
+
+app.post("/api/payments/asaas/webhook", express.json({ limit: "64kb" }), async (req, res) => {
+    res.set("Cache-Control", "no-store");
+    try {
+        const result = await asaasPaymentService().processWebhook({
+            token: req.get("asaas-access-token"), payload: req.body
+        });
+        res.status(result.httpStatus).json(result.body);
+    } catch (_error) {
+        console.error("[ASAAS-WEBHOOK] processing failed");
+        res.status(500).json({ error: "webhook_processing_failed" });
     }
 });
 

@@ -102,8 +102,8 @@
       if (error || !data.session?.user) return redirectToLogin();
       if (!global.CentralProAuth.userName(data.session.user)) return redirectToLogin();
       const access = await global.CentralProAuth.getAccess(data.session);
-      const accountPage = location.pathname === '/minha-conta.html';
-      if (!access.allowed && !accountPage) return redirectToExpired(access);
+      const accessManagementPage = location.pathname === '/minha-conta.html' || location.pathname === '/planos.html';
+      if (!access.allowed && !accessManagementPage) return redirectToExpired(access);
       if (document.readyState === 'loading') {
         await new Promise((resolve) => document.addEventListener('DOMContentLoaded', resolve, { once: true }));
       }

@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Planos | Central Pro</title>
+  <script src="auth-guard.js?v=4"></script>
+  <link rel="stylesheet" href="app-shell.css?v=2">
+  <link rel="stylesheet" href="planos.css?v=1">
+</head>
+<body class="plans-page">
+  <main class="plans-layout">
+    <a class="plans-brand" href="/index.html"><img src="assets/central-pro-logo.png" alt="Central Pro"></a>
+    <header><p class="eyebrow">PLANOS CENTRAL PRO</p><h1>Continue com acesso completo</h1><p>Escolha o período. Os dois planos dão acesso ao mesmo Central Pro.</p></header>
+    <section class="plans-grid" aria-label="Planos disponíveis">
+      <article class="plan-option"><p>PLANO</p><h2>Mensal</h2><strong><span>R$</span> 19,90</strong><small>por mês</small><button type="button" data-plan="monthly">Assinar mensal</button></article>
+      <article class="plan-option featured"><p>PLANO</p><h2>Trimestral</h2><strong><span>R$</span> 49,90</strong><small>a cada três meses</small><button type="button" data-plan="quarterly">Assinar trimestral</button></article>
+    </section>
+    <p class="payment-methods">Pagamento por Pix ou cartão. O pagamento é concluído no ambiente seguro do Asaas.</p>
+    <p class="plans-message" id="plansMessage" role="status" aria-live="polite"></p>
+    <nav><a href="/minha-conta.html">← Voltar para Minha Conta</a></nav>
+  </main>
+  <script src="planos.js?v=1"></script>
+</body>
+</html>

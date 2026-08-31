@@ -61,11 +61,14 @@
     byId('accessSummaryDescription').textContent = accessDescriptions[status];
     byId('accessStatus').textContent = stateLabels[status];
     const prefix = status === 'expired' ? 'Encerrado em' : status === 'canceled' ? 'Última validade' : 'Acesso válido até';
-    byId('accessValidity').textContent = status === 'lifetime' ? 'Sem vencimento' : `${prefix} ${formatDate(access.trialEndsAt)}`;
+    const validity = status === 'active' ? access.accessExpiresAt : access.trialEndsAt;
+    byId('accessValidity').textContent = status === 'lifetime' ? 'Sem vencimento' : `${prefix} ${formatDate(validity)}`;
     byId('planDescription').textContent = descriptions[status];
     byId('planHeadline').textContent = planHeadlines[status];
+    if (status === 'active' && access.planName) byId('planHeadline').textContent = `Plano ${access.planName}`;
     byId('planSupporting').textContent = planSupporting[status];
     byId('futurePlan').hidden = status === 'lifetime';
+    byId('renewPlan').hidden = status !== 'active';
     if (status === 'trial') {
       byId('remainingRow').hidden = false;
       byId('accessRemaining').textContent = formatRemaining(access.remainingSeconds);
