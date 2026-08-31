@@ -1,30 +1,34 @@
 (async function () {
   'use strict';
   const byId = (id) => document.getElementById(id);
-  const stateLabels = { trial: 'Teste gratuito', expired: 'Teste encerrado', active: 'Acesso ativo', canceled: 'Acesso cancelado' };
+  const stateLabels = { trial: 'Teste gratuito', expired: 'Teste encerrado', active: 'Acesso ativo', canceled: 'Acesso cancelado', lifetime: 'Acesso vitalício' };
   const accessDescriptions = {
     trial: 'Aproveite todos os recursos do Central Pro.',
     expired: 'Seu período gratuito foi encerrado.',
     active: 'Seu acesso ao Central Pro está disponível.',
-    canceled: 'Seu acesso ao Central Pro foi cancelado.'
+    canceled: 'Seu acesso ao Central Pro foi cancelado.',
+    lifetime: 'Acesso permanente ao Central Pro.'
   };
   const descriptions = {
     trial: 'Você está usando o período gratuito de 24 horas.',
     expired: 'Seu período gratuito terminou. Este espaço receberá as opções de assinatura futuramente.',
     active: 'Seu acesso ao Central Pro está ativo.',
-    canceled: 'Seu acesso foi cancelado. As opções de renovação serão exibidas aqui futuramente.'
+    canceled: 'Seu acesso foi cancelado. As opções de renovação serão exibidas aqui futuramente.',
+    lifetime: 'Seu acesso ao Central Pro é permanente.'
   };
   const planHeadlines = {
     trial: 'Você está no período gratuito',
     expired: 'Seu teste gratuito terminou',
     active: 'Seu acesso está ativo',
-    canceled: 'Seu acesso está cancelado'
+    canceled: 'Seu acesso está cancelado',
+    lifetime: 'Central Pro — Proprietária'
   };
   const planSupporting = {
     trial: 'Você ainda não possui um plano ativo. Assinaturas e renovações estarão disponíveis em breve.',
     expired: 'As opções de assinatura serão disponibilizadas aqui futuramente.',
     active: 'Os detalhes do seu plano serão exibidos aqui quando estiverem disponíveis.',
-    canceled: 'As opções de renovação serão disponibilizadas aqui futuramente.'
+    canceled: 'As opções de renovação serão disponibilizadas aqui futuramente.',
+    lifetime: 'Acesso permanente, sem necessidade de renovação.'
   };
 
   async function waitForAuth() {
@@ -57,10 +61,11 @@
     byId('accessSummaryDescription').textContent = accessDescriptions[status];
     byId('accessStatus').textContent = stateLabels[status];
     const prefix = status === 'expired' ? 'Encerrado em' : status === 'canceled' ? 'Última validade' : 'Acesso válido até';
-    byId('accessValidity').textContent = `${prefix} ${formatDate(access.trialEndsAt)}`;
+    byId('accessValidity').textContent = status === 'lifetime' ? 'Sem vencimento' : `${prefix} ${formatDate(access.trialEndsAt)}`;
     byId('planDescription').textContent = descriptions[status];
     byId('planHeadline').textContent = planHeadlines[status];
     byId('planSupporting').textContent = planSupporting[status];
+    byId('futurePlan').hidden = status === 'lifetime';
     if (status === 'trial') {
       byId('remainingRow').hidden = false;
       byId('accessRemaining').textContent = formatRemaining(access.remainingSeconds);

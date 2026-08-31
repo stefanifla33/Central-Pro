@@ -13,9 +13,11 @@ function element() {
 }
 
 async function accountScenario(access) {
-  const ids = ['accountAvatar', 'accountName', 'accountEmail', 'accessBadge', 'accessTitle', 'accessSummaryDescription', 'accessStatus', 'accessValidity', 'remainingRow', 'accessRemaining', 'trialProgress', 'trialProgressBar', 'trialStart', 'trialStartText', 'planHeadline', 'planDescription', 'planSupporting', 'accountMessage', 'logoutButton'];
+  const ids = ['accountAvatar', 'accountName', 'accountEmail', 'accessBadge', 'accessTitle', 'accessSummaryDescription', 'accessStatus', 'accessValidity', 'remainingRow', 'accessRemaining', 'trialProgress', 'trialProgressBar', 'trialStart', 'trialStartText', 'planHeadline', 'planDescription', 'planSupporting', 'futurePlan', 'accountMessage', 'logoutButton'];
   const elements = Object.fromEntries(ids.map((id) => [id, element()]));
   elements.remainingRow.hidden = true;
+  elements.trialProgress.hidden = true;
+  elements.trialStart.hidden = true;
   const redirects = [];
   let signOutCalls = 0;
   const CentralProAuth = {
@@ -56,6 +58,14 @@ async function accountScenario(access) {
   assert.strictEqual(expired.elements.accessStatus.textContent, 'Teste encerrado');
   assert.strictEqual(expired.elements.accessTitle.textContent, 'Teste encerrado');
   assert.match(expired.elements.accessValidity.textContent, /^Encerrado em /);
+
+  const lifetime = await accountScenario({ status: 'lifetime', allowed: true, trialStartedAt: null, trialEndsAt: null, remainingSeconds: null });
+  assert.strictEqual(lifetime.elements.accessStatus.textContent, 'Acesso vitalício');
+  assert.strictEqual(lifetime.elements.accessValidity.textContent, 'Sem vencimento');
+  assert.strictEqual(lifetime.elements.planHeadline.textContent, 'Central Pro — Proprietária');
+  assert.strictEqual(lifetime.elements.remainingRow.hidden, true, 'lifetime não mostra horas restantes');
+  assert.strictEqual(lifetime.elements.trialProgress.hidden, true, 'lifetime não mostra barra de trial');
+  assert.strictEqual(lifetime.elements.futurePlan.hidden, true, 'lifetime não mostra renovação');
   assert.match(guardSource, /!access\.allowed && !accountPage/, 'páginas premium continuam bloqueando expirados');
   assert.match(fs.readFileSync('public/auth.js', 'utf8'), /destination\.origin !== global\.location\.origin/, 'open redirect permanece protegido');
   assert.doesNotMatch(`${pageSource}\n${accountSource}`, /api-football|api-sports|\/api\/jogos/i, 'Minha Conta não chama API-Football');

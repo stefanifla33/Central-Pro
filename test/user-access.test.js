@@ -67,12 +67,27 @@ async function runGuard({ session, access, pathname = '/games.html' }) {
   const expired = await expiredScenario.service.getAccess('Bearer signed-jwt');
   assert.strictEqual(expired.body.allowed, false, 'trial expirado é bloqueado');
 
+  const activeScenario = serviceScenario({ ...trial, allowed: true, status: 'active', created: false, remaining_seconds: 0 });
+  assert.strictEqual((await activeScenario.service.getAccess('Bearer signed-jwt')).body.allowed, true, 'active continua liberado');
+  const canceledScenario = serviceScenario({ ...trial, allowed: false, status: 'canceled', created: false, remaining_seconds: 0 });
+  assert.strictEqual((await canceledScenario.service.getAccess('Bearer signed-jwt')).body.allowed, false, 'canceled continua bloqueado');
+
+  const lifetimeScenario = serviceScenario({
+    allowed: true, status: 'lifetime', created: false,
+    trial_started_at: null, trial_ends_at: null, remaining_seconds: null
+  });
+  const lifetime = await lifetimeScenario.service.getAccess('Bearer signed-jwt');
+  assert.strictEqual(lifetime.body.allowed, true, 'lifetime é sempre liberado');
+  assert.strictEqual(lifetime.body.trialEndsAt, null, 'lifetime não possui vencimento');
+  assert.strictEqual(lifetime.body.remainingSeconds, null, 'lifetime não possui tempo restante');
+
   const noSession = await createUserAccessService({}).getAccess('');
   assert.strictEqual(noSession.httpStatus, 401, 'sessão ausente é negada');
   assert.deepStrictEqual(await runGuard({ session: null }), ['/login.html?next=%2Fgames.html'], 'sem sessão vai ao login');
   const user = { access_token: 'jwt', user: { user_metadata: { name: 'Ana' } } };
   assert.deepStrictEqual(await runGuard({ session: user, access: expired.body, pathname: '/minha-conta.html' }), [], 'expired account page allowed');
   assert.deepStrictEqual(await runGuard({ session: user, access: created.body, pathname: '/minha-conta.html' }), [], 'active trial account page allowed');
+  assert.deepStrictEqual(await runGuard({ session: user, access: lifetime.body }), [], 'premium aceita lifetime');
   assert.deepStrictEqual(await runGuard({ session: user, access: expired.body }), ['/trial-expired.html?ended=2026-09-01T17%3A32%3A00.000Z'], 'expirado vai à tela pública');
 
   const invalid = createUserAccessService({
@@ -87,6 +102,13 @@ async function runGuard({ session, access, pathname = '/games.html' }) {
   assert.match(sql, /clock_timestamp\(\)/, 'relógio é o do banco');
   assert.match(sql, /central_pro_trial_duration[\s\S]*interval '24 hours'/, 'duração fica centralizada no banco');
   assert.match(sql, /v_now \+ public\.central_pro_trial_duration\(\)/, 'criação usa a configuração central');
+
+  const lifetimeSql = fs.readFileSync('supabase/user-access-lifetime.sql', 'utf8');
+  assert.match(lifetimeSql, /'trial', 'expired', 'active', 'canceled', 'lifetime'/, 'constraint aceita todos os estados');
+  assert.match(lifetimeSql, /access_status in \('active', 'lifetime'\)/, 'RPC libera lifetime no banco');
+  assert.match(lifetimeSql, /access_status = 'lifetime' then null/, 'RPC não inventa vencimento para lifetime');
+  assert.match(lifetimeSql, /if v_row\.access_status = 'trial'/, 'somente trial pode virar expired');
+  assert.match(lifetimeSql, /on conflict \(user_id\) do nothing/, 'novas sessões não alteram lifetime');
 
   const authSource = fs.readFileSync('public/auth.js', 'utf8');
   assert.match(authSource, /destination\.origin !== global\.location\.origin/, 'open redirect continua bloqueado');
