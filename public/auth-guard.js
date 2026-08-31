@@ -4,7 +4,7 @@
   const root = document.documentElement;
   root.classList.add('auth-pending');
   const guardStyle = document.createElement('style');
-  guardStyle.textContent = 'html.auth-pending body{visibility:hidden!important}.auth-logout{padding:0;border:0;background:none;color:#9da8a1;font:inherit;text-align:left;cursor:pointer}.auth-logout:hover{color:var(--green,#16e785)}.auth-session{display:grid;gap:7px;margin:18px 10px;padding:12px;border:1px solid #273029;border-radius:9px;color:#9da8a1;font-size:10px}.auth-session strong{overflow:hidden;color:#eef3f0;text-overflow:ellipsis}.auth-session .auth-logout{color:var(--green,#16e785)}';
+  guardStyle.textContent = 'html.auth-pending body{visibility:hidden!important}.account-link{cursor:pointer;transition:border-color .15s,background .15s,box-shadow .15s}.account-link:hover{border-color:#316046!important;background:#15231c!important}.account-link:focus-visible{outline:2px solid var(--green,#16e785);outline-offset:3px}.auth-session{display:grid;gap:7px;margin:18px 10px;padding:12px;border:1px solid #273029;border-radius:9px;color:#9da8a1;font-size:10px}.auth-session strong{overflow:hidden;color:#eef3f0;text-overflow:ellipsis}';
   document.head.appendChild(guardStyle);
 
   const currentDestination = `${location.pathname}${location.search}${location.hash}`;
@@ -61,6 +61,31 @@
       if (role) role.textContent = 'Conta autenticada';
     });
 
+    function bindAccountLink(element) {
+      if (!element || element.dataset.accountLink === 'true') return;
+      element.dataset.accountLink = 'true';
+      element.classList.add('account-link');
+      element.setAttribute('role', 'link');
+      element.setAttribute('tabindex', '0');
+      element.setAttribute('aria-label', 'Abrir Minha Conta');
+      const openAccount = () => { location.href = '/minha-conta.html'; };
+      element.addEventListener('click', openAccount);
+      element.addEventListener('keydown', (event) => {
+        if (event.key !== 'Enter' && event.key !== ' ') return;
+        event.preventDefault();
+        openAccount();
+      });
+    }
+
+    document.querySelectorAll('.user-card').forEach(bindAccountLink);
+    document.querySelectorAll('.header-user').forEach((identity) => {
+      const group = identity.parentElement;
+      bindAccountLink(group && !group.querySelector('button') ? group : identity);
+    });
+    document.querySelectorAll('.header-avatar').forEach((avatar) => {
+      if (!avatar.closest('.account-link')) bindAccountLink(avatar);
+    });
+
     const greeting = document.getElementById('homeGreeting');
     if (greeting && displayName) {
       const hour = new Date().getHours();
@@ -68,33 +93,6 @@
       greeting.textContent = `${period}, ${displayName}!`;
     }
 
-    let accountArea = document.querySelector('.sidebar-future');
-    if (!accountArea) {
-      const sidebar = document.querySelector('.sidebar');
-      if (sidebar) {
-        accountArea = document.createElement('div');
-        accountArea.className = 'auth-session';
-        const nameLabel = document.createElement('strong');
-        nameLabel.textContent = displayName;
-        nameLabel.title = displayName;
-        accountArea.appendChild(nameLabel);
-        sidebar.appendChild(accountArea);
-      }
-    }
-    if (accountArea && !accountArea.querySelector('.auth-logout')) {
-      const logout = document.createElement('button');
-      logout.className = 'auth-logout';
-      logout.type = 'button';
-      logout.textContent = 'Sair da conta';
-      logout.addEventListener('click', async () => {
-        logout.disabled = true;
-        logout.textContent = 'Saindo…';
-        const { error } = await global.CentralProAuth.signOut();
-        if (error) { logout.disabled = false; logout.textContent = 'Sair da conta'; return; }
-        location.replace('/login.html');
-      });
-      accountArea.appendChild(logout);
-    }
   }
 
   async function initialize() {
@@ -104,7 +102,8 @@
       if (error || !data.session?.user) return redirectToLogin();
       if (!global.CentralProAuth.userName(data.session.user)) return redirectToLogin();
       const access = await global.CentralProAuth.getAccess(data.session);
-      if (!access.allowed) return redirectToExpired(access);
+      const accountPage = location.pathname === '/minha-conta.html';
+      if (!access.allowed && !accountPage) return redirectToExpired(access);
       if (document.readyState === 'loading') {
         await new Promise((resolve) => document.addEventListener('DOMContentLoaded', resolve, { once: true }));
       }

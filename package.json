@@ -16,7 +16,7 @@
     "test:player-optimization": "node test/player-history-optimization.test.js",
     "test:player-persistence": "node test/player-history-persistence.test.js",
     "test:top-day": "node test/top-day-goals-only.test.js",
-    "test:auth": "node test/auth-navigation.test.js && node test/user-access.test.js"
+    "test:auth": "node test/auth-navigation.test.js && node test/user-access.test.js && node test/minha-conta.test.js"
   },
   "keywords": [],
   "author": "",

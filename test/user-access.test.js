@@ -25,10 +25,10 @@ function classList() {
   return { add: (v) => values.add(v), remove: (v) => values.delete(v), contains: (v) => values.has(v) };
 }
 
-async function runGuard({ session, access }) {
+async function runGuard({ session, access, pathname = '/games.html' }) {
   const source = fs.readFileSync('public/auth-guard.js', 'utf8');
   const redirects = [];
-  const location = { pathname: '/games.html', search: '', hash: '', replace: (value) => redirects.push(value) };
+  const location = { pathname, search: '', hash: '', replace: (value) => redirects.push(value) };
   const document = {
     documentElement: { classList: classList() }, head: { appendChild() {} }, readyState: 'complete',
     createElement: () => ({ textContent: '', appendChild() {}, addEventListener() {} }),
@@ -71,6 +71,8 @@ async function runGuard({ session, access }) {
   assert.strictEqual(noSession.httpStatus, 401, 'sessão ausente é negada');
   assert.deepStrictEqual(await runGuard({ session: null }), ['/login.html?next=%2Fgames.html'], 'sem sessão vai ao login');
   const user = { access_token: 'jwt', user: { user_metadata: { name: 'Ana' } } };
+  assert.deepStrictEqual(await runGuard({ session: user, access: expired.body, pathname: '/minha-conta.html' }), [], 'expired account page allowed');
+  assert.deepStrictEqual(await runGuard({ session: user, access: created.body, pathname: '/minha-conta.html' }), [], 'active trial account page allowed');
   assert.deepStrictEqual(await runGuard({ session: user, access: expired.body }), ['/trial-expired.html?ended=2026-09-01T17%3A32%3A00.000Z'], 'expirado vai à tela pública');
 
   const invalid = createUserAccessService({
