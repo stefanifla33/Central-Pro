@@ -25,7 +25,7 @@
     buttons.forEach((item) => { item.disabled = true; });
     message.textContent = 'Preparando checkout seguro…';
     try {
-      const response = await fetch('/api/payments/asaas/checkout', {
+      const response = await fetch('/api/payments/pagbank/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${currentSession.access_token}` },
         body: JSON.stringify({ planId: button.dataset.plan })

@@ -10,6 +10,7 @@ const { createPlayerRateLimiter } = require("./lib/player-rate-limiter");
 const { createSerializedJsonPersister } = require("./lib/serialized-json-persister");
 const { createUserAccessService } = require("./lib/user-access");
 const { createAsaasPaymentService } = require("./lib/asaas-payments");
+const { createPagBankPaymentService } = require("./lib/pagbank-payments");
 const { CP_MAIN_LEAGUES: MAIN_LEAGUES, cpIsScannerEligibleLeagueId } = require("./public/competition-config");
 
 const app = express();
@@ -919,6 +920,50 @@ app.post("/api/payments/asaas/webhook", express.json({ limit: "64kb" }), async (
         res.status(result.httpStatus).json(result.body);
     } catch (_error) {
         console.error("[ASAAS-WEBHOOK] processing failed");
+        res.status(500).json({ error: "webhook_processing_failed" });
+    }
+});
+
+function pagBankPaymentService() {
+    return createPagBankPaymentService({
+        supabaseUrl: process.env.SUPABASE_URL,
+        publishableKey: process.env.SUPABASE_PUBLISHABLE_KEY || process.env.SUPABASE_ANON_KEY,
+        serviceRoleKey: process.env.SUPABASE_SERVICE_ROLE_KEY,
+        pagBankToken: process.env.PAGBANK_TOKEN,
+        pagBankEnvironment: process.env.PAGBANK_ENV || "sandbox"
+    });
+}
+
+app.post("/api/payments/pagbank/checkout", express.json({ limit: "16kb" }), async (req, res) => {
+    res.set("Cache-Control", "no-store");
+    try {
+        const callbackBase = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "https://central-pro.vercel.app";
+        const result = await pagBankPaymentService().createCheckout({
+            authorization: req.get("Authorization"), planId: req.body?.planId, callbackBase
+        });
+        res.status(result.httpStatus).json(result.body);
+    } catch (error) {
+        console.error("[PAGBANK-CHECKOUT] request failed", {
+            code: String(error?.code || "unexpected_error"), status: Number.isInteger(error?.status) ? error.status : null
+        });
+        res.status(502).json({ error: "checkout_unavailable" });
+    }
+});
+
+app.post("/api/payments/pagbank/webhook", express.json({
+    limit: "64kb",
+    verify: (req, _res, buffer) => { req.rawBody = buffer.toString("utf8"); }
+}), async (req, res) => {
+    res.set("Cache-Control", "no-store");
+    try {
+        const result = await pagBankPaymentService().processWebhook({
+            signature: req.get("x-authenticity-token"), rawBody: req.rawBody, payload: req.body
+        });
+        res.status(result.httpStatus).json(result.body);
+    } catch (error) {
+        console.error("[PAGBANK-WEBHOOK] processing failed", {
+            code: String(error?.code || "unexpected_error"), status: Number.isInteger(error?.status) ? error.status : null
+        });
         res.status(500).json({ error: "webhook_processing_failed" });
     }
 });

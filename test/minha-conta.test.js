@@ -12,7 +12,7 @@ function element(dataset = {}) {
   return { textContent: '', className: '', hidden: false, disabled: false, style: {}, dataset, addEventListener(type, callback) { listeners[type] = callback; }, listeners };
 }
 
-async function accountScenario(access, checkoutResponse = { ok: true, checkoutUrl: 'https://sandbox.asaas.com/checkout/test' }) {
+async function accountScenario(access, checkoutResponse = { ok: true, checkoutUrl: 'https://pagseguro.test/checkout' }) {
   const ids = ['accountAvatar', 'accountName', 'accountEmail', 'accessBadge', 'accessTitle', 'accessSummaryDescription', 'accessStatus', 'accessValidity', 'remainingRow', 'accessRemaining', 'trialProgress', 'trialProgressBar', 'trialStart', 'trialStartText', 'planHeadline', 'planDescription', 'planSupporting', 'purchasePlans', 'renewPlan', 'accountMessage', 'logoutButton'];
   const elements = Object.fromEntries(ids.map((id) => [id, element()]));
   const checkoutButtons = [element({ plan: 'monthly' }), element({ plan: 'quarterly' })];
@@ -62,10 +62,10 @@ async function accountScenario(access, checkoutResponse = { ok: true, checkoutUr
   assert.match(trial.elements.trialStartText.textContent, /começou em/, 'início seguro do trial é exibido');
   assert.strictEqual(trial.elements.purchasePlans.hidden, false, 'trial pode assinar sem esperar o término');
   await trial.checkoutButtons[0].listeners.click();
-  assert.strictEqual(trial.checkoutCalls[0].url, '/api/payments/asaas/checkout');
+  assert.strictEqual(trial.checkoutCalls[0].url, '/api/payments/pagbank/checkout');
   assert.strictEqual(trial.checkoutCalls[0].options.headers.Authorization, 'Bearer jwt');
   assert.deepStrictEqual(JSON.parse(trial.checkoutCalls[0].options.body), { planId: 'monthly' });
-  assert.deepStrictEqual(trial.assigned, ['https://sandbox.asaas.com/checkout/test']);
+  assert.deepStrictEqual(trial.assigned, ['https://pagseguro.test/checkout']);
 
   const quarterly = await accountScenario({ status: 'trial', allowed: true, trialStartedAt: '2026-08-31T17:32:00Z', trialEndsAt: '2026-09-01T17:32:00Z', remainingSeconds: 3600 });
   await quarterly.checkoutButtons[1].listeners.click();

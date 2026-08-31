@@ -17,7 +17,8 @@
     "test:player-persistence": "node test/player-history-persistence.test.js",
     "test:top-day": "node test/top-day-goals-only.test.js",
     "test:auth": "node test/auth-navigation.test.js && node test/user-access.test.js && node test/minha-conta.test.js && node test/asaas-payments.test.js",
-    "test:payments": "node test/asaas-payments.test.js"
+    "test:payments": "node test/asaas-payments.test.js && node test/pagbank-payments.test.js",
+    "test:pagbank": "node test/pagbank-payments.test.js"
   },
   "keywords": [],
   "author": "",
