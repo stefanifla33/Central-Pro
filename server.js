@@ -8,6 +8,7 @@ const { resolveGames } = require("./lib/storage/game-snapshot-storage");
 const { assertExternalRequestsAllowed, isCentralProOffline } = require("./lib/central-pro-offline");
 const { createPlayerRateLimiter } = require("./lib/player-rate-limiter");
 const { createSerializedJsonPersister } = require("./lib/serialized-json-persister");
+const { createUserAccessService } = require("./lib/user-access");
 const { CP_MAIN_LEAGUES: MAIN_LEAGUES, cpIsScannerEligibleLeagueId } = require("./public/competition-config");
 
 const app = express();
@@ -866,6 +867,21 @@ app.get("/api/auth/config", (req, res) => {
     res.set("Cache-Control", "no-store");
     if (!url || !publishableKey) return res.json({ configured: false });
     res.json({ configured: true, url, publishableKey });
+});
+
+app.get("/api/auth/access", async (req, res) => {
+    res.set("Cache-Control", "no-store");
+    const accessService = createUserAccessService({
+        supabaseUrl: process.env.SUPABASE_URL,
+        publishableKey: process.env.SUPABASE_PUBLISHABLE_KEY || process.env.SUPABASE_ANON_KEY
+    });
+    try {
+        const result = await accessService.getAccess(req.get("Authorization"));
+        res.status(result.httpStatus).json(result.body);
+    } catch (_error) {
+        console.error("[AUTH-ACCESS] unexpected failure");
+        res.status(503).json({ error: "access_unavailable" });
+    }
 });
 
 app.use(express.static(path.join(__dirname, "public")));

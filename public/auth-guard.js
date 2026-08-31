@@ -17,6 +17,13 @@
     location.replace(loginDestination);
   }
 
+  function redirectToExpired(access) {
+    if (redirecting) return;
+    redirecting = true;
+    const end = encodeURIComponent(access?.trialEndsAt || '');
+    location.replace(`/trial-expired.html?ended=${end}`);
+  }
+
   function loadScript(source) {
     return new Promise((resolve, reject) => {
       const script = document.createElement('script');
@@ -96,6 +103,8 @@
       const { data, error } = await global.CentralProAuth.getSession();
       if (error || !data.session?.user) return redirectToLogin();
       if (!global.CentralProAuth.userName(data.session.user)) return redirectToLogin();
+      const access = await global.CentralProAuth.getAccess(data.session);
+      if (!access.allowed) return redirectToExpired(access);
       if (document.readyState === 'loading') {
         await new Promise((resolve) => document.addEventListener('DOMContentLoaded', resolve, { once: true }));
       }

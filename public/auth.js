@@ -58,6 +58,22 @@
     return client.auth.getSession();
   }
 
+  async function getAccess(session) {
+    const token = session?.access_token;
+    if (!token) return { allowed: false, error: 'unauthorized' };
+    const response = await fetch('/api/auth/access', {
+      headers: { Accept: 'application/json', Authorization: `Bearer ${token}` },
+      cache: 'no-store'
+    });
+    const result = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      const error = new Error('NÃ£o foi possÃ­vel validar seu acesso. Tente novamente.');
+      error.code = result.error || 'ACCESS_UNAVAILABLE';
+      throw error;
+    }
+    return result;
+  }
+
   async function getUser() {
     const client = await getClient();
     return client.auth.getUser();
@@ -84,5 +100,5 @@
     }
   }
 
-  global.CentralProAuth = Object.freeze({ getClient, signUp, signIn, signOut, getSession, getUser, updateName, normalizeName, userName, onAuthStateChange, safeInternalDestination });
+  global.CentralProAuth = Object.freeze({ getClient, signUp, signIn, signOut, getSession, getAccess, getUser, updateName, normalizeName, userName, onAuthStateChange, safeInternalDestination });
 })(window);

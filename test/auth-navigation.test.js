@@ -60,6 +60,7 @@ async function guardContext(session, withHomeShell = false) {
   };
   const CentralProAuth = {
     getSession: async () => ({ data: { session }, error: null }),
+    getAccess: async () => ({ allowed: true, status: 'trial' }),
     onAuthStateChange: async () => ({ data: { subscription: {} } }),
     signOut: async () => ({ error: null }),
     userName: (user) => String(user?.user_metadata?.name || '').trim()
@@ -95,11 +96,11 @@ async function guardContext(session, withHomeShell = false) {
   const missingName = await guardContext({ user: { email: 'pessoa@teste.local', user_metadata: {} } });
   assert.deepStrictEqual(missingName.redirects, ['/login.html?next=%2Fmatch.html%3Fid%3D123']);
 
-  const loggedIn = await guardContext({ user: { email: 'pessoa@teste.local', user_metadata: { name: 'Pessoa Teste' } } });
+  const loggedIn = await guardContext({ access_token: 'valid-token', user: { email: 'pessoa@teste.local', user_metadata: { name: 'Pessoa Teste' } } });
   assert.deepStrictEqual(loggedIn.redirects, []);
   assert.strictEqual(loggedIn.rootClasses.contains('auth-pending'), false);
 
-  const home = await guardContext({ user: { email: 'nao-exibir@teste.local', user_metadata: { name: 'Ana Silva' } } }, true);
+  const home = await guardContext({ access_token: 'valid-token', user: { email: 'nao-exibir@teste.local', user_metadata: { name: 'Ana Silva' } } }, true);
   assert.strictEqual(home.avatar.textContent, 'A');
   assert.strictEqual(home.name.textContent, 'Ana Silva');
   assert.strictEqual(home.role.textContent, 'Conta autenticada');
