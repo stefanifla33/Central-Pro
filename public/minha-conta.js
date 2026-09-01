@@ -87,6 +87,43 @@
 
   let currentSession = null;
 
+  function redirectPaymentParams() {
+    const params = new URLSearchParams(location.search || '');
+    const payment = {
+      order_nsu: params.get('order_nsu') || '',
+      transaction_nsu: params.get('transaction_nsu') || '',
+      slug: params.get('slug') || ''
+    };
+    return Object.values(payment).every(Boolean) ? payment : null;
+  }
+
+  function clearRedirectPaymentParams() {
+    const url = new URL(location.href);
+    ['order_nsu', 'transaction_nsu', 'slug', 'receipt_url', 'capture_method'].forEach((key) => url.searchParams.delete(key));
+    history.replaceState(history.state, '', `${url.pathname}${url.search}${url.hash}`);
+  }
+
+  async function confirmRedirectPayment(session) {
+    const payment = redirectPaymentParams();
+    if (!payment) return;
+    byId('accountMessage').textContent = 'Confirmando seu pagamento…';
+    try {
+      const response = await fetch('/api/payments/infinitepay/confirm', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.access_token}` },
+        body: JSON.stringify(payment)
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok || result.success !== true) throw new Error('payment_confirmation_failed');
+      byId('accountMessage').textContent = result.duplicate
+        ? 'Pagamento já confirmado.' : 'Pagamento confirmado. Seu acesso foi atualizado.';
+    } catch (_error) {
+      byId('accountMessage').textContent = 'Não foi possível confirmar o pagamento agora. Seu acesso não foi alterado.';
+    } finally {
+      clearRedirectPaymentParams();
+    }
+  }
+
   try {
     const auth = await waitForAuth();
     const { data, error } = await auth.getSession();
@@ -98,6 +135,7 @@
     byId('accountName').textContent = name;
     byId('accountEmail').textContent = user.email || 'E-mail não informado';
     byId('accountAvatar').textContent = name.charAt(0).toUpperCase();
+    await confirmRedirectPayment(currentSession);
     renderAccess(await auth.getAccess(currentSession));
   } catch (_error) {
     byId('accountMessage').textContent = 'Não foi possível carregar os dados da conta agora.';

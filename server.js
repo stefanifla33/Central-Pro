@@ -994,6 +994,24 @@ app.post("/api/payments/infinitepay/checkout", express.json({ limit: "16kb" }), 
     }
 });
 
+app.post("/api/payments/infinitepay/confirm", express.json({ limit: "16kb" }), async (req, res) => {
+    res.set("Cache-Control", "no-store");
+    try {
+        const result = await infinitePayPaymentService().confirmPayment({
+            authorization: req.get("Authorization"),
+            orderNsu: req.body?.order_nsu,
+            transactionNsu: req.body?.transaction_nsu,
+            slug: req.body?.slug
+        });
+        res.status(result.httpStatus).json(result.body);
+    } catch (error) {
+        console.error("[INFINITEPAY-CONFIRM] processing failed", {
+            code: String(error?.code || "unexpected_error"), status: Number.isInteger(error?.status) ? error.status : null
+        });
+        res.status(500).json({ error: "payment_confirmation_failed" });
+    }
+});
+
 app.post("/api/payments/infinitepay/webhook", express.json({ limit: "64kb" }), async (req, res) => {
     res.set("Cache-Control", "no-store");
     try {

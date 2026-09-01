@@ -21,13 +21,13 @@ function response(ok, data, status = ok ? 200 : 400, contentType = 'application/
 function scenario({
   planId = 'monthly', amount = 19.90, verifiedAmount = 1990,
   paid = true, success = true, accessStatus = 'trial', futureExpiry = null,
-  checkoutUrl = 'https://checkout.infinitepay.com.br/centralpro?lenc=test'
+  checkoutUrl = 'https://checkout.infinitepay.com.br/centralpro?lenc=test', orderUserId = USER_ID
 } = {}) {
   const calls = [];
   const seenEvents = new Set();
   const state = { accessStatus, planId: null, expiry: futureExpiry, applied: 0, orderStatus: 'pending' };
   const order = {
-    id: ORDER_ID, user_id: USER_ID, plan_id: planId, amount,
+    id: ORDER_ID, user_id: orderUserId, plan_id: planId, amount,
     provider_checkout_id: null, provider_payment_id: null
   };
   const fetchImpl = async (url, options = {}) => {
@@ -144,6 +144,40 @@ function notification(overrides = {}) {
   assert.strictEqual((await unauthenticated.service.createCheckout({ planId: 'monthly' })).httpStatus, 401);
   const invalidPlan = scenario();
   assert.strictEqual((await invalidPlan.service.createCheckout({ authorization: 'Bearer valid', planId: 'lifetime' })).body.error, 'invalid_plan');
+
+  const confirmation = scenario();
+  const confirmationInput = {
+    authorization: 'Bearer valid', orderNsu: ORDER_ID, transactionNsu: TRANSACTION_ID, slug: 'invoice-test'
+  };
+  const confirmed = await confirmation.service.confirmPayment(confirmationInput);
+  assert.deepStrictEqual(confirmed.body, { success: true, message: null, duplicate: false, applied: true });
+  const confirmationCheck = confirmation.calls.find((call) => call.url === `${INFINITEPAY_BASE_URL}/payment_check`);
+  assert.deepStrictEqual(confirmationCheck.body, {
+    handle: 'centralpro', order_nsu: ORDER_ID, transaction_nsu: TRANSACTION_ID, slug: 'invoice-test'
+  }, 'confirmação autenticada sempre consulta payment_check');
+  const confirmedAgain = await confirmation.service.confirmPayment(confirmationInput);
+  assert.strictEqual(confirmedAgain.body.duplicate, true, 'repetição usa a mesma RPC idempotente');
+  assert.strictEqual(confirmation.state.applied, 1);
+
+  const otherUserOrder = scenario({ orderUserId: '44444444-4444-4444-8444-444444444444' });
+  assert.strictEqual((await otherUserOrder.service.confirmPayment(confirmationInput)).httpStatus, 403);
+  assert.strictEqual(otherUserOrder.calls.some((call) => call.url.includes('/payment_check')), false, 'pedido de outro usuário não é consultado nem aplicado');
+
+  const confirmationWrongAmount = scenario({ verifiedAmount: 1989 });
+  assert.strictEqual((await confirmationWrongAmount.service.confirmPayment(confirmationInput)).body.error, 'payment_amount_mismatch');
+  assert.strictEqual(confirmationWrongAmount.state.applied, 0);
+  const confirmationPending = scenario({ paid: false });
+  assert.strictEqual((await confirmationPending.service.confirmPayment(confirmationInput)).body.error, 'payment_not_paid');
+  assert.strictEqual(confirmationPending.state.applied, 0);
+  const confirmationLifetime = scenario({ accessStatus: 'lifetime' });
+  await confirmationLifetime.service.confirmPayment(confirmationInput);
+  assert.strictEqual(confirmationLifetime.state.accessStatus, 'lifetime');
+  assert.strictEqual(confirmationLifetime.state.planId, null);
+  assert.strictEqual((await scenario().service.confirmPayment({ ...confirmationInput, authorization: '' })).httpStatus, 401);
+  assert.strictEqual((await scenario().service.confirmPayment({ ...confirmationInput, orderNsu: '' })).httpStatus, 400);
+  assert.strictEqual((await scenario().service.confirmPayment({ ...confirmationInput, orderNsu: 'invalid' })).httpStatus, 400);
+  assert.strictEqual((await scenario().service.confirmPayment({ ...confirmationInput, transactionNsu: '' })).httpStatus, 400);
+  assert.strictEqual((await scenario().service.confirmPayment({ ...confirmationInput, slug: '' })).httpStatus, 400);
 
   const approved = scenario();
   const first = await approved.service.processWebhook(notification());
