@@ -12,6 +12,7 @@ const { createUserAccessService } = require("./lib/user-access");
 const { createAsaasPaymentService } = require("./lib/asaas-payments");
 const { createPagBankPaymentService } = require("./lib/pagbank-payments");
 const { createInfinitePayPaymentService, infinitePayCallbackBase } = require("./lib/infinitepay-payments");
+const { createMetricSampleCoverage, selectStatisticsItems, mergeMissingMetricValues, createConcurrencyLimiter } = require("./lib/metric-sample-coverage");
 const { CP_MAIN_LEAGUES: MAIN_LEAGUES, cpIsScannerEligibleLeagueId } = require("./public/competition-config");
 
 const app = express();
@@ -24,6 +25,9 @@ const CORNER_HISTORY_FILE = path.join(__dirname, "data", "corner-history.json");
 const IS_SERVERLESS = process.env.VERCEL === "1" || Boolean(process.env.AWS_LAMBDA_FUNCTION_NAME);
 const cache = new Map();
 const pending = new Map();
+const PREMATCH_STATISTICS_CONCURRENCY = 3;
+const periodStatisticsLimiter = createConcurrencyLimiter(PREMATCH_STATISTICS_CONCURRENCY);
+const pendingPeriodStatistics = new Map();
 const lineupRefreshes = new Map();
 const lineupRevalidations = new Map();
 const metrics = { requests: 0, externalRequests: 0, cacheHits: 0, startedAt: Date.now() };
@@ -781,6 +785,14 @@ function cornerFootball(endpoint, ttl) {
     return scheduled;
 }
 
+function periodStatisticsFootball(endpoint, ttl) {
+    if (pendingPeriodStatistics.has(endpoint)) return pendingPeriodStatistics.get(endpoint);
+    const request = periodStatisticsLimiter(() => football(endpoint, ttl));
+    pendingPeriodStatistics.set(endpoint, request);
+    request.finally(() => pendingPeriodStatistics.delete(endpoint)).catch(() => {});
+    return request;
+}
+
 function selectPlayerStatistics(response, { teamId, leagueId, season }) {
     const blocks = (response || []).flatMap(item => item.statistics || []);
     return blocks.find(stat => stat.league?.id === leagueId && stat.league?.season === season && stat.team?.id === teamId)
@@ -1119,6 +1131,8 @@ app.get("/api/estatisticas-periodos", async (req, res) => {
         ];
         const rows = [];
         const attempts = [];
+        const periodCoverage = createMetricSampleCoverage(metrics, ["halftime", "secondHalf"], limit);
+        const periodFulltimeCoverage = createMetricSampleCoverage(metrics, ["fulltime"], limit);
 
         const valuesForTeam = (response) => normalizeStatistics(response)?.[team]?.values || null;
         const valuesFromList = list => Object.fromEntries((list || []).map(item => [item.type, item.value]));
@@ -1137,8 +1151,18 @@ app.get("/api/estatisticas-periodos", async (req, res) => {
             return null;
         };
 
-        for (const game of candidates) {
-            if (rows.length >= limit) break;
+        for (let candidateIndex = 0; candidateIndex < candidates.length && !periodCoverage.complete(); candidateIndex += PREMATCH_STATISTICS_CONCURRENCY) {
+            const batch = candidates.slice(candidateIndex, candidateIndex + PREMATCH_STATISTICS_CONCURRENCY);
+            const batchResults = await Promise.all(batch.map(async game => {
+                try {
+                    const periodResult = await periodStatisticsFootball(`/fixtures/statistics?fixture=${game.fixture.id}&half=true`, 21_600_000);
+                    return { game, periodResult, error: null };
+                } catch (error) {
+                    return { game, periodResult: null, error };
+                }
+            }));
+            for (const batchResult of batchResults) {
+            const { game } = batchResult;
             const gameId = Number(game.fixture.id);
             let fulltime = null;
             let halftime = null;
@@ -1149,7 +1173,8 @@ app.get("/api/estatisticas-periodos", async (req, res) => {
             // Fonte principal: UMA única chamada histórica à API-Football.
             // A própria resposta de half=true contém FT, 1T e 2T em campos separados.
             try {
-                const periodResult = await cornerFootball(`/fixtures/statistics?fixture=${gameId}&half=true`, 21_600_000);
+                if (batchResult.error) throw batchResult.error;
+                const periodResult = batchResult.periodResult;
                 const periodResponse = periodResult.response || [];
                 fulltime = periodValuesForTeam(periodResponse, "full");
                 halftime = periodValuesForTeam(periodResponse, "first");
@@ -1160,39 +1185,40 @@ app.get("/api/estatisticas-periodos", async (req, res) => {
                 diagnostic.secondHalf = hasUsefulMetric(secondHalf) ? "ok" : "empty";
 
                 // Fallback defensivo apenas para APIs/partidas que não tragam statistics_2h.
-                if (!hasUsefulMetric(secondHalf) && hasUsefulMetric(fulltime) && hasUsefulMetric(halftime)) {
+                if (hasUsefulMetric(fulltime) && hasUsefulMetric(halftime)) {
                     const normalizedFull = { [team]: { team: { id: team }, values: fulltime } };
                     const normalizedHalf = { [team]: { team: { id: team }, values: halftime } };
-                    secondHalf = subtractStatistics(normalizedFull, normalizedHalf)?.[team]?.values || null;
+                    const calculatedSecondHalf = subtractStatistics(normalizedFull, normalizedHalf)?.[team]?.values || null;
+                    secondHalf = mergeMissingMetricValues(secondHalf, calculatedSecondHalf, metrics);
                 }
             } catch (error) {
                 diagnostic.error = "Falha na consulta externa.";
             }
 
             // Cache local antigo é apenas fallback. Nunca limita a amostra principal.
-            if (!hasUsefulMetric(halftime) || !hasUsefulMetric(fulltime)) {
-                const stored = periodStore.fixtures[gameId];
-                if (stored) {
-                    const storedHalf = stored.halftime?.statistics?.[team]?.values || null;
-                    const storedFull = stored.fulltime?.statistics?.[team]?.values || null;
-                    const storedSecond = stored.secondHalf?.statistics?.[team]?.values || null;
-                    if (!hasUsefulMetric(halftime) && hasUsefulMetric(storedHalf)) halftime = storedHalf;
-                    if (!hasUsefulMetric(fulltime) && hasUsefulMetric(storedFull)) fulltime = storedFull;
-                    if (!hasUsefulMetric(secondHalf) && hasUsefulMetric(storedSecond)) secondHalf = storedSecond;
-                    source = "api-football+local-fallback";
-                }
+            const stored = periodStore.fixtures[gameId];
+            if (stored) {
+                const storedHalf = stored.halftime?.statistics?.[team]?.values || null;
+                const storedFull = stored.fulltime?.statistics?.[team]?.values || null;
+                const storedSecond = stored.secondHalf?.statistics?.[team]?.values || null;
+                halftime = mergeMissingMetricValues(halftime, storedHalf, metrics);
+                fulltime = mergeMissingMetricValues(fulltime, storedFull, metrics);
+                secondHalf = mergeMissingMetricValues(secondHalf, storedSecond, metrics);
+                source = "api-football+local-fallback";
             }
 
-            if (!hasUsefulMetric(secondHalf) && hasUsefulMetric(fulltime) && hasUsefulMetric(halftime)) {
+            if (hasUsefulMetric(fulltime) && hasUsefulMetric(halftime)) {
                 const normalizedFull = { [team]: { team: { id: team }, values: fulltime } };
                 const normalizedHalf = { [team]: { team: { id: team }, values: halftime } };
-                secondHalf = subtractStatistics(normalizedFull, normalizedHalf)?.[team]?.values || null;
+                const calculatedSecondHalf = subtractStatistics(normalizedFull, normalizedHalf)?.[team]?.values || null;
+                secondHalf = mergeMissingMetricValues(secondHalf, calculatedSecondHalf, metrics);
             }
 
             attempts.push(diagnostic);
-            // Uma partida entra na amostra de períodos se tiver pelo menos estatística
-            // real de 1T ou 2T; continuamos voltando no histórico até completar 5/10.
-            if (!hasUsefulMetric(halftime) && !hasUsefulMetric(secondHalf)) continue;
+            const selectedHalftime = periodCoverage.take("halftime", halftime);
+            const selectedSecondHalf = periodCoverage.take("secondHalf", secondHalf);
+            const selectedFulltime = periodFulltimeCoverage.take("fulltime", fulltime);
+            if (!selectedHalftime && !selectedSecondHalf && !selectedFulltime) continue;
             rows.push({
                 fixture: {
                     id: gameId,
@@ -1201,11 +1227,12 @@ app.get("/api/estatisticas-periodos", async (req, res) => {
                     league: game.league,
                     teams: game.teams
                 },
-                halftime: hasUsefulMetric(halftime) ? halftime : null,
-                secondHalf: hasUsefulMetric(secondHalf) ? secondHalf : null,
-                fulltime: hasUsefulMetric(fulltime) ? fulltime : null,
+                halftime: selectedHalftime,
+                secondHalf: selectedSecondHalf,
+                fulltime: selectedFulltime,
                 source
             });
+            }
         }
 
         const metricCoverage = Object.fromEntries(metrics.map(metric => [metric, {
@@ -1835,6 +1862,7 @@ app.get("/api/partidas/:id/estatisticas-avancadas", async (req, res) => {
         if (!fixture) return res.status(404).json({ erro: "Partida não encontrada." });
 
         const teams = [fixture.teams.home, fixture.teams.away];
+        const advancedMetrics = [...PERIOD_SHOT_METRICS];
         const historySize = 30;
         const recent = await Promise.all(teams.map(team => football(
             `/fixtures?team=${team.id}&last=${historySize}&timezone=${encodeURIComponent(APP_TIMEZONE)}`,
@@ -1844,10 +1872,24 @@ app.get("/api/partidas/:id/estatisticas-avancadas", async (req, res) => {
         const build = async (team, fixtures) => {
             const rows = [];
             const attempts = [];
-            for (const fixtureRow of fixtures.response || []) {
-                if (rows.length >= sample) break;
+            const metricCoverage = Object.fromEntries(advancedMetrics.map(metric => [metric, 0]));
+            const candidates = [...(fixtures.response || [])]
+                .sort((a, b) => new Date(b.fixture.date) - new Date(a.fixture.date));
+            for (let candidateIndex = 0; candidateIndex < candidates.length && !advancedMetrics.every(metric => metricCoverage[metric] >= sample); candidateIndex += PREMATCH_STATISTICS_CONCURRENCY) {
+                const batch = candidates.slice(candidateIndex, candidateIndex + PREMATCH_STATISTICS_CONCURRENCY);
+                const batchResults = await Promise.all(batch.map(async fixtureRow => {
+                    try {
+                        const result = await periodStatisticsFootball(`/fixtures/statistics?fixture=${fixtureRow.fixture.id}`, 21_600_000);
+                        return { fixtureRow, result, error: null };
+                    } catch (error) {
+                        return { fixtureRow, result: null, error };
+                    }
+                }));
+                for (const batchResult of batchResults) {
+                const { fixtureRow } = batchResult;
                 try {
-                    const result = await football(`/fixtures/statistics?fixture=${fixtureRow.fixture.id}`, 21_600_000);
+                    if (batchResult.error) throw batchResult.error;
+                    const result = batchResult.result;
                     const blocks = Array.isArray(result.response) ? result.response : [];
                     const teamIds = blocks.map(row => Number(row.team?.id)).filter(Number.isInteger);
                     const own = blocks.find(row => Number(row.team?.id) === Number(team.id));
@@ -1861,10 +1903,15 @@ app.get("/api/partidas/:id/estatisticas-avancadas", async (req, res) => {
                     attempts.push(diagnostic);
                     console.log(`[MATCH-STATS-REQUEST] fixture=${fixtureRow.fixture.id} status=${diagnostic.status} blocks=${blocks.length} teams=${teamIds.join(",") || "none"} totalShots=${hasTotalShots} shotsOnGoal=${hasShotsOnGoal}`);
                     if (!validBlocks) continue;
-                    rows.push({ fixture: fixtureRow, statistics, opponentStatistics, status: "ok" });
+                    const selectedStatistics = selectStatisticsItems(statistics, advancedMetrics, metricCoverage, sample);
+                    if (!selectedStatistics.length) continue;
+                    const selectedTypes = new Set(selectedStatistics.map(item => item.type));
+                    const selectedOpponentStatistics = opponentStatistics.filter(item => selectedTypes.has(item.type));
+                    rows.push({ fixture: fixtureRow, statistics: selectedStatistics, opponentStatistics: selectedOpponentStatistics, status: "ok" });
                 } catch (error) {
                     attempts.push({ fixture: fixtureRow.fixture.id, status: "error", blocks: 0, teamIds: [], hasTotalShots: false, hasShotsOnGoal: false, error: "Falha na consulta externa.", errorCode: "request_failed" });
                     console.warn(`[MATCH-STATS-REQUEST] fixture=${fixtureRow.fixture.id} status=error blocks=0 teams=none totalShots=false shotsOnGoal=false`);
+                }
                 }
             }
             return { rows, attempts };
