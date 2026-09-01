@@ -34,6 +34,10 @@
     return String(value || '').replace(/\s+/g, ' ').trim();
   }
 
+  function firstName(value) {
+    return normalizeName(value).split(' ')[0] || '';
+  }
+
   function userName(user) {
     return normalizeName(user?.user_metadata?.name);
   }
@@ -100,5 +104,5 @@
     }
   }
 
-  global.CentralProAuth = Object.freeze({ getClient, signUp, signIn, signOut, getSession, getAccess, getUser, updateName, normalizeName, userName, onAuthStateChange, safeInternalDestination });
+  global.CentralProAuth = Object.freeze({ getClient, signUp, signIn, signOut, getSession, getAccess, getUser, updateName, normalizeName, firstName, userName, onAuthStateChange, safeInternalDestination });
 })(window);

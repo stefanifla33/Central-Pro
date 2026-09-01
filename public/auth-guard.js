@@ -36,11 +36,12 @@
 
   async function loadAuth() {
     if (!global.supabase?.createClient) await loadScript('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2');
-    if (!global.CentralProAuth) await loadScript('/auth.js?v=2');
+    if (!global.CentralProAuth) await loadScript('/auth.js?v=3');
   }
 
   function enhanceShell(user) {
-    const displayName = global.CentralProAuth.userName(user);
+    const fullName = global.CentralProAuth.userName(user);
+    const displayName = global.CentralProAuth.firstName?.(fullName) || fullName;
     const userCard = document.querySelector('.user-card');
     if (userCard && displayName) {
       const avatar = userCard.querySelector('.avatar');
