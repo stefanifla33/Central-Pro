@@ -93,7 +93,8 @@
     if (error || !data.session?.user) return location.replace('/login.html');
     currentSession = data.session;
     const user = currentSession.user;
-    const name = auth.userName(user);
+    const fullName = auth.userName(user);
+    const name = auth.firstName?.(fullName) || fullName;
     byId('accountName').textContent = name;
     byId('accountEmail').textContent = user.email || 'E-mail não informado';
     byId('accountAvatar').textContent = name.charAt(0).toUpperCase();

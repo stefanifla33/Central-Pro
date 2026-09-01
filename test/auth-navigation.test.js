@@ -63,6 +63,7 @@ async function guardContext(session, withHomeShell = false) {
     getAccess: async () => ({ allowed: true, status: 'trial' }),
     onAuthStateChange: async () => ({ data: { subscription: {} } }),
     signOut: async () => ({ error: null }),
+    firstName: (value) => String(value || '').trim().split(/\s+/)[0] || '',
     userName: (user) => String(user?.user_metadata?.name || '').trim()
   };
   const window = { supabase: { createClient() {} }, CentralProAuth };
@@ -80,6 +81,10 @@ async function guardContext(session, withHomeShell = false) {
   assert.strictEqual(api.safeInternalDestination('//evil.example/roubo'), '/index.html');
   assert.strictEqual(api.safeInternalDestination('/login.html'), '/index.html');
   assert.strictEqual(api.normalizeName('  Ana   Silva  '), 'Ana Silva');
+  assert.strictEqual(api.firstName('  Ana   Silva  '), 'Ana');
+  assert.strictEqual(api.firstName('  Stefani   Pena Nunes  '), 'Stefani');
+  assert.strictEqual(api.firstName('   '), '');
+  assert.strictEqual(api.firstName(null), '', 'ausência de nome preserva o fallback vazio seguro');
   assert.strictEqual(api.userName({ user_metadata: { name: ' Ana ' } }), 'Ana');
   await api.signUp('ana@teste.local', 'senha-segura', '  Ana   Silva ');
   assert.strictEqual(calls[0][1].options.data.name, 'Ana Silva');
@@ -100,11 +105,12 @@ async function guardContext(session, withHomeShell = false) {
   assert.deepStrictEqual(loggedIn.redirects, []);
   assert.strictEqual(loggedIn.rootClasses.contains('auth-pending'), false);
 
-  const home = await guardContext({ access_token: 'valid-token', user: { email: 'nao-exibir@teste.local', user_metadata: { name: 'Ana Silva' } } }, true);
-  assert.strictEqual(home.avatar.textContent, 'A');
-  assert.strictEqual(home.name.textContent, 'Ana Silva');
+  const home = await guardContext({ access_token: 'valid-token', user: { email: 'nao-exibir@teste.local', user_metadata: { name: '  Stefani   Pena Nunes  ' } } }, true);
+  assert.strictEqual(home.avatar.textContent, 'S');
+  assert.strictEqual(home.name.textContent, 'Stefani');
   assert.strictEqual(home.role.textContent, 'Conta autenticada');
-  assert.match(home.greeting.textContent, /Ana Silva!/);
+  assert.match(home.greeting.textContent, /Stefani!/);
+  assert.doesNotMatch(home.greeting.textContent, /Pena|Nunes/);
   assert.doesNotMatch(home.name.textContent, /@/);
 
   assert.match(loginSource, /CentralProAuth\.signIn[\s\S]*?continueWithSession\(data\.session\)/);

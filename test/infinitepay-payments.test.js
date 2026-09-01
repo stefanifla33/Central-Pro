@@ -18,7 +18,8 @@ function response(ok, data, status = ok ? 200 : 400, contentType = 'application/
 
 function scenario({
   planId = 'monthly', amount = 19.90, verifiedAmount = 1990,
-  paid = true, success = true, accessStatus = 'trial', futureExpiry = null
+  paid = true, success = true, accessStatus = 'trial', futureExpiry = null,
+  checkoutUrl = 'https://checkout.infinitepay.com.br/centralpro?lenc=test'
 } = {}) {
   const calls = [];
   const seenEvents = new Set();
@@ -53,7 +54,7 @@ function scenario({
       return response(true, { duplicate: false, applied: state.accessStatus !== 'lifetime' });
     }
     if (url === `${INFINITEPAY_BASE_URL}/links`) {
-      return response(true, { url: 'https://checkout.infinitepay.com.br/centralpro?lenc=test' });
+      return response(true, { url: checkoutUrl });
     }
     if (url === `${INFINITEPAY_BASE_URL}/payment_check`) {
       return response(true, { success, paid, amount: verifiedAmount, paid_amount: verifiedAmount, capture_method: 'pix' });
@@ -105,6 +106,21 @@ function notification(overrides = {}) {
     assert.strictEqual(responseLog.details.contentType, 'application/json; charset=utf-8');
     assert.strictEqual(responseLog.details.body.url, 'https://checkout.infinitepay.com.br/centralpro?[redacted]', 'query sensível é removida do log');
   }
+
+  const productionHost = scenario({ checkoutUrl: 'https://checkout.infinitepay.io/stefani-pena?lenc=production-test' });
+  const productionResult = await productionHost.service.createCheckout({
+    authorization: 'Bearer valid', planId: 'monthly', callbackBase: 'https://central-pro.vercel.app'
+  });
+  assert.strictEqual(productionResult.body.checkoutUrl, 'https://checkout.infinitepay.io/stefani-pena?lenc=production-test');
+  const productionLog = productionHost.logs.find((entry) => entry.message.includes('POST /links response'));
+  assert.strictEqual(productionLog.details.body.url, 'https://checkout.infinitepay.io/stefani-pena?[redacted]');
+
+  const fakeHost = scenario({ checkoutUrl: 'https://checkout.infinitepay.io.evil.example/stefani-pena?lenc=test' });
+  await assert.rejects(
+    fakeHost.service.createCheckout({ authorization: 'Bearer valid', planId: 'monthly', callbackBase: 'https://central-pro.vercel.app' }),
+    (error) => error?.code === 'INFINITEPAY_INVALID_RESPONSE',
+    'hostname parecido, mas fora da allowlist exata, é rejeitado'
+  );
 
   const unauthenticated = scenario();
   assert.strictEqual((await unauthenticated.service.createCheckout({ planId: 'monthly' })).httpStatus, 401);

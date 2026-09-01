@@ -28,6 +28,7 @@ async function accountScenario(access, checkoutResponse = { ok: true, checkoutUr
   const CentralProAuth = {
     getSession: async () => ({ data: { session: { access_token: 'jwt', user: { email: 'ana@teste.local', user_metadata: { name: 'Ana Silva' } } } }, error: null }),
     userName: (user) => user.user_metadata.name,
+    firstName: (value) => String(value || '').trim().split(/\s+/)[0] || '',
     getAccess: async () => access,
     signOut: async () => { signOutCalls += 1; return { error: null }; }
   };
@@ -53,7 +54,7 @@ async function accountScenario(access, checkoutResponse = { ok: true, checkoutUr
   assert.doesNotMatch(appShellSource, /Sair da conta|signOut/, 'shell principal não oferece logout');
 
   const trial = await accountScenario({ status: 'trial', allowed: true, trialStartedAt: '2026-08-31T17:32:00Z', trialEndsAt: '2026-09-01T17:32:00Z', remainingSeconds: 3600 });
-  assert.strictEqual(trial.elements.accountName.textContent, 'Ana Silva', 'nome vem da sessão');
+  assert.strictEqual(trial.elements.accountName.textContent, 'Ana', 'primeiro nome vem da sessão sem modificar o metadata');
   assert.strictEqual(trial.elements.accountEmail.textContent, 'ana@teste.local', 'e-mail vem da sessão');
   assert.strictEqual(trial.elements.accessStatus.textContent, 'Teste gratuito', 'status vem do backend');
   assert.strictEqual(trial.elements.accessTitle.textContent, 'Teste gratuito', 'destaque visual acompanha o status');

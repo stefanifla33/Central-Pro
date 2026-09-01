@@ -5,7 +5,8 @@
   try {
     const { data, error } = await CentralProAuth.getSession();
     if (error || !data.session?.user) return location.replace('/login.html');
-    document.getElementById('userName').textContent = CentralProAuth.userName(data.session.user);
+    const fullName = CentralProAuth.userName(data.session.user);
+    document.getElementById('userName').textContent = CentralProAuth.firstName?.(fullName) || fullName;
     const access = await CentralProAuth.getAccess(data.session);
     if (access.allowed) return location.replace('/index.html');
     if (access.status !== 'expired') throw new Error('Acesso indisponível.');
