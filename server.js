@@ -12,7 +12,7 @@ const { createUserAccessService } = require("./lib/user-access");
 const { createAsaasPaymentService } = require("./lib/asaas-payments");
 const { createPagBankPaymentService } = require("./lib/pagbank-payments");
 const { createInfinitePayPaymentService, infinitePayCallbackBase } = require("./lib/infinitepay-payments");
-const { createMetricSampleCoverage, selectStatisticsItems, mergeMissingMetricValues, createConcurrencyLimiter } = require("./lib/metric-sample-coverage");
+const { createMetricSampleCoverage, selectStatisticsItems, mergeMissingMetricValues, createConcurrencyLimiter, createExpiringCache } = require("./lib/metric-sample-coverage");
 const { CP_MAIN_LEAGUES: MAIN_LEAGUES, cpIsScannerEligibleLeagueId } = require("./public/competition-config");
 
 const app = express();
@@ -26,8 +26,10 @@ const IS_SERVERLESS = process.env.VERCEL === "1" || Boolean(process.env.AWS_LAMB
 const cache = new Map();
 const pending = new Map();
 const PREMATCH_STATISTICS_CONCURRENCY = 3;
+const PERIOD_STATISTICS_NEGATIVE_TTL_MS = 120_000;
 const periodStatisticsLimiter = createConcurrencyLimiter(PREMATCH_STATISTICS_CONCURRENCY);
 const pendingPeriodStatistics = new Map();
+const negativePeriodStatistics = createExpiringCache(PERIOD_STATISTICS_NEGATIVE_TTL_MS);
 const lineupRefreshes = new Map();
 const lineupRevalidations = new Map();
 const metrics = { requests: 0, externalRequests: 0, cacheHits: 0, startedAt: Date.now() };
@@ -786,8 +788,32 @@ function cornerFootball(endpoint, ttl) {
 }
 
 function periodStatisticsFootball(endpoint, ttl) {
+    const negative = negativePeriodStatistics.get(endpoint);
+    if (negative) {
+        metrics.requests++;
+        metrics.cacheHits++;
+        apiUsageDiagnostic.cacheHits++;
+        if (negative.error) return Promise.reject(negative.error);
+        return Promise.resolve(negative.data);
+    }
     if (pendingPeriodStatistics.has(endpoint)) return pendingPeriodStatistics.get(endpoint);
-    const request = periodStatisticsLimiter(() => football(endpoint, ttl));
+    const request = periodStatisticsLimiter(async () => {
+        try {
+            const data = await football(endpoint, ttl);
+            const useful = (data.response || []).some(block => [block.statistics, block.statistics_1h, block.statistics_2h]
+                .some(items => Array.isArray(items) && items.some(item => Number.isFinite(item?.value))));
+            if (!useful) {
+                cache.delete(endpoint);
+                negativePeriodStatistics.set(endpoint, { data });
+            }
+            return data;
+        } catch (error) {
+            if (!error?.code || ["API_TRANSIENT", "API_MINUTE_QUOTA"].includes(error.code)) {
+                negativePeriodStatistics.set(endpoint, { error });
+            }
+            throw error;
+        }
+    });
     pendingPeriodStatistics.set(endpoint, request);
     request.finally(() => pendingPeriodStatistics.delete(endpoint)).catch(() => {});
     return request;
@@ -1946,11 +1972,9 @@ app.get("/api/partidas/:id/estatisticas-avancadas", async (req, res) => {
         console.log(`[MATCH-STATS] fixture=${id} home=${homeCovered}/${home.length} away=${awayCovered}/${away.length} failed=${failed}`);
         const allAttempts = [...homeResult.attempts, ...awayResult.attempts];
         const allExternalRequestsRejected = allAttempts.length > 0 && allAttempts.every(row => row.errorCode === "request_failed");
-        if (allExternalRequestsRejected) return res.status(502).json({
-            erro: "Estatísticas avançadas temporariamente indisponíveis.",
-            diagnostics
-        });
-        res.json({ sample, venue, scope, home, away, coverage: { home: homeCovered, away: awayCovered }, diagnostics });
+        const status = allExternalRequestsRejected || (!home.length && !away.length) ? "unavailable"
+            : homeCovered >= sample && awayCovered >= sample ? "complete" : "partial";
+        res.json({ sample, venue, scope, status, home, away, coverage: { home: homeCovered, away: awayCovered }, diagnostics });
     } catch (erro) {
         console.error(erro);
         res.status(502).json({ erro: "Estatísticas avançadas indisponíveis.", detalhe: erro.message });
