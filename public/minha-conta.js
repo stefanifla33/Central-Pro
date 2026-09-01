@@ -110,7 +110,7 @@
     button.textContent = 'Carregando…';
     byId('accountMessage').textContent = 'Preparando checkout seguro…';
     try {
-      const response = await fetch('/api/payments/pagbank/checkout', {
+      const response = await fetch('/api/payments/infinitepay/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${currentSession.access_token}` },
         body: JSON.stringify({ planId: button.dataset.plan })

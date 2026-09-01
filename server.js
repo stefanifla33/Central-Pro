@@ -11,6 +11,7 @@ const { createSerializedJsonPersister } = require("./lib/serialized-json-persist
 const { createUserAccessService } = require("./lib/user-access");
 const { createAsaasPaymentService } = require("./lib/asaas-payments");
 const { createPagBankPaymentService } = require("./lib/pagbank-payments");
+const { createInfinitePayPaymentService } = require("./lib/infinitepay-payments");
 const { CP_MAIN_LEAGUES: MAIN_LEAGUES, cpIsScannerEligibleLeagueId } = require("./public/competition-config");
 
 const app = express();
@@ -965,6 +966,44 @@ app.post("/api/payments/pagbank/webhook", express.json({
             code: String(error?.code || "unexpected_error"), status: Number.isInteger(error?.status) ? error.status : null
         });
         res.status(500).json({ error: "webhook_processing_failed" });
+    }
+});
+
+function infinitePayPaymentService() {
+    return createInfinitePayPaymentService({
+        supabaseUrl: process.env.SUPABASE_URL,
+        publishableKey: process.env.SUPABASE_PUBLISHABLE_KEY || process.env.SUPABASE_ANON_KEY,
+        serviceRoleKey: process.env.SUPABASE_SERVICE_ROLE_KEY,
+        infinitePayHandle: process.env.INFINITEPAY_HANDLE
+    });
+}
+
+app.post("/api/payments/infinitepay/checkout", express.json({ limit: "16kb" }), async (req, res) => {
+    res.set("Cache-Control", "no-store");
+    try {
+        const callbackBase = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "https://central-pro.vercel.app";
+        const result = await infinitePayPaymentService().createCheckout({
+            authorization: req.get("Authorization"), planId: req.body?.planId, callbackBase
+        });
+        res.status(result.httpStatus).json(result.body);
+    } catch (error) {
+        console.error("[INFINITEPAY-CHECKOUT] request failed", {
+            code: String(error?.code || "unexpected_error"), status: Number.isInteger(error?.status) ? error.status : null
+        });
+        res.status(502).json({ error: "checkout_unavailable" });
+    }
+});
+
+app.post("/api/payments/infinitepay/webhook", express.json({ limit: "64kb" }), async (req, res) => {
+    res.set("Cache-Control", "no-store");
+    try {
+        const result = await infinitePayPaymentService().processWebhook({ payload: req.body });
+        res.status(result.httpStatus).json(result.body);
+    } catch (error) {
+        console.error("[INFINITEPAY-WEBHOOK] processing failed", {
+            code: String(error?.code || "unexpected_error"), status: Number.isInteger(error?.status) ? error.status : null
+        });
+        res.status(500).json({ success: false, message: "Falha ao processar notificação" });
     }
 });
 

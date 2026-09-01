@@ -140,7 +140,7 @@ function notification(event = 'ORDER.CHARGE.PAID', status = 'PAID') {
   assert.match(migration, /p_amount_cents <> v_expected_cents/);
   assert.match(migration, /Eventos adversos são auditados, mas nunca reduzem/);
   const publicSources = ['public/planos.js', 'public/minha-conta.js', 'public/planos.html', 'public/trial-expired.js', 'public/trial-expired.html'].map((file) => fs.readFileSync(file, 'utf8')).join('\n');
-  assert.match(publicSources, /\/api\/payments\/pagbank\/checkout/);
+  assert.match(fs.readFileSync('server.js', 'utf8'), /\/api\/payments\/pagbank\/checkout/, 'rota PagBank permanece disponível');
   assert.doesNotMatch(publicSources, /PAGBANK_TOKEN|Bearer pagbank|service.role/i, 'nenhum segredo PagBank está no frontend');
   const serverSource = fs.readFileSync('server.js', 'utf8');
   assert.match(serverSource, /req\.get\("x-authenticity-token"\)/);
