@@ -11,7 +11,7 @@ const { createSerializedJsonPersister } = require("./lib/serialized-json-persist
 const { createUserAccessService } = require("./lib/user-access");
 const { createAsaasPaymentService } = require("./lib/asaas-payments");
 const { createPagBankPaymentService } = require("./lib/pagbank-payments");
-const { createInfinitePayPaymentService } = require("./lib/infinitepay-payments");
+const { createInfinitePayPaymentService, infinitePayCallbackBase } = require("./lib/infinitepay-payments");
 const { CP_MAIN_LEAGUES: MAIN_LEAGUES, cpIsScannerEligibleLeagueId } = require("./public/competition-config");
 
 const app = express();
@@ -981,9 +981,9 @@ function infinitePayPaymentService() {
 app.post("/api/payments/infinitepay/checkout", express.json({ limit: "16kb" }), async (req, res) => {
     res.set("Cache-Control", "no-store");
     try {
-        const callbackBase = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "https://central-pro.vercel.app";
         const result = await infinitePayPaymentService().createCheckout({
-            authorization: req.get("Authorization"), planId: req.body?.planId, callbackBase
+            authorization: req.get("Authorization"), planId: req.body?.planId,
+            callbackBase: infinitePayCallbackBase()
         });
         res.status(result.httpStatus).json(result.body);
     } catch (error) {

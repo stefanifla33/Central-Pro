@@ -1,7 +1,9 @@
 const assert = require('assert');
 const fs = require('fs');
 const { INFINITEPAY_BASE_URL, createInfinitePayClient } = require('../lib/infinitepay');
-const { createInfinitePayPaymentService } = require('../lib/infinitepay-payments');
+const {
+  INFINITEPAY_PRODUCTION_BASE_URL, infinitePayCallbackBase, createInfinitePayPaymentService
+} = require('../lib/infinitepay-payments');
 
 const ORDER_ID = '11111111-1111-4111-8111-111111111111';
 const USER_ID = '22222222-2222-4222-8222-222222222222';
@@ -79,6 +81,22 @@ function notification(overrides = {}) {
 (async () => {
   assert.strictEqual(INFINITEPAY_BASE_URL, 'https://api.checkout.infinitepay.io');
   assert.strictEqual(createInfinitePayClient({ handle: '$centralpro', fetchImpl: async () => {} }).handle, 'centralpro');
+  assert.strictEqual(INFINITEPAY_PRODUCTION_BASE_URL, 'https://central-pro.vercel.app');
+  assert.strictEqual(
+    infinitePayCallbackBase({ nodeEnv: 'production', vercel: '1', port: 3000, vercelUrl: 'central-preview-projects.vercel.app' }),
+    'https://central-pro.vercel.app',
+    'produção ignora completamente a URL dinâmica do deployment'
+  );
+  assert.strictEqual(infinitePayCallbackBase({ nodeEnv: 'development', vercel: '', port: 4567 }), 'http://localhost:4567');
+
+  const productionCheckout = scenario();
+  await productionCheckout.service.createCheckout({
+    authorization: 'Bearer valid', planId: 'monthly',
+    callbackBase: infinitePayCallbackBase({ nodeEnv: 'production', vercel: '1' })
+  });
+  const productionPayload = productionCheckout.calls.find((call) => call.url === `${INFINITEPAY_BASE_URL}/links`).body;
+  assert.strictEqual(productionPayload.redirect_url, 'https://central-pro.vercel.app/minha-conta.html');
+  assert.strictEqual(productionPayload.webhook_url, 'https://central-pro.vercel.app/api/payments/infinitepay/webhook');
 
   for (const [planId, expectedCents] of [['monthly', 1990], ['quarterly', 4990]]) {
     const checkout = scenario({ planId, amount: expectedCents / 100 });
