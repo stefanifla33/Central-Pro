@@ -7,8 +7,13 @@ const ORDER_ID = '11111111-1111-4111-8111-111111111111';
 const USER_ID = '22222222-2222-4222-8222-222222222222';
 const TRANSACTION_ID = '33333333-3333-4333-8333-333333333333';
 
-function response(ok, data, status = ok ? 200 : 400) {
-  return { ok, status, json: async () => data };
+function response(ok, data, status = ok ? 200 : 400, contentType = 'application/json; charset=utf-8') {
+  return {
+    ok, status,
+    headers: { get: (name) => name.toLowerCase() === 'content-type' ? contentType : null },
+    text: async () => typeof data === 'string' ? data : JSON.stringify(data),
+    json: async () => data
+  };
 }
 
 function scenario({
@@ -55,11 +60,12 @@ function scenario({
     }
     throw new Error(`unexpected URL ${url}`);
   };
+  const logs = [];
   const service = createInfinitePayPaymentService({
     supabaseUrl: 'https://project.supabase.co', publishableKey: 'public-key', serviceRoleKey: 'service-key',
-    infinitePayHandle: '$centralpro', fetchImpl, logger: { info() {}, error() {} }
+    infinitePayHandle: '$centralpro', fetchImpl, logger: { info(message, details) { logs.push({ message, details }); }, error() {} }
   });
-  return { calls, service, state };
+  return { calls, service, state, logs };
 }
 
 function notification(overrides = {}) {
@@ -94,6 +100,10 @@ function notification(overrides = {}) {
     const persistedCheckout = checkout.calls.find((call) => call.url.includes('/payment_orders?id=eq.') && call.options.method === 'PATCH' && call.body.checkout_url);
     assert.strictEqual(persistedCheckout.body.checkout_url, result.body.checkoutUrl);
     assert.strictEqual(persistedCheckout.body.provider_checkout_id, undefined, 'URL nunca ocupa o campo reservado ao invoice_slug');
+    const responseLog = checkout.logs.find((entry) => entry.message.includes('POST /links response'));
+    assert.strictEqual(responseLog.details.status, 200);
+    assert.strictEqual(responseLog.details.contentType, 'application/json; charset=utf-8');
+    assert.strictEqual(responseLog.details.body.url, 'https://checkout.infinitepay.com.br/centralpro?[redacted]', 'query sensível é removida do log');
   }
 
   const unauthenticated = scenario();
