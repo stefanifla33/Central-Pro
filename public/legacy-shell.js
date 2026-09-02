@@ -1,4 +1,4 @@
-(function(){
+﻿(function(){
   'use strict';
   const script=document.currentScript,path=location.pathname.split('/').pop()||'index.html',active=script?.dataset.active||'';
   const overrides=document.createElement('link');overrides.rel='stylesheet';overrides.href='legacy-pages.css?v=1';document.head.append(overrides);
@@ -20,3 +20,4 @@
   document.addEventListener('keydown',event=>{if((event.ctrlKey||event.metaKey)&&event.key.toLowerCase()==='k'){event.preventDefault();document.getElementById('globalSearch')?.focus()}});
   document.getElementById('globalSearch')?.addEventListener('keydown',event=>{const query=event.target.value.trim();if(event.key==='Enter'&&query.length>=3)location.href=`teams.html?q=${encodeURIComponent(query)}`});
 }());
+(()=>{const s=document.createElement('script');s.src='site-footer.js?v=1';document.body.appendChild(s)})();
