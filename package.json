@@ -4,7 +4,7 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "test": "node test/api-quota-classification.test.js && node test/asaas-payments.test.js && node test/auth-navigation.test.js && node test/game-snapshot-store.test.js && node test/infinitepay-payments.test.js && node test/match-player-history-route.test.js && node test/minha-conta.test.js && node test/offline-mode.test.js && node test/pagbank-payments.test.js && node test/period-monitor-frequency.test.js && node test/player-api-dedup.test.js && node test/player-history-optimization.test.js && node test/player-history-persistence.test.js && node test/player-rate-limiter.test.js && node test/player-snapshot.test.js && node test/scanner-competition-whitelist.test.js && node test/top-day-goals-only.test.js && node test/user-access.test.js",
+    "test": "node test/api-quota-classification.test.js && node test/asaas-payments.test.js && node test/auth-navigation.test.js && node test/game-snapshot-store.test.js && node test/infinitepay-payments.test.js && node test/match-player-history-route.test.js && node test/metric-sample-coverage.test.js && node test/minha-conta.test.js && node test/offline-mode.test.js && node test/pagbank-payments.test.js && node test/period-monitor-frequency.test.js && node test/player-api-dedup.test.js && node test/player-history-optimization.test.js && node test/player-history-persistence.test.js && node test/player-rate-limiter.test.js && node test/player-snapshot.test.js && node test/scanner-competition-whitelist.test.js && node test/top-day-goals-only.test.js && node test/user-access.test.js",
     "start": "node server.js",
     "dev": "node --watch server.js",
     "test:snapshots": "node test/game-snapshot-store.test.js",

@@ -7,6 +7,7 @@ const { createConfiguredGameSnapshotStorage } = require("./lib/storage/create-ga
 const { resolveGames } = require("./lib/storage/game-snapshot-storage");
 const { assertExternalRequestsAllowed, isCentralProOffline } = require("./lib/central-pro-offline");
 const { createPlayerRateLimiter } = require("./lib/player-rate-limiter");
+const { createRemoteFootballCache } = require("./lib/remote-football-cache");
 const { createSerializedJsonPersister } = require("./lib/serialized-json-persister");
 const { createUserAccessService } = require("./lib/user-access");
 const { createAsaasPaymentService } = require("./lib/asaas-payments");
@@ -39,6 +40,9 @@ const apiQuotaState = { remaining: null, limit: null, blockedUntil: 0, reason: n
 const API_DAILY_COOLDOWN_MS = 6 * 60 * 60 * 1000;
 const API_MINUTE_COOLDOWN_MS = 60_000;
 const playerRateLimiter = createPlayerRateLimiter({ limit: 240, windowMs: 60_000 });
+const remoteFootballCache = createRemoteFootballCache();
+let remoteQuotaCheck = null;
+let remoteQuotaCheckedAt = 0;
 let periodStore = { version: 1, fixtures: {} };
 let playerHistoryStore = { version: 1, fixtures: {} };
 let cornerHistoryStore = { version: 1, fixtures: {} };
@@ -650,17 +654,52 @@ async function football(endpoint, ttl = 60_000, options = {}) {
     // Cache and in-flight hits above remain available while offline.
     assertExternalRequestsAllowed(endpoint);
 
-    if (apiQuotaState.blockedUntil > Date.now()) {
-        const retryAfterMs = apiQuotaState.blockedUntil - Date.now();
-        console.warn(`[API-QUOTA] BLOCKED_BY_COOLDOWN endpoint=${endpointPath} remaining=${apiQuotaState.remaining ?? "unknown"} retryAfterMs=${retryAfterMs}`);
-        const quotaError = new Error("Cota diária da API-Football esgotada. Nova tentativa externa bloqueada temporariamente.");
-        quotaError.code = "API_DAILY_QUOTA";
-        quotaError.status = 429;
-        quotaError.retryAfterMs = retryAfterMs;
-        throw quotaError;
-    }
-
+    let heldRemoteLock = null;
     const request = (async () => {
+        if (!options.force) {
+            const remoteEntry = await remoteFootballCache.get(endpoint, ttl);
+            if (remoteEntry) {
+                cache.set(endpoint, remoteEntry);
+                metrics.cacheHits++;
+                apiUsageDiagnostic.cacheHits++;
+                console.log(`[API-USAGE-DIAGNOSTIC] ${new Date().toISOString()} REMOTE_CACHE_HIT endpoint=${endpointPath} query="${query}" caller="${caller}" durationMs=${Date.now() - diagnosticStartedAt}`);
+                return remoteEntry.data;
+            }
+        }
+
+        if (remoteFootballCache.enabled && Date.now() - remoteQuotaCheckedAt >= 1_000) {
+            remoteQuotaCheck ||= remoteFootballCache.getQuotaState().finally(() => { remoteQuotaCheck = null; });
+            const sharedQuota = await remoteQuotaCheck;
+            remoteQuotaCheckedAt = Date.now();
+            if (sharedQuota?.blockedUntil > apiQuotaState.blockedUntil) Object.assign(apiQuotaState, sharedQuota);
+        }
+
+        if (apiQuotaState.blockedUntil > Date.now()) {
+            const retryAfterMs = apiQuotaState.blockedUntil - Date.now();
+            const minute = apiQuotaState.reason === "minute-limit";
+            console.warn(`[API-QUOTA] BLOCKED_BY_COOLDOWN endpoint=${endpointPath} remaining=${apiQuotaState.remaining ?? "unknown"} retryAfterMs=${retryAfterMs}`);
+            const quotaError = new Error(minute ? "Rate limit temporário da API-Football." : "Cota diária da API-Football esgotada. Nova tentativa externa bloqueada temporariamente.");
+            quotaError.code = minute ? "API_MINUTE_QUOTA" : "API_DAILY_QUOTA";
+            quotaError.status = 429;
+            quotaError.retryAfterMs = retryAfterMs;
+            throw quotaError;
+        }
+
+        let remoteLock = null;
+        if (!options.force && ttl > 0 && remoteFootballCache.enabled) {
+            remoteLock = await remoteFootballCache.acquire(endpoint);
+            heldRemoteLock = remoteLock;
+            if (remoteLock === null) {
+                const remoteEntry = await remoteFootballCache.waitForValue(endpoint, ttl);
+                if (remoteEntry) {
+                    cache.set(endpoint, remoteEntry);
+                    metrics.cacheHits++;
+                    apiUsageDiagnostic.cacheHits++;
+                    return remoteEntry.data;
+                }
+            }
+        }
+
         metrics.externalRequests++;
         apiUsageDiagnostic.externalTotal++;
         const sequence = apiUsageDiagnostic.externalTotal;
@@ -697,6 +736,7 @@ async function football(endpoint, ttl = 60_000, options = {}) {
                 apiQuotaState.reason = "daily-limit";
                 requestError.code = "API_DAILY_QUOTA";
                 requestError.retryAfterMs = API_DAILY_COOLDOWN_MS;
+                await remoteFootballCache.setQuotaState(apiQuotaState);
                 console.error(`[API-QUOTA] DAILY_LIMIT_REACHED blockedUntil=${new Date(apiQuotaState.blockedUntil).toISOString()}`);
             } else if (resposta.status === 429) {
                 const retryAfter = resposta.headers.get("retry-after");
@@ -706,6 +746,11 @@ async function football(endpoint, ttl = 60_000, options = {}) {
                 requestError.retryAfterMs = Number.isFinite(retrySeconds)
                     ? Math.max(1_000, retrySeconds * 1_000)
                     : Number.isFinite(retryDateMs) && retryDateMs > 0 ? retryDateMs : API_MINUTE_COOLDOWN_MS;
+                await remoteFootballCache.setQuotaState({
+                    ...apiQuotaState,
+                    blockedUntil: Date.now() + requestError.retryAfterMs,
+                    reason: "minute-limit"
+                });
                 console.warn(`[API-MINUTE-QUOTA] PAUSED retryAfterMs=${requestError.retryAfterMs} dailyRemaining=${Number.isFinite(apiQuotaState.remaining) ? apiQuotaState.remaining : "unknown"}`);
             } else if (resposta.status >= 500) {
                 requestError.code = "API_TRANSIENT";
@@ -715,14 +760,17 @@ async function football(endpoint, ttl = 60_000, options = {}) {
             throw requestError;
         }
 
-        cache.set(endpoint, { data: dados, createdAt: Date.now() });
+        const createdAt = Date.now();
+        cache.set(endpoint, { data: dados, createdAt });
+        await remoteFootballCache.set(endpoint, dados, ttl, createdAt);
         if (apiQuotaState.remaining === 0) {
             apiQuotaState.blockedUntil = Date.now() + API_DAILY_COOLDOWN_MS;
             apiQuotaState.reason = "remaining-zero";
+            await remoteFootballCache.setQuotaState(apiQuotaState);
             console.error(`[API-QUOTA] DAILY_LIMIT_REACHED blockedUntil=${new Date(apiQuotaState.blockedUntil).toISOString()}`);
         }
         return dados;
-    })();
+    })().finally(() => remoteFootballCache.release(heldRemoteLock));
 
     pending.set(endpoint, request);
     try {
@@ -749,6 +797,43 @@ function rateLimitedPlayerFootball(endpoint, ttl = 60_000, options = {}) {
 
 function shouldRevalidatePlayerLineup({ lineups, force, cacheHit }) {
     return !lineups.length && !force && cacheHit;
+}
+
+function hasCompleteOfficialLineups(lineups) {
+    return Array.isArray(lineups) && lineups.length === 2
+        && lineups.every(lineup => Array.isArray(lineup.startXI) && lineup.startXI.length === 11);
+}
+
+function recoverOfficialLineups(lineups, matchPlayerTeams, events) {
+    if (hasCompleteOfficialLineups(lineups)) return lineups;
+    const incomingByTeam = new Map();
+    for (const event of events || []) {
+        if (event.type !== "subst" || !Number.isSafeInteger(Number(event.assist?.id))) continue;
+        const teamId = Number(event.team?.id);
+        if (!incomingByTeam.has(teamId)) incomingByTeam.set(teamId, new Set());
+        incomingByTeam.get(teamId).add(Number(event.assist.id));
+    }
+    const recovered = (lineups || []).map(lineup => {
+        const teamPlayers = (matchPlayerTeams || []).find(item => Number(item.team?.id) === Number(lineup.team?.id));
+        const incoming = incomingByTeam.get(Number(lineup.team?.id)) || new Set();
+        const starters = (teamPlayers?.players || []).filter(item => {
+            const games = item.statistics?.[0]?.games;
+            const playerId = Number(item.player?.id);
+            return Number.isSafeInteger(playerId) && playerId > 0 && Number(games?.minutes) > 0 && !incoming.has(playerId);
+        });
+        if (starters.length !== 11) return lineup;
+        const toLineupPlayer = item => {
+            const games = item.statistics?.[0]?.games || {};
+            return { player: { ...item.player, number: games.number, pos: games.position, captain: games.captain }, rating: Number(games.rating) || null };
+        };
+        const starterIds = new Set(starters.map(item => Number(item.player?.id)));
+        return {
+            ...lineup,
+            startXI: starters.map(toLineupPlayer),
+            substitutes: (teamPlayers.players || []).filter(item => !starterIds.has(Number(item.player?.id))).map(toLineupPlayer)
+        };
+    });
+    return hasCompleteOfficialLineups(recovered) ? recovered : [];
 }
 
 function printApiUsageDiagnosticSummary() {
@@ -1507,6 +1592,7 @@ app.get("/api/partidas/:id/jogadores", async (req, res) => {
 
         let official = await playerFootball(endpoint, ttl, { force });
         let lineups = Array.isArray(official.response) ? official.response : [];
+        let matchPlayers = null;
         let lineupSource = cacheHit ? "cache" : "api";
         let lineupCacheState = cacheHit ? "hit" : force ? "refresh" : "miss";
         // Revalidate only an older cached empty response. A fresh cache miss has
@@ -1522,6 +1608,14 @@ app.get("/api/partidas/:id/jogadores", async (req, res) => {
                 lineupSource = "api";
                 lineupCacheState = "refresh";
             }
+        }
+        if (lineups.length && !hasCompleteOfficialLineups(lineups) && finished) {
+            const [matchPlayerResult, eventResult] = await Promise.all([
+                playerOptional(playerFootball(`/fixtures/players?fixture=${id}`, 21_600_000, { force })),
+                playerOptional(playerFootball(`/fixtures/events?fixture=${id}`, 21_600_000, { force }))
+            ]);
+            matchPlayers = matchPlayerResult;
+            lineups = recoverOfficialLineups(lineups, matchPlayerResult.response, eventResult.response);
         }
         const updatedAt = cache.get(endpoint)?.createdAt || now;
         let status = lineups.length ? "available" : "not_released";
@@ -1601,9 +1695,9 @@ app.get("/api/partidas/:id/jogadores", async (req, res) => {
         const fixturePlayerTtl = ["1H", "HT", "2H", "ET", "BT", "P", "LIVE"].includes(fixtureStatus) ? 30_000
             : ["FT", "AET", "PEN"].includes(fixtureStatus) ? 21_600_000
             : 60_000;
-        const matchPlayers = matchHasStarted
+        matchPlayers = matchPlayers || (matchHasStarted
             ? await playerOptional(playerFootball(`/fixtures/players?fixture=${id}`, fixturePlayerTtl, { force }))
-            : { response: [] };
+            : { response: [] });
         const tablePlayers = lineups.length
             ? lineups.reduce((total, lineup) => total + (lineup.startXI?.length || 0) + (lineup.substitutes?.length || 0), 0)
             : playerStatsTeams.reduce((total, team) => total + team.players.length, 0);
