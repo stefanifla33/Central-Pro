@@ -3,12 +3,15 @@
 
   const byId = (id) => document.getElementById(id);
   const authPanel = byId('authPanel');
+  const forgotPanel = byId('forgotPanel');
+  const resetPanel = byId('resetPanel');
   const profilePanel = byId('profilePanel');
   const sessionPanel = byId('sessionPanel');
   const message = byId('authMessage');
   const tabs = document.querySelectorAll('[data-auth-tab]');
   const forms = document.querySelectorAll('[data-auth-form]');
   let busy = false;
+  let recoveryMode = new URLSearchParams(location.search).get('recovery') === '1';
 
   function safeDestination() {
     const candidate = new URLSearchParams(location.search).get('next');
@@ -19,13 +22,20 @@
     location.replace(safeDestination());
   }
 
+  function recoveryRedirectUrl() {
+    const url = new URL('/login.html', location.origin);
+    url.searchParams.set('recovery', '1');
+    return url.toString();
+  }
+
   const friendlyErrors = {
     invalid_credentials: 'E-mail ou senha incorretos.',
     email_not_confirmed: 'Confirme seu e-mail antes de entrar.',
     user_already_exists: 'Já existe uma conta com este e-mail.',
     signup_disabled: 'A criação de contas está desativada no momento.',
     weak_password: 'Escolha uma senha mais segura.',
-    over_email_send_rate_limit: 'Muitas tentativas. Aguarde um pouco e tente novamente.'
+    over_email_send_rate_limit: 'Muitas tentativas. Aguarde um pouco e tente novamente.',
+    same_password: 'A nova senha precisa ser diferente da senha atual.'
   };
 
   function showMessage(text, type = 'error') {
@@ -36,9 +46,9 @@
 
   function setBusy(value) {
     busy = value;
-    document.querySelectorAll('.auth-submit, #logoutButton').forEach((button) => {
+    document.querySelectorAll('.auth-submit, .auth-secondary, .forgot-password-link, #logoutButton').forEach((button) => {
       button.disabled = value;
-      button.classList.toggle('loading', value);
+      button.classList.toggle('loading', value && button.classList.contains('auth-submit'));
     });
   }
 
@@ -47,7 +57,38 @@
     return friendlyErrors[error?.code] || error?.message || 'Não foi possível concluir a operação. Tente novamente.';
   }
 
+  function hidePanels() {
+    authPanel.hidden = true;
+    forgotPanel.hidden = true;
+    resetPanel.hidden = true;
+    profilePanel.hidden = true;
+    sessionPanel.hidden = true;
+  }
+
+  function showAuthPanel() {
+    hidePanels();
+    authPanel.hidden = false;
+  }
+
+  function showForgotPanel() {
+    hidePanels();
+    forgotPanel.hidden = false;
+    showMessage('');
+    const currentEmail = byId('loginEmail').value.trim();
+    if (currentEmail) byId('forgotEmail').value = currentEmail;
+    byId('forgotEmail').focus();
+  }
+
+  function showResetPanel() {
+    recoveryMode = true;
+    hidePanels();
+    resetPanel.hidden = false;
+    showMessage('');
+    byId('resetPassword').focus();
+  }
+
   function showTab(name) {
+    showAuthPanel();
     tabs.forEach((tab) => {
       const active = tab.dataset.authTab === name;
       tab.classList.toggle('active', active);
@@ -59,16 +100,19 @@
 
   function renderSession(session) {
     const signedIn = Boolean(session?.user);
-    authPanel.hidden = signedIn;
-    profilePanel.hidden = true;
-    sessionPanel.hidden = !signedIn;
-    byId('sessionEmail').textContent = signedIn ? session.user.email : '';
-    if (signedIn) showMessage('');
+    hidePanels();
+    if (signedIn) {
+      sessionPanel.hidden = false;
+      byId('sessionEmail').textContent = session.user.email;
+      showMessage('');
+    } else {
+      authPanel.hidden = false;
+      byId('sessionEmail').textContent = '';
+    }
   }
 
   function renderProfileCompletion() {
-    authPanel.hidden = true;
-    sessionPanel.hidden = true;
+    hidePanels();
     profilePanel.hidden = false;
     showMessage('');
     byId('profileName').focus();
@@ -83,11 +127,15 @@
   }
 
   function continueWithSession(session) {
+    if (recoveryMode) return showResetPanel();
     if (!CentralProAuth.userName(session?.user)) return renderProfileCompletion();
     enterCentralPro();
   }
 
   tabs.forEach((tab) => tab.addEventListener('click', () => showTab(tab.dataset.authTab)));
+
+  byId('forgotPasswordButton').addEventListener('click', showForgotPanel);
+  byId('backToLoginButton').addEventListener('click', () => showTab('login'));
 
   byId('loginForm').addEventListener('submit', async (event) => {
     event.preventDefault();
@@ -102,6 +150,52 @@
       const { data, error } = await CentralProAuth.signIn(email, password);
       if (error) throw error;
       continueWithSession(data.session);
+    } catch (error) {
+      showMessage(errorMessage(error));
+    } finally {
+      setBusy(false);
+    }
+  });
+
+  byId('forgotForm').addEventListener('submit', async (event) => {
+    event.preventDefault();
+    if (busy) return;
+    const email = byId('forgotEmail').value.trim();
+    if (!email) return showMessage('Informe o e-mail cadastrado.');
+
+    setBusy(true);
+    showMessage('Enviando link de recuperação…', 'info');
+    try {
+      const { error } = await CentralProAuth.requestPasswordReset(email, recoveryRedirectUrl());
+      if (error) throw error;
+      showMessage('Pronto! Se esse e-mail estiver cadastrado, você receberá um link para redefinir sua senha. Confira também a caixa de spam.', 'success');
+      event.target.reset();
+    } catch (error) {
+      showMessage(errorMessage(error));
+    } finally {
+      setBusy(false);
+    }
+  });
+
+  byId('resetForm').addEventListener('submit', async (event) => {
+    event.preventDefault();
+    if (busy) return;
+    const password = byId('resetPassword').value;
+    const confirmation = byId('resetPasswordConfirmation').value;
+    if (!password || !confirmation) return showMessage('Preencha os dois campos de senha.');
+    if (password.length < 6) return showMessage('A senha deve ter pelo menos 6 caracteres.');
+    if (password !== confirmation) return showMessage('As senhas não coincidem.');
+
+    setBusy(true);
+    showMessage('Salvando sua nova senha…', 'info');
+    try {
+      const { error } = await CentralProAuth.updatePassword(password);
+      if (error) throw error;
+      recoveryMode = false;
+      history.replaceState({}, '', '/login.html');
+      event.target.reset();
+      showTab('login');
+      showMessage('Senha alterada com sucesso. Agora você já pode entrar com a nova senha.', 'success');
     } catch (error) {
       showMessage(errorMessage(error));
     } finally {
@@ -179,12 +273,22 @@
     try {
       const [{ data, error }] = await Promise.all([
         CentralProAuth.getSession(),
-        CentralProAuth.onAuthStateChange((_event, session) => {
+        CentralProAuth.onAuthStateChange((event, session) => {
+          if (event === 'PASSWORD_RECOVERY') {
+            recoveryMode = true;
+            return showResetPanel();
+          }
+          if (recoveryMode) return;
           if (!session?.user) return renderSession(null);
           if (!CentralProAuth.userName(session.user)) renderProfileCompletion();
         })
       ]);
       if (error) throw error;
+      if (recoveryMode) {
+        if (data.session?.user) return showResetPanel();
+        showAuthPanel();
+        return showMessage('Abra novamente o link de recuperação enviado para o seu e-mail. Se ele expirou, solicite um novo link.', 'info');
+      }
       if (data.session?.user) return continueWithSession(data.session);
       renderSession(null);
     } catch (error) {

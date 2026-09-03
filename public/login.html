@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Acesso | Central Pro</title>
   <link rel="stylesheet" href="app-shell.css?v=2">
-  <link rel="stylesheet" href="login.css?v=1">
+  <link rel="stylesheet" href="login.css?v=2">
 </head>
 <body class="login-page">
   <main class="auth-layout">
@@ -30,6 +30,7 @@
         <form class="auth-form" id="loginForm" data-auth-form="login">
           <label><span>E-mail</span><input id="loginEmail" type="email" autocomplete="email" required></label>
           <label><span>Senha</span><input id="loginPassword" type="password" autocomplete="current-password" required></label>
+          <button class="forgot-password-link" id="forgotPasswordButton" type="button">Esqueceu sua senha?</button>
           <button class="auth-submit" type="submit"><span>Entrar</span></button>
         </form>
 
@@ -39,6 +40,32 @@
           <label><span>Senha</span><input id="signupPassword" type="password" autocomplete="new-password" minlength="6" required></label>
           <label><span>Confirmar senha</span><input id="signupPasswordConfirmation" type="password" autocomplete="new-password" minlength="6" required></label>
           <button class="auth-submit" type="submit"><span>Criar conta</span></button>
+        </form>
+      </div>
+
+      <div id="forgotPanel" hidden>
+        <div class="auth-card-heading recovery-heading">
+          <p class="eyebrow">RECUPERAR ACESSO</p>
+          <h2>Redefinir senha</h2>
+          <p>Digite o e-mail cadastrado. Enviaremos um link para você criar uma nova senha.</p>
+        </div>
+        <form class="auth-form" id="forgotForm">
+          <label><span>E-mail</span><input id="forgotEmail" type="email" autocomplete="email" required></label>
+          <button class="auth-submit" type="submit"><span>Enviar link de recuperação</span></button>
+          <button class="auth-secondary" id="backToLoginButton" type="button">← Voltar para entrar</button>
+        </form>
+      </div>
+
+      <div id="resetPanel" hidden>
+        <div class="auth-card-heading recovery-heading">
+          <p class="eyebrow">NOVA SENHA</p>
+          <h2>Crie uma nova senha</h2>
+          <p>Escolha uma senha com pelo menos 6 caracteres.</p>
+        </div>
+        <form class="auth-form" id="resetForm">
+          <label><span>Nova senha</span><input id="resetPassword" type="password" autocomplete="new-password" minlength="6" required></label>
+          <label><span>Confirmar nova senha</span><input id="resetPasswordConfirmation" type="password" autocomplete="new-password" minlength="6" required></label>
+          <button class="auth-submit" type="submit"><span>Salvar nova senha</span></button>
         </form>
       </div>
 
@@ -67,8 +94,8 @@
     </section>
   </main>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="auth.js?v=2"></script>
-  <script src="login.js?v=2"></script>
-  <script src="site-footer.js?v=1"></script>
+  <script src="auth.js?v=3"></script>
+  <script src="login.js?v=3"></script>
+  <script src="site-footer.js?v=2"></script>
 </body>
 </html>

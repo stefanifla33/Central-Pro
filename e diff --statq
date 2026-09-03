@@ -1,0 +1,15 @@
+warning: in the working copy of 'data/corner-history.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'data/period-stats.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'data/player-history.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'package.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'public/dashboard.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'public/home.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'server.js', LF will be replaced by CRLF the next time Git touches it
+ data/corner-history.json |   13161 [32m+[m[31m-[m
+ data/period-stats.json   |   22815 [32m+[m[31m-[m
+ data/player-history.json | 1325917 [32m+++++++++++++++++++++++++++++++++++++++++[m[31m--[m
+ package.json             |       2 [32m+[m[31m-[m
+ public/dashboard.js      |       4 [32m+[m[31m-[m
+ public/home.css          |       5 [32m+[m[31m-[m
+ server.js                |     122 [32m+[m[31m-[m
+ 7 files changed, 1295980 insertions(+), 66046 deletions(-)

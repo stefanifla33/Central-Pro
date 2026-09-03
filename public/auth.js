@@ -57,6 +57,17 @@
     return client.auth.signOut({ scope: 'local' });
   }
 
+  async function requestPasswordReset(email, redirectTo) {
+    const client = await getClient();
+    const options = redirectTo ? { redirectTo } : undefined;
+    return client.auth.resetPasswordForEmail(email, options);
+  }
+
+  async function updatePassword(password) {
+    const client = await getClient();
+    return client.auth.updateUser({ password });
+  }
+
   async function getSession() {
     const client = await getClient();
     return client.auth.getSession();
@@ -104,5 +115,5 @@
     }
   }
 
-  global.CentralProAuth = Object.freeze({ getClient, signUp, signIn, signOut, getSession, getAccess, getUser, updateName, normalizeName, firstName, userName, onAuthStateChange, safeInternalDestination });
+  global.CentralProAuth = Object.freeze({ getClient, signUp, signIn, signOut, requestPasswordReset, updatePassword, getSession, getAccess, getUser, updateName, normalizeName, firstName, userName, onAuthStateChange, safeInternalDestination });
 })(window);

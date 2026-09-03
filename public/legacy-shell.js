@@ -20,4 +20,4 @@
   document.addEventListener('keydown',event=>{if((event.ctrlKey||event.metaKey)&&event.key.toLowerCase()==='k'){event.preventDefault();document.getElementById('globalSearch')?.focus()}});
   document.getElementById('globalSearch')?.addEventListener('keydown',event=>{const query=event.target.value.trim();if(event.key==='Enter'&&query.length>=3)location.href=`teams.html?q=${encodeURIComponent(query)}`});
 }());
-(()=>{const s=document.createElement('script');s.src='site-footer.js?v=1';document.body.appendChild(s)})();
+(()=>{const s=document.createElement('script');s.src='site-footer.js?v=2';document.body.appendChild(s)})();
