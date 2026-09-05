@@ -8,6 +8,7 @@ const { resolveGames } = require("./lib/storage/game-snapshot-storage");
 const { assertExternalRequestsAllowed, isCentralProOffline } = require("./lib/central-pro-offline");
 const { createPlayerRateLimiter } = require("./lib/player-rate-limiter");
 const { createRemoteFootballCache } = require("./lib/remote-football-cache");
+const { createPrematchOddsService } = require("./lib/prematch-odds");
 const { createSerializedJsonPersister } = require("./lib/serialized-json-persister");
 const { createUserAccessService } = require("./lib/user-access");
 const { createAsaasPaymentService } = require("./lib/asaas-payments");
@@ -1512,6 +1513,14 @@ app.get("/api/jogadores/:id", async (req, res) => {
     } catch (erro) {
         res.status(502).json({ erro: "Não foi possível carregar o jogador.", detalhe: erro.message });
     }
+});
+
+const prematchOdds = createPrematchOddsService({ football, cacheExpiry: endpoint => (cache.get(endpoint)?.createdAt || Date.now()) + 30 * 60_000 });
+app.get("/api/partidas/:id/odds", async (req, res) => {
+    res.set("Cache-Control", "no-store");
+    const id = Number(req.params.id);
+    if (!/^\d+$/.test(req.params.id) || !Number.isSafeInteger(id) || id <= 0) return res.status(400).json({ status: "unavailable", selections: {}, reason: "invalid_fixture" });
+    res.json(await prematchOdds.get(id));
 });
 
 app.get("/api/partidas/:id", async (req, res) => {

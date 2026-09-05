@@ -154,6 +154,7 @@
       match: params.get('match') || '',
       market: params.get('market') || '',
       selection: params.get('selection') || '',
+      odd: /^\d+(?:\.\d+)?$/.test(params.get('odd') || '') && Number.isFinite(Number(params.get('odd'))) && Number(params.get('odd')) > 1 ? params.get('odd') : '',
       result: 'pending'
     });
     history.replaceState(null, '', location.pathname);

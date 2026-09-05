@@ -1,0 +1,13 @@
+.cp-odds{margin-top:10px;min-width:0;max-width:100%;color:#8b9b91;font-size:10px;line-height:1.4}
+.cp-odds-options{display:flex;flex-wrap:wrap;gap:6px;min-width:0}
+.cp-odd{appearance:none;display:flex;align-items:center;flex-wrap:wrap;gap:7px;max-width:100%;padding:7px 9px;border:1px solid #2b3730;border-radius:7px;background:#101a14;color:#dce8df;font:inherit;cursor:pointer;transition:border-color .15s,background .15s}
+.cp-odd:hover{background:#17261d;border-color:#52735f}
+.cp-odd:focus-visible{outline:2px solid #6ee7ab;outline-offset:2px}
+.cp-odd[aria-pressed=true]{background:#192a20;border-color:#58856a}
+.cp-odd.is-best{border-color:#397252}
+.cp-odd-name{font-size:10px;font-weight:700;letter-spacing:.1px}
+.cp-odd strong{font-size:12px;color:#eff8f2;font-variant-numeric:tabular-nums}
+.cp-odd small{font-size:8px;color:#80c79c}
+.cp-odds-note{display:block;margin-top:5px;color:#7d9184;font-size:9px;overflow-wrap:anywhere}
+.cp-odds.is-unavailable{color:#839087;font-size:10px}
+@media(max-width:480px){.cp-odds-options{gap:5px}.cp-odd{padding:7px;gap:5px}.cp-odd small{font-size:8px}}

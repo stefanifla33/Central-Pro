@@ -102,7 +102,7 @@
         <label class="field full"><span>Partida</span><input id="entryMatch" type="text" required maxlength="120" placeholder="Mandante x Visitante"></label>
         <label class="field"><span>Mercado</span><input id="entryMarket" type="text" required maxlength="80" placeholder="Ex.: Mais de 2.5 gols"></label>
         <label class="field"><span>Seleção</span><input id="entrySelection" type="text" required maxlength="100" placeholder="Ex.: Over 2.5"></label>
-        <label class="field"><span>Odd</span><input id="entryOdd" type="number" min="1.01" step="0.01" required placeholder="1,85"></label>
+        <label class="field"><span>Odd</span><input id="entryOdd" type="number" min="1.01" step="any" required placeholder="1,85"></label>
         <label class="field"><span>Stake (R$)</span><input id="entryStake" type="number" min="0.01" step="0.01" required placeholder="50,00"></label>
         <label class="field full"><span>Resultado</span><select id="entryResult"><option value="pending">Pendente</option><option value="green">Green</option><option value="red">Red</option><option value="void">Void</option></select></label>
       </div>
@@ -122,7 +122,7 @@
   <script src="/vendor/exceljs/exceljs.min.js"></script>
   <script src="bankroll-store.js"></script>
   <script src="bankroll-export.js"></script>
-  <script src="bankroll.js?v=2"></script>
+  <script src="bankroll.js?v=3"></script>
   <script src="app-shell.js?v=2"></script>
 </body>
 </html>
