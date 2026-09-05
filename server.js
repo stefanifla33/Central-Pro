@@ -9,6 +9,7 @@ const { assertExternalRequestsAllowed, isCentralProOffline } = require("./lib/ce
 const { createPlayerRateLimiter } = require("./lib/player-rate-limiter");
 const { createRemoteFootballCache } = require("./lib/remote-football-cache");
 const { createPrematchOddsService } = require("./lib/prematch-odds");
+const { mapPlayerPropQuotes } = require("./lib/player-prop-odds");
 const { createSerializedJsonPersister } = require("./lib/serialized-json-persister");
 const { createUserAccessService } = require("./lib/user-access");
 const { createAsaasPaymentService } = require("./lib/asaas-payments");
@@ -2504,6 +2505,26 @@ app.get("/api/partidas/:id/jogadores-recentes", async (req, res) => {
         const quota = ["API_DAILY_QUOTA", "API_MINUTE_QUOTA"].includes(erro.code);
         res.status(quota ? 429 : 502).json({ erro: "Histórico recente de jogadores indisponível.", detalhe: erro.message, code: erro.code || "API_TRANSIENT", retryAfterMs: erro.retryAfterMs || null });
     }
+});
+
+app.get("/api/jogadores/:id/odds", async (req, res) => {
+    const playerId = Number(req.params.id), fixtureId = Number(req.query.fixture);
+    if (!Number.isSafeInteger(playerId) || playerId <= 0 || !Number.isSafeInteger(fixtureId) || fixtureId <= 0) return res.status(400).json({ erro: "Jogador e fixture são obrigatórios." });
+    try {
+        const fixtureBody = await football(`/fixtures?id=${fixtureId}`, 30_000);
+        const fixture = fixtureBody.response?.[0];
+        if (!fixture) return res.status(404).json({ erro: "Partida não encontrada." });
+        if (fixture.fixture?.status?.short !== "NS" || Date.parse(fixture.fixture?.date) <= Date.now()) return res.json({ fixtureId, playerId, status: "unavailable", reason: "fixture_not_prematch", quotes: [] });
+        const recentTeam = [fixture.teams.home, fixture.teams.away].find(item => Object.values(playerHistoryStore.fixtures).some(record => Number(record.players?.[playerId]?.teamId) === Number(item.id)));
+        if (!recentTeam) return res.json({ fixtureId, playerId, status: "unavailable", reason: "player_not_in_fixture", quotes: [] });
+        const recent = buildPlayerRecentPayload(playerId, recentTeam.id, fixture.fixture.date, 5);
+        const playerName = recent.player?.name;
+        if (!playerName) return res.json({ fixtureId, playerId, status: "unavailable", reason: "player_name_unavailable", quotes: [] });
+        const records=[]; let page=1,total=1;
+        do { const body=await football(`/odds?fixture=${fixtureId}${page>1?`&page=${page}`:""}`, 60_000); total=Number(body.paging?.total||1); records.push(...(body.response||[])); } while(++page<=total && page<=10);
+        const quotes=mapPlayerPropQuotes(records,fixtureId,playerName,Date.now());
+        res.json({ fixtureId, playerId, playerName, status: quotes.length?"available":"unavailable", reason: quotes.length?null:"no_player_quotes", fetchedAt: new Date().toISOString(), quotes });
+    } catch (erro) { res.status(502).json({ erro: "Odds do jogador indisponíveis.", detalhe: erro.message }); }
 });
 
 app.get("/api/jogadores/:id/recentes", async (req, res) => {
