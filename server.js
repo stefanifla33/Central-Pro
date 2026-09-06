@@ -226,7 +226,8 @@ const PLAYER_MARKETS = Object.freeze({
     assists: "assists",
     tackles: "tackles",
     foulsCommitted: "fouls.committed",
-    foulsDrawn: "fouls.drawn"
+    foulsDrawn: "fouls.drawn",
+    saves: "saves"
 });
 const PLAYER_POSITION_METRICS = Object.freeze({
     G: ["saves", "passes.total", "rating", "cards.yellow", "cards.red"],
@@ -284,6 +285,51 @@ function getPlayerRecentGames(playerId, { teamId = null, before = null, limit = 
         });
 }
 
+
+function getTeamRecentCompletedFixtureRecords(teamId, before, limit = 5) {
+    const beforeTime = before ? new Date(before).getTime() : Number.POSITIVE_INFINITY;
+    return Object.values(playerHistoryStore.fixtures)
+        .filter(record => record.complete && record.fixture?.date && new Date(record.fixture.date).getTime() < beforeTime)
+        .filter(record => ["FT", "AET", "PEN"].includes(record.fixture?.status || "FT"))
+        .filter(record => {
+            const teams = record.fixture?.teams || {};
+            return Number(teams.home?.id) === Number(teamId) || Number(teams.away?.id) === Number(teamId);
+        })
+        .sort((a, b) => new Date(b.fixture.date) - new Date(a.fixture.date))
+        .slice(0, Math.min(10, Math.max(1, Number(limit) || 5)));
+}
+
+function getPlayerRecentRotation(playerId, teamId, before, limit = 5) {
+    const fixtures = getTeamRecentCompletedFixtureRecords(teamId, before, limit);
+    const appearances = fixtures.map(record => {
+        const player = record.players?.[playerId];
+        const minutes = Number(player?.minutes || 0);
+        return {
+            fixtureId: Number(record.fixture.id),
+            date: record.fixture.date,
+            minutes,
+            played: Boolean(player && minutes > 0),
+            starter: player?.substitute == null ? null : !player.substitute
+        };
+    });
+    const played = appearances.filter(row => row.played);
+    const minutes = played.reduce((sum, row) => sum + row.minutes, 0);
+    const recent3 = appearances.slice(0, 3).filter(row => row.played).length;
+    const sample = fixtures.length;
+    const eligible = sample < 3
+        ? played.length > 0
+        : (played.length >= 3 || minutes >= 180) && recent3 >= 1;
+    return {
+        eligible,
+        sample,
+        appearances: played.length,
+        minutes,
+        recent3,
+        starterGames: played.filter(row => row.starter === true).length,
+        games: appearances
+    };
+}
+
 function summarizePlayerMetric(games, metric) {
     const rows = games.map(game => ({ ...game, value: playerHistoryValue(game, metric) }))
         .filter(game => game.value != null && Number.isFinite(Number(game.value)))
@@ -305,7 +351,8 @@ function buildIndividualPlayerMarkets(summaries) {
         assists: summaries.assists,
         tackles: summaries.tackles,
         foulsCommitted: summaries["fouls.committed"],
-        foulsDrawn: summaries["fouls.drawn"]
+        foulsDrawn: summaries["fouls.drawn"],
+        saves: summaries.saves
     };
 }
 
@@ -331,7 +378,9 @@ function buildPlayerHighlights(positionGroup, markets) {
             ["fouls_target", "Alvo frequente de faltas", "Sofreu faltas em {hits} de {covered} jogos.", "foulsDrawn", s => s.coverage >= 4 && s.frequency.hits >= 4],
             ["goal_frequency", "Presença frequente em gols", "Marcou em {hits} de {covered} jogos com dado.", "goals", s => s.coverage >= 4 && s.frequency.hits >= 2]
         ],
-        G: []
+        G: [
+            ["goalkeeper_saves", "Goleiro exigido", "Fez ao menos uma defesa em {hits} de {covered} jogos com dado.", "saves", s => s.coverage >= 3 && s.frequency.hits >= 2]
+        ]
     };
     return (rules[positionGroup] || rules.M).flatMap(([type, title, template, metric, passes]) => {
         const summary = markets[metric];
@@ -352,6 +401,7 @@ function buildPlayerRecentPayload(playerId, teamId, before, limit = 5) {
     const positionGroup = playerPositionGroup(position);
     const markets = buildIndividualPlayerMarkets(summaries);
     const minutesAverage = games.length ? games.reduce((sum, game) => sum + Number(game.minutes), 0) / games.length : null;
+    const rotation = getPlayerRecentRotation(playerId, teamId, before, 5);
     return {
         player: {
             id: Number(playerId),
@@ -363,6 +413,7 @@ function buildPlayerRecentPayload(playerId, teamId, before, limit = 5) {
             number: latest?.number ?? cachedPlayer?.number ?? null
         },
         participationGames: games.length,
+        rotation,
         games,
         summaries,
         markets,
@@ -384,8 +435,9 @@ function buildPlayerRecentPayload(playerId, teamId, before, limit = 5) {
 function selectPlayerMarketLeaders(players, market, maximum = 5) {
     const metric = PLAYER_MARKETS[market];
     if (!metric) return [];
-    const minimumCoverage = ["tackles", "foulsCommitted", "foulsDrawn"].includes(market) ? 3 : 1;
+    const minimumCoverage = ["tackles", "foulsCommitted", "foulsDrawn", "saves"].includes(market) ? 3 : 1;
     return players.map(player => ({ player, summary: player.summaries[metric] }))
+        .filter(item => item.player.rotation?.eligible !== false)
         .filter(item => item.summary.coverage >= minimumCoverage)
         .sort((a, b) => b.summary.average - a.summary.average
             || b.summary.frequency.hits - a.summary.frequency.hits
@@ -2477,7 +2529,8 @@ app.get("/api/partidas/:id/jogadores-recentes", async (req, res) => {
                 .filter(player => !relevantIds.size || relevantIds.has(Number(player.playerId)))
                 .map(player => player.playerId));
             const players = [...playerIds].map(playerId => buildPlayerRecentPayload(playerId, team.id, before, 5))
-                .filter(player => player.participationGames > 0);
+                .filter(player => player.participationGames > 0)
+                .filter(player => player.rotation?.eligible !== false);
             return {
                 team,
                 players,
@@ -2490,7 +2543,7 @@ app.get("/api/partidas/:id/jogadores-recentes", async (req, res) => {
             fixture,
             teams,
             selection: {
-                participation: "minutes > 0 em fixture anterior e concluída",
+                participation: "rotação recente: 3/5 jogos ou 180+ minutos, com participação em ao menos 1 dos 3 jogos mais recentes",
                 markets: "média, frequência, minutos e cobertura; sem score composto",
                 maximumPerMarket: 5,
                 candidateWindow: 30,

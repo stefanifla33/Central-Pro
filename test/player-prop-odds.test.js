@@ -15,6 +15,7 @@ const records=[{fixture:{id:100},update:"2026-09-05T20:59:00Z",bookmakers:[
 ]}];
 assert.equal(marketKey("Home Player Shots"),"shotsTotal");
 assert.equal(marketKey("Home Player Shots On Target Total"),"shotsOnGoal");
+assert.equal(marketKey("Goalkeeper Saves"),"saves");
 assert.equal(marketKey("Away Player Shots Total"),null);
 assert.deepEqual(parseSelection("Yeferson Soteldo - 2","Yeferson Soteldo","shotsTotal"),{threshold:1.5,selection:"Yeferson Soteldo - 2"});
 assert.equal(parseSelection("Yeferson Soteldo Junior - 2","Yeferson Soteldo","shotsTotal"),null);

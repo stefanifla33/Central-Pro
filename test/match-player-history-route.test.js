@@ -67,7 +67,7 @@ async function run() {
         assert.strictEqual(normal.status, 200, "normal match request succeeds without player query parameters");
         assert.notStrictEqual(normal.body.code, "PLAYER_CONFIRMATION_EMPTY", "normal match request never requires scanner confirmation parameters");
         assert.deepStrictEqual(normal.body.teams.map(team => team.players.length), [1, 1], "normal mode discovers both players from the lineup");
-        assert(normal.body.teams.every(team => Object.keys(team.markets).length === 7), "all seven existing player markets are assembled");
+        assert(normal.body.teams.every(team => Object.keys(team.markets).length === 8), "all eight player markets, including goalkeeper saves, are assembled");
 
         const missingConfirmation = await request(server, `/api/partidas/${fixtureId}/jogadores-recentes?mode=scanner&league=39`);
         assert.strictEqual(missingConfirmation.status, 409);
