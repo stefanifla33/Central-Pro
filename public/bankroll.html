@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Minha Banca | Central Pro</title><script src="auth-guard.js?v=2"></script>
   <link rel="stylesheet" href="app-shell.css?v=2">
-  <link rel="stylesheet" href="bankroll.css?v=3">
+  <link rel="stylesheet" href="bankroll.css?v=4">
   <link rel="stylesheet" href="design-system.css?v=1">
 </head>
 <body class="bankroll-page">
@@ -46,18 +46,31 @@
         <button class="btn btn-primary" id="setupNoticeButton" type="button">Definir banca inicial</button>
       </div>
 
-      <section class="summary-grid" aria-label="Resumo da banca">
-        <article class="metric-card primary"><span>Banca inicial</span><strong id="initialBankroll">—</strong></article>
-        <article class="metric-card primary"><span>Banca atual</span><strong id="currentBankroll">—</strong></article>
-        <article class="metric-card"><span>Lucro / Prejuízo</span><strong id="netProfit">R$ 0,00</strong></article>
-        <article class="metric-card"><span>ROI</span><strong id="roi">0,00%</strong></article>
-        <article class="metric-card"><span>Total apostado</span><strong id="totalStake">R$ 0,00</strong></article>
-        <article class="metric-card result-green"><span>Greens</span><strong id="greens">0</strong></article>
-        <article class="metric-card result-red"><span>Reds</span><strong id="reds">0</strong></article>
-        <article class="metric-card"><span>Voids</span><strong id="voids">0</strong></article>
-        <article class="metric-card result-pending"><span>Pendentes</span><strong id="pendings">0</strong></article>
-        <article class="metric-card"><span>Odd média</span><strong id="averageOdd">0,00</strong></article>
-        <article class="metric-card"><span>Taxa de acerto</span><strong id="hitRate">0,00%</strong></article>
+      <section class="summary-grid summary-main" aria-label="Indicadores principais da banca">
+        <article class="metric-card primary"><span>Banca atual</span><strong id="currentBankroll">—</strong><small id="bankrollDelta">Banca inicial não definida</small></article>
+        <article class="metric-card"><span>Lucro / Prejuízo</span><strong id="netProfit">R$ 0,00</strong><small id="profitPercent">0,00% da banca inicial</small></article>
+        <article class="metric-card"><span>ROI</span><strong id="roi">0,00%</strong><small>Sobre entradas liquidadas</small></article>
+        <article class="metric-card"><span>Taxa de acerto</span><strong id="hitRate">0,00%</strong><small id="hitRateDetail">0 de 0 entradas decididas</small></article>
+      </section>
+
+      <section class="summary-grid summary-secondary" aria-label="Indicadores complementares">
+        <article class="metric-card compact"><span>Banca inicial</span><strong id="initialBankroll">—</strong></article>
+        <article class="metric-card compact"><span>Total apostado</span><strong id="totalStake">R$ 0,00</strong></article>
+        <article class="metric-card compact result-green"><span>Greens</span><strong id="greens">0</strong></article>
+        <article class="metric-card compact result-red"><span>Reds</span><strong id="reds">0</strong></article>
+        <article class="metric-card compact result-pending"><span>Pendentes</span><strong id="pendings">0</strong></article>
+        <article class="metric-card compact"><span>Odd média</span><strong id="averageOdd">0,00</strong></article>
+        <article class="metric-card compact"><span>Voids</span><strong id="voids">0</strong></article>
+      </section>
+
+      <section class="bankroll-management" id="bankrollManagement" aria-label="Gestão da banca">
+        <div class="management-icon">◇</div>
+        <div class="management-copy">
+          <div class="management-heading"><strong>Gestão da banca</strong><span class="risk-pill" id="managementRisk">Aguardando dados</span></div>
+          <p><span>Stake média: <strong id="averageStakePercent">—</strong></span><i></i><span>Maior exposição: <strong id="maxStakePercent">—</strong></span><i></i><span>Exposição pendente: <strong id="pendingExposurePercent">—</strong></span></p>
+          <small id="managementMessage">Defina sua banca inicial para acompanhar a exposição das suas entradas.</small>
+        </div>
+        <div class="management-meter" aria-hidden="true"><span id="managementMeterFill"></span></div>
       </section>
 
       <section class="panel chart-panel">
@@ -103,7 +116,13 @@
         <label class="field"><span>Mercado</span><input id="entryMarket" type="text" required maxlength="80" placeholder="Ex.: Mais de 2.5 gols"></label>
         <label class="field"><span>Seleção</span><input id="entrySelection" type="text" required maxlength="100" placeholder="Ex.: Over 2.5"></label>
         <label class="field"><span>Odd</span><input id="entryOdd" type="number" min="1.01" step="any" required placeholder="1,85"></label>
-        <label class="field"><span>Stake (R$)</span><input id="entryStake" type="number" min="0.01" step="0.01" required placeholder="50,00"></label>
+        <label class="field"><span>Stake (R$)</span><input id="entryStake" type="number" min="0.01" step="0.01" required placeholder="50,00"><small class="stake-inline" id="stakeInline">Informe a stake para calcular a exposição.</small></label>
+        <div class="stake-risk full" id="stakeRisk" hidden>
+          <div class="stake-risk-head"><strong id="stakeRiskTitle">Exposição da entrada</strong><span id="stakeRiskBadge">—</span></div>
+          <p id="stakeRiskText"></p>
+          <div class="stake-risk-meter"><span id="stakeRiskFill"></span></div>
+          <div class="stake-risk-scale"><span>0%</span><span>3%</span><span>5%</span><span>10%+</span></div>
+        </div>
         <label class="field full"><span>Resultado</span><select id="entryResult"><option value="pending">Pendente</option><option value="green">Green</option><option value="red">Red</option><option value="void">Void</option></select></label>
       </div>
       <div class="modal-actions"><button class="btn btn-secondary close-dialog" type="button">Cancelar</button><button class="btn btn-primary" type="submit">Salvar entrada</button></div>

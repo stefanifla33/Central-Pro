@@ -83,17 +83,19 @@ tbody tr:hover { background: rgba(255,255,255,.018); }
 .empty-state .btn { margin-top: 6px; }
 .modal { width: min(450px, calc(100vw - 30px)); padding: 0; border: 1px solid rgba(255,255,255,.13); border-radius: 13px; color: var(--text); background: #11161d; box-shadow: 0 24px 80px rgba(0,0,0,.58); }
 .modal::backdrop { background: rgba(3,7,10,.76); backdrop-filter: blur(3px); }
-.modal-wide { width: min(650px, calc(100vw - 30px)); }
-.modal form { padding: 18px; }
+.modal-wide { width: min(720px, calc(100vw - 30px)); }
+.modal form { padding: 16px 18px; }
+#entryDialog { max-height: calc(100dvh - 24px); overflow: hidden; }
+#entryDialog form { max-height: calc(100dvh - 24px); overflow-x: hidden; overflow-y: auto; scrollbar-width: thin; scrollbar-color: rgba(52,211,120,.35) transparent; }
 .modal-head { padding-bottom: 13px; border-bottom: 1px solid var(--border); }
 .modal-head h2 { margin: 2px 0 0; font-size: 17px; }
 .icon-button { width: 30px; height: 30px; border: 1px solid var(--border); border-radius: 7px; color: var(--text-muted); background: transparent; font-size: 19px; cursor: pointer; }
-.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 15px 0; }
-.field { display: flex; flex-direction: column; gap: 6px; margin: 15px 0; }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; column-gap: 12px; row-gap: 9px; margin: 12px 0; }
+.field { display: flex; flex-direction: column; gap: 5px; margin: 12px 0; }
 .form-grid .field { margin: 0; }
 .field.full { grid-column: 1 / -1; }
 .field > span { color: var(--text-muted); font-size: 10px; font-weight: 750; text-transform: uppercase; letter-spacing: .04em; }
-.field input, .field select, .money-input { width: 100%; height: 38px; box-sizing: border-box; border: 1px solid var(--border); border-radius: 8px; outline: none; color: var(--text); background: rgba(255,255,255,.035); font: inherit; font-size: 12px; }
+.field input, .field select, .money-input { width: 100%; height: 36px; box-sizing: border-box; border: 1px solid var(--border); border-radius: 8px; outline: none; color: var(--text); background: rgba(255,255,255,.035); font: inherit; font-size: 12px; }
 .field input, .field select { padding: 0 10px; }
 .field input:focus, .field select:focus, .money-input:focus-within { border-color: rgba(52,211,120,.5); box-shadow: 0 0 0 3px rgba(52,211,120,.07); }
 .field select option { background: #11161d; }
@@ -157,4 +159,64 @@ tbody tr:hover { background: rgba(255,255,255,.018); }
   .summary-grid { grid-template-columns: 1fr 1fr; }
   .table-wrap tbody tr { grid-template-columns: 1fr; }
   .table-wrap tbody td, .table-wrap tbody .match-cell, .table-wrap tbody .entry-actions-cell { grid-column: 1; }
+}
+
+/* Professional bankroll dashboard */
+.summary-main { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin-bottom: 9px; }
+.summary-main .metric-card { min-height: 86px; padding: 13px 15px; }
+.summary-main .metric-card strong { font-size: 22px; }
+.metric-card small { color: var(--text-muted); font-size: 9px; line-height: 1.3; }
+.summary-secondary { grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 7px; margin-bottom: 10px; }
+.metric-card.compact { min-height: 58px; padding: 9px 10px; }
+.metric-card.compact strong { font-size: 15px; }
+.bankroll-management { display: grid; grid-template-columns: 42px minmax(0, 1fr); align-items: start; column-gap: 14px; row-gap: 10px; padding: 15px 16px 14px; margin-bottom: 10px; border: 1px solid rgba(52,211,120,.24); border-radius: 11px; background: linear-gradient(100deg, rgba(52,211,120,.09), rgba(52,211,120,.02)); }
+.management-icon { width: 40px; height: 40px; display: grid; place-items: center; border-radius: 11px; color: var(--primary); background: rgba(52,211,120,.12); font-size: 21px; }
+.management-copy { min-width: 0; }
+.management-heading { display: flex; align-items: center; gap: 10px; margin-bottom: 9px; }
+.management-heading > strong { font-size: 13px; letter-spacing: -.01em; }
+.management-copy p { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin: 0 0 9px; color: var(--text-muted); font-size: 9px; }
+.management-copy p > span { min-width: 0; padding: 8px 10px; border: 1px solid rgba(255,255,255,.055); border-radius: 8px; background: rgba(255,255,255,.022); }
+.management-copy p strong { display: block; margin-top: 3px; color: var(--text); font-size: 12px; }
+.management-copy p i { display: none; }
+.management-copy small { display: block; color: var(--text-muted); font-size: 10px; line-height: 1.45; }
+.risk-pill { margin-left: auto; padding: 5px 8px; border-radius: 999px; color: var(--text-muted); background: rgba(255,255,255,.055); font-size: 9px; font-weight: 800; white-space: nowrap; }
+.risk-pill.controlled { color: var(--bank-green); background: rgba(57,219,133,.1); }
+.risk-pill.moderate { color: var(--bank-yellow); background: rgba(242,193,78,.11); }
+.risk-pill.high { color: var(--bank-red); background: rgba(255,101,119,.11); }
+.management-meter { grid-column: 2; height: 6px; overflow: hidden; border-radius: 999px; background: rgba(255,255,255,.07); }
+.management-meter span { display: block; width: 0; height: 100%; border-radius: inherit; background: var(--bank-green); transition: width .2s ease; }
+.management-meter span.moderate { background: var(--bank-yellow); }
+.management-meter span.high { background: var(--bank-red); }
+.stake-inline { display: block; min-height: 12px; margin-top: -1px; color: var(--text-muted); font-size: 9px; text-transform: none; letter-spacing: 0; }
+.stake-risk { grid-column: 1 / -1; padding: 11px 12px; border: 1px solid var(--border); border-radius: 9px; background: rgba(255,255,255,.025); }
+.stake-risk[hidden] { display: none; }
+.stake-risk.moderate { border-color: rgba(242,193,78,.28); background: rgba(242,193,78,.055); }
+.stake-risk.high { border-color: rgba(255,101,119,.3); background: rgba(255,101,119,.055); }
+.stake-risk-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.stake-risk-head strong { font-size: 11px; }
+.stake-risk-head span { padding: 3px 7px; border-radius: 999px; color: var(--bank-green); background: rgba(57,219,133,.1); font-size: 9px; font-weight: 800; }
+.stake-risk.moderate .stake-risk-head span { color: var(--bank-yellow); background: rgba(242,193,78,.1); }
+.stake-risk.high .stake-risk-head span { color: var(--bank-red); background: rgba(255,101,119,.1); }
+.stake-risk p { margin: 5px 0 8px; color: var(--text-muted); font-size: 10px; line-height: 1.4; }
+.stake-risk-meter { height: 5px; overflow: hidden; border-radius: 999px; background: rgba(255,255,255,.07); }
+.stake-risk-meter span { display: block; width: 0; height: 100%; border-radius: inherit; background: var(--bank-green); transition: width .18s ease; }
+.stake-risk.moderate .stake-risk-meter span { background: var(--bank-yellow); }
+.stake-risk.high .stake-risk-meter span { background: var(--bank-red); }
+.stake-risk-scale { display: flex; justify-content: space-between; margin-top: 4px; color: var(--text-muted); font-size: 8px; }
+
+@media (max-width: 1200px) {
+  .summary-secondary { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+@media (max-width: 760px) {
+  .summary-main { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .summary-main .metric-card { min-height: 76px; padding: 11px; }
+  .summary-main .metric-card strong { font-size: 18px; }
+  .summary-secondary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .bankroll-management { grid-template-columns: 34px minmax(0, 1fr); padding: 13px 12px; column-gap: 10px; }
+  .management-icon { width: 34px; height: 34px; }
+  .management-copy p { grid-template-columns: 1fr; gap: 6px; }
+  .management-copy p > span { padding: 7px 9px; }
+  .management-meter { grid-column: 1 / -1; }
+  .management-heading { align-items: flex-start; }
+  .risk-pill { white-space: nowrap; }
 }
