@@ -38,12 +38,12 @@ const lineupRefreshes = new Map();
 const lineupRevalidations = new Map();
 const metrics = { requests: 0, externalRequests: 0, cacheHits: 0, startedAt: Date.now() };
 // API-USAGE-DIAGNOSTIC: instrumentação temporária; remover após a auditoria de cota.
-const apiUsageDiagnostic = { externalTotal: 0, cacheHits: 0, pendingHits: 0, byEndpoint: new Map() };
+const apiUsageDiagnostic = { logicalTotal: 0, externalTotal: 0, cacheHits: 0, cacheHitsL1: 0, cacheHitsRedis: 0, pendingHits: 0, byEndpoint: new Map() };
 const apiQuotaState = { remaining: null, limit: null, blockedUntil: 0, reason: null };
 const API_DAILY_COOLDOWN_MS = 6 * 60 * 60 * 1000;
 const API_MINUTE_COOLDOWN_MS = 60_000;
 const playerRateLimiter = createPlayerRateLimiter({ limit: 240, windowMs: 60_000 });
-const remoteFootballCache = createRemoteFootballCache();
+const remoteFootballCache = createRemoteFootballCache({ filePath: path.join(__dirname, "data", "remote-football-cache.json") });
 let remoteQuotaCheck = null;
 let remoteQuotaCheckedAt = 0;
 let periodStore = { version: 1, fixtures: {} };
@@ -684,6 +684,7 @@ function applyPeriodSnapshot(store, game, phase, response, capturedAt = new Date
 }
 
 async function football(endpoint, ttl = 60_000, options = {}) {
+    apiUsageDiagnostic.logicalTotal++;
     metrics.requests++;
     const cached = cache.get(endpoint);
     const diagnosticStartedAt = Date.now();
@@ -697,6 +698,7 @@ async function football(endpoint, ttl = 60_000, options = {}) {
     if (!options.force && cached && Date.now() - cached.createdAt < ttl) {
         metrics.cacheHits++;
         apiUsageDiagnostic.cacheHits++;
+        apiUsageDiagnostic.cacheHitsL1++;
         console.log(`[API-USAGE-DIAGNOSTIC] ${new Date().toISOString()} CACHE_HIT endpoint=${endpointPath} query="${query}" caller="${caller}" durationMs=${Date.now() - diagnosticStartedAt}`);
         return cached.data;
     }
@@ -720,6 +722,7 @@ async function football(endpoint, ttl = 60_000, options = {}) {
                 cache.set(endpoint, remoteEntry);
                 metrics.cacheHits++;
                 apiUsageDiagnostic.cacheHits++;
+                apiUsageDiagnostic.cacheHitsRedis++;
                 console.log(`[API-USAGE-DIAGNOSTIC] ${new Date().toISOString()} REMOTE_CACHE_HIT endpoint=${endpointPath} query="${query}" caller="${caller}" durationMs=${Date.now() - diagnosticStartedAt}`);
                 return remoteEntry.data;
             }

@@ -1,0 +1,10 @@
+const assert = require('assert');
+const { resolveMatchConsistency } = require('../lib/bilhetes-analysis');
+const req = (marketKey, score) => ({ marketKey, game: { analysis: { score } } });
+let result = resolveMatchConsistency([req('homeWin', 69), req('awayWin', 62)]);
+assert.equal(result.qualified.length, 0, 'scores próximos não devem forçar um vencedor'); assert.equal(result.rejected.length, 2);
+result = resolveMatchConsistency([req('homeWin', 85), req('awayWin', 62)]);
+assert.deepStrictEqual(result.qualified.map(x => x.marketKey), ['homeWin']);
+result = resolveMatchConsistency([req('homeWin', 80), req('homeOrDraw', 75), req('over15', 80), req('over25', 70), req('btts', 70)]);
+assert.equal(result.rejected.length, 0); assert(result.agreements.length >= 1);
+console.log('bilhetes consistency scenarios: OK');

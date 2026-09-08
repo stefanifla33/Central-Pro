@@ -1,0 +1,13 @@
+const assert = require('assert');
+const { analyzeMatch } = require('../lib/bilhetes-analysis');
+const base = { teams: { home: { id: 1 }, away: { id: 2 } } };
+const match = (team, home, away, date) => ({ teams: { home: { id: home ? team : 99 }, away: { id: away ? team : 99 } }, goals: { home, away }, fixture: { date: date || new Date().toISOString() } });
+const history = (team, scores, asAway = false) => scores.map(([a, b], i) => ({ teams: { home: { id: asAway ? 99 : team }, away: { id: asAway ? team : 99 } }, goals: { home: asAway ? b : a, away: asAway ? a : b }, fixture: { date: new Date(Date.now() - i * 86400000).toISOString() } }));
+const strong = history(1, [[2, 0], [2, 0], [1, 0], [3, 1], [2, 0]]);
+const weak = history(2, [[0, 2], [0, 1], [1, 3], [0, 1], [0, 2]], true);
+const a = analyzeMatch({ ...base, marketKey: 'homeWin' }, { 1: strong, 2: weak });
+assert.equal(a.venue.home.sampleSize, 5); assert.equal(a.venue.away.sampleSize, 5); assert(a.score > 55);
+const absent = analyzeMatch({ ...base, marketKey: 'cornersOver85' }, {});
+assert.equal(absent.score, 0); assert(absent.signals.unavailable.length);
+assert.equal(a.venue.home.notLost.recent5.total, 5);
+console.log('bilhetes analysis scenarios: OK');
