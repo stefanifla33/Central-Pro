@@ -11,6 +11,7 @@ const { createRemoteFootballCache } = require("./lib/remote-football-cache");
 const { createPrematchOddsService } = require("./lib/prematch-odds");
 const { mapPlayerPropQuotes } = require("./lib/player-prop-odds");
 const { createSerializedJsonPersister } = require("./lib/serialized-json-persister");
+const { createConfiguredBilhetesStore } = require("./lib/bilhetes-storage");
 const { createUserAccessService } = require("./lib/user-access");
 const { createAsaasPaymentService } = require("./lib/asaas-payments");
 const { createPagBankPaymentService } = require("./lib/pagbank-payments");
@@ -49,6 +50,9 @@ let periodStore = { version: 1, fixtures: {} };
 let playerHistoryStore = { version: 1, fixtures: {} };
 let cornerHistoryStore = { version: 1, fixtures: {} };
 const gameSnapshotStorage = createConfiguredGameSnapshotStorage();
+const configuredBilhetes = createConfiguredBilhetesStore();
+const bilhetesStore = configuredBilhetes.store;
+const bilhetesReady = configuredBilhetes.seedPromise;
 const playerHistoryPersister = createSerializedJsonPersister({
     fileSystem: fs.promises,
     file: PLAYER_HISTORY_FILE,
@@ -1202,6 +1206,9 @@ app.post("/api/payments/infinitepay/webhook", express.json({ limit: "64kb" }), a
     }
 });
 
+app.get("/api/bilhetes", async (req, res) => { await bilhetesReady; const tickets = await bilhetesStore.list({ date: req.query.date, status: req.query.status }); res.json({ tickets, source: "persistent-store", apiFootballRequests: 0 }); });
+app.get("/api/bilhetes/historico", async (req, res) => { await bilhetesReady; res.json({ tickets: await bilhetesStore.history({ date: req.query.date, status: req.query.status }), source: "persistent-store" }); });
+app.get("/api/bilhetes/:id", async (req, res) => { await bilhetesReady; const ticket = await bilhetesStore.get(req.params.id); if (!ticket) return res.status(404).json({ erro: "Bilhete não encontrado." }); res.json({ ticket, source: "persistent-store" }); });
 app.use(express.static(path.join(__dirname, "public")));
 
 app.get("/api/status", (req, res) => {
@@ -1568,7 +1575,13 @@ app.get("/api/jogadores/:id", async (req, res) => {
     }
 });
 
-const prematchOdds = createPrematchOddsService({ football, cacheExpiry: endpoint => (cache.get(endpoint)?.createdAt || Date.now()) + 30 * 60_000 });
+const prematchOdds = createPrematchOddsService({ football, sharedCache: remoteFootballCache, cacheExpiry: endpoint => (cache.get(endpoint)?.createdAt || Date.now()) + 30 * 60_000 });
+const { generateBilhetesPreview } = require("./lib/bilhetes-generation");
+app.locals.bilhetesPreviewGenerator = options => generateBilhetesPreview({ ...options, football, oddsService: prematchOdds, sharedCache: remoteFootballCache });
+app.locals.bilhetesGameSnapshot = date => gameSnapshotStorage.get(date);
+app.locals.bilhetesFixturesLoader = date => resolveGames(date, () => football(`/fixtures?date=${date}&timezone=${encodeURIComponent(APP_TIMEZONE)}`, 30_000), gameSnapshotStorage);
+app.locals.bilhetesApiMetrics = metrics;
+app.locals.bilhetesApiUsageDiagnostic = apiUsageDiagnostic;
 app.get("/api/partidas/:id/odds", async (req, res) => {
     res.set("Cache-Control", "no-store");
     const id = Number(req.params.id);

@@ -1,0 +1,10 @@
+const assert = require('assert');
+const { idFor, validateTicket, recordFor } = require('../scripts/publish-bilhetes');
+const item = { fixtureId: 1, marketKey: 'over15', marketId: 5, market: 'Goals Over/Under', selection: 'Over 1.5', bookmakerId: 32, bookmakerName: 'Betano', odd: '1.50', selectionDisplay: '+1.5 gols' };
+const ticket = { type: 'CHAMPIONS', combinationType: 'SAME_FIXTURE', combinedOddType: 'CALCULATED', totalOdd: 1.5, selections: [item] };
+assert.equal(validateTicket(ticket, '2026-09-08').length, 0);
+assert.equal(validateTicket({ ...ticket, selections: [{ ...item, bookmakerName: 'demo' }] }, '2026-09-08').includes('bookmaker_invalido'), true);
+assert.equal(idFor(ticket, '2026-09-08'), idFor(ticket, '2026-09-08'));
+const record = recordFor(ticket, '2026-09-08');
+assert.equal(record.source, 'real'); assert.equal(record.status, 'OPEN'); assert.equal(record.settled_at, null); assert.equal(record.analysis.combinedOddType, 'CALCULATED');
+console.log('publish bilhetes validation scenarios: OK');
