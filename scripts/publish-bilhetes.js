@@ -6,6 +6,7 @@ const { createSupabaseBilhetesStore } = require('../lib/supabase-bilhetes-store'
 
 const requested = process.argv.find(arg => arg.startsWith('--date='))?.slice(7) || '';
 const publish = process.argv.includes('--publish');
+const replaceDay = process.argv.includes('--replace');
 const previewPath = path.join(__dirname, '..', 'outputs', 'bilhetes-real-preview.json');
 const hash = value => crypto.createHash('sha256').update(value).digest('hex').slice(0, 24);
 const idFor = (ticket, date) => `REAL-${date.replaceAll('-', '')}-${hash(JSON.stringify({ date, type: ticket.type, selections: ticket.selections.map(item => [item.fixtureId, item.marketKey, item.selection, item.line]) }))}`;
@@ -33,6 +34,7 @@ async function main() {
   const summary = { preview: previewPath, ticketsFound: tickets.length, valid: valid.length, invalid: invalid.length, new: publish ? null : records.length, alreadyPublished: publish ? 0 : 'não consultado no dry-run', conflicts: 0, wouldInsert: records.length, wouldSkip: 0, apiFootballCalls: 0, supabaseWrites: 0, records, invalidTickets: invalid };
   if (publish) {
     const store = createSupabaseBilhetesStore({ supabaseUrl: process.env.SUPABASE_URL, serviceRoleKey: process.env.SUPABASE_SERVICE_ROLE_KEY });
+    if (replaceDay) { await store.deleteByDate(requested); summary.replacedDate = requested; summary.supabaseWrites++; }
     for (const record of records) { const existing = await store.getById(record.id); if (existing) { if (JSON.stringify(existing.selections) !== JSON.stringify(record.selections)) throw new Error(`CONFLICT ${record.id}`); summary.wouldInsert--; summary.wouldSkip++; } else { await store.create(record); summary.supabaseWrites++; } }
   }
   console.log(JSON.stringify(summary, null, 2));
