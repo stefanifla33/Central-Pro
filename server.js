@@ -1585,6 +1585,38 @@ app.locals.bilhetesGameSnapshot = date => gameSnapshotStorage.get(date);
 app.locals.bilhetesFixturesLoader = date => resolveGames(date, () => football(`/fixtures?date=${date}&timezone=${encodeURIComponent(APP_TIMEZONE)}`, 30_000), gameSnapshotStorage);
 app.locals.bilhetesApiMetrics = metrics;
 app.locals.bilhetesApiUsageDiagnostic = apiUsageDiagnostic;
+
+let bilhetesDailyRun = null;
+async function runBilhetesDailyMaintenance(date = new Intl.DateTimeFormat("en-CA", { timeZone: APP_TIMEZONE }).format(new Date())) {
+    if (bilhetesDailyRun) return bilhetesDailyRun;
+    bilhetesDailyRun = (async () => {
+        const { createSupabaseBilhetesStore } = require("./lib/supabase-bilhetes-store");
+        const { settleOpenTickets } = require("./lib/bilhetes-settlement");
+        const { recordFor } = require("./scripts/publish-bilhetes");
+        const store = createSupabaseBilhetesStore({ supabaseUrl: process.env.SUPABASE_URL, serviceRoleKey: process.env.SUPABASE_SERVICE_ROLE_KEY });
+        if (!store.configured) throw new Error("Supabase Bilhetes não configurado.");
+        const settlement = await settleOpenTickets({ store, football });
+        const existing = await store.listByDate(date);
+        if (existing.length) return { date, settlement, generated: 0, published: 0, alreadyPublished: existing.length };
+        const payload = await app.locals.bilhetesFixturesLoader(date);
+        const report = await app.locals.bilhetesPreviewGenerator({ games: payload.response || [], date, apiUsageDiagnostic });
+        let published = 0;
+        for (const ticket of report.tickets || []) {
+            const record = recordFor(ticket, date);
+            if (!await store.getById(record.id)) { await store.create(record); published++; }
+        }
+        return { date, settlement, generated: (report.tickets || []).length, published, alreadyPublished: 0 };
+    })();
+    try { return await bilhetesDailyRun; } finally { bilhetesDailyRun = null; }
+}
+app.locals.runBilhetesDailyMaintenance = runBilhetesDailyMaintenance;
+app.get("/api/bilhetes/cron", async (req, res) => {
+    const secret = String(process.env.CRON_SECRET || "").trim();
+    if (secret && req.get("authorization") !== `Bearer ${secret}`) return res.status(401).json({ erro: "Não autorizado." });
+    if (!secret && (process.env.NODE_ENV === "production" || process.env.VERCEL === "1")) return res.status(503).json({ erro: "CRON_SECRET não configurado." });
+    try { res.json(await runBilhetesDailyMaintenance()); }
+    catch (erro) { console.error("[BILHETES-DAILY]", erro); res.status(500).json({ erro: erro.message }); }
+});
 app.get("/api/partidas/:id/odds", async (req, res) => {
     res.set("Cache-Control", "no-store");
     const id = Number(req.params.id);

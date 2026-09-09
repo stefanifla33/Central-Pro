@@ -21,7 +21,9 @@
     "test:payments": "node test/asaas-payments.test.js && node test/pagbank-payments.test.js && node test/infinitepay-payments.test.js",
     "test:pagbank": "node test/pagbank-payments.test.js",
     "test:infinitepay": "node test/infinitepay-payments.test.js",
-    "test:odds": "node test/prematch-odds.test.js"
+    "test:odds": "node test/prematch-odds.test.js",
+    "bilhetes:daily": "node scripts/run-daily-bilhetes.js",
+    "bilhetes:settle": "node scripts/settle-bilhetes.js"
   },
   "keywords": [],
   "author": "",

@@ -1,0 +1,11 @@
+const assert = require('assert');
+const { evaluateSelection } = require('../lib/bilhetes-settlement');
+const fixture={goals:{home:2,away:1},score:{halftime:{home:1,away:0}},teams:{home:{id:1},away:{id:2}}};
+assert.equal(evaluateSelection({marketKey:'over15'},fixture),true);
+assert.equal(evaluateSelection({marketKey:'over25'},fixture),true);
+assert.equal(evaluateSelection({marketKey:'btts'},fixture),true);
+assert.equal(evaluateSelection({marketKey:'homeWin'},fixture),true);
+assert.equal(evaluateSelection({marketKey:'awayWin'},fixture),false);
+assert.equal(evaluateSelection({marketKey:'homeWinEitherHalf'},fixture),true);
+assert.equal(evaluateSelection({marketKey:'cornersOver85',line:8.5},fixture,[{team:{id:1},statistics:[{type:'Corner Kicks',value:5}]},{team:{id:2},statistics:[{type:'Corner Kicks',value:4}]}]),true);
+console.log('bilhetes-settlement.test.js OK');
