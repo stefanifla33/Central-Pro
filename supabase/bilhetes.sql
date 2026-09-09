@@ -26,7 +26,7 @@ create index if not exists central_pro_bilhetes_published_at_idx on public.centr
 
 alter table public.central_pro_bilhetes enable row level security;
 revoke all on table public.central_pro_bilhetes from anon, authenticated;
-grant select, insert, update on table public.central_pro_bilhetes to service_role;
+grant select, insert, update, delete on table public.central_pro_bilhetes to service_role;
 
 create or replace function public.central_pro_bilhetes_set_updated_at()
 returns trigger

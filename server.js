@@ -13,6 +13,7 @@ const { mapPlayerPropQuotes } = require("./lib/player-prop-odds");
 const { createSerializedJsonPersister } = require("./lib/serialized-json-persister");
 const { createConfiguredBilhetesStore } = require("./lib/bilhetes-storage");
 const { createUserAccessService } = require("./lib/user-access");
+const { authenticateAdmin, buildManualTicket, editablePatch } = require("./lib/bilhetes-admin");
 const { createAsaasPaymentService } = require("./lib/asaas-payments");
 const { createPagBankPaymentService } = require("./lib/pagbank-payments");
 const { createInfinitePayPaymentService, infinitePayCallbackBase } = require("./lib/infinitepay-payments");
@@ -1209,6 +1210,41 @@ app.post("/api/payments/infinitepay/webhook", express.json({ limit: "64kb" }), a
     }
 });
 
+app.get("/api/bilhetes/admin/status", async (req, res) => {
+    res.set("Cache-Control", "no-store");
+    try { res.json({ admin: Boolean(await authenticateAdmin(req.get("Authorization"))) }); }
+    catch (_error) { res.json({ admin: false }); }
+});
+app.post("/api/bilhetes/manual", express.json({ limit: "32kb" }), async (req, res) => {
+    try {
+        if (!(await authenticateAdmin(req.get("Authorization")))) return res.status(403).json({ erro: "Acesso administrativo necessário." });
+        await bilhetesReady;
+        const ticket = buildManualTicket(req.body || {});
+        const created = await bilhetesStore.create(ticket);
+        res.status(201).json({ ticket: created });
+    } catch (error) { res.status(error.status || 500).json({ erro: error.status ? error.message : "Não foi possível publicar o bilhete." }); }
+});
+app.patch("/api/bilhetes/manual/:id", express.json({ limit: "16kb" }), async (req, res) => {
+    try {
+        if (!(await authenticateAdmin(req.get("Authorization")))) return res.status(403).json({ erro: "Acesso administrativo necessário." });
+        await bilhetesReady;
+        const ticket = await bilhetesStore.get(req.params.id);
+        if (!ticket) return res.status(404).json({ erro: "Bilhete não encontrado." });
+        const updated = await bilhetesStore.update(req.params.id, editablePatch(req.body || {}, ticket));
+        res.json({ ticket: updated });
+    } catch (error) { res.status(error.status || 500).json({ erro: error.status ? error.message : "Não foi possível alterar o bilhete." }); }
+});
+app.delete("/api/bilhetes/manual/:id", async (req, res) => {
+    try {
+        if (!(await authenticateAdmin(req.get("Authorization")))) return res.status(403).json({ erro: "Acesso administrativo necessário." });
+        await bilhetesReady;
+        const ticket = await bilhetesStore.get(req.params.id);
+        if (!ticket) return res.status(404).json({ erro: "Bilhete não encontrado." });
+        if (ticket.source !== "manual") return res.status(403).json({ erro: "Bilhetes automáticos não podem ser excluídos por esta função." });
+        await bilhetesStore.delete(req.params.id);
+        res.json({ ok: true });
+    } catch (_error) { res.status(500).json({ erro: "Não foi possível excluir o bilhete." }); }
+});
 app.get("/api/bilhetes", async (req, res) => { await bilhetesReady; const tickets = await bilhetesStore.list({ date: req.query.date, status: req.query.status }); res.json({ tickets, source: "persistent-store", apiFootballRequests: 0 }); });
 app.get("/api/bilhetes/historico", async (req, res) => { await bilhetesReady; res.json({ tickets: await bilhetesStore.history({ date: req.query.date, status: req.query.status }), source: "persistent-store" }); });
 app.get("/api/bilhetes/:id", async (req, res) => { await bilhetesReady; const ticket = await bilhetesStore.get(req.params.id); if (!ticket) return res.status(404).json({ erro: "Bilhete não encontrado." }); res.json({ ticket, source: "persistent-store" }); });
