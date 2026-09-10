@@ -1231,7 +1231,14 @@ app.post("/api/push/unsubscribe", express.json({ limit: "8kb" }), async (req, re
         if (!user) return res.status(401).json({ erro: "Faça login para alterar as notificações." });
         await removeSubscription(user, req.body?.endpoint);
         res.json({ ok: true });
-    } catch (_error) { res.status(500).json({ erro: "Não foi possível desativar a notificação." }); }
+    } catch (error) {
+        console.error("[PUSH-UNSUBSCRIBE] falhou:", {
+            message: error?.message,
+            status: error?.status,
+            stack: error?.stack
+        });
+        res.status(error?.status || 500).json({ erro: error?.status ? error.message : "Não foi possível desativar a notificação." });
+    }
 });
 
 app.get("/api/bilhetes/admin/status", async (req, res) => {
