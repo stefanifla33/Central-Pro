@@ -1,0 +1,18 @@
+CENTRAL PRO — PUSH DE NOVOS BILHETES
+
+1) No Supabase > SQL Editor, execute o arquivo:
+   supabase/push-subscriptions.sql
+
+2) Na Vercel > Project > Settings > Environment Variables, crie para Production:
+   VAPID_PUBLIC_KEY = BEvp2SNnWctMijyuuFHNc1pmZp3pCcnaVVtYqfDwf17SwCR12aNkFfn1Q6n5w-PD1YW9PV3dg9DIoj5NPClRZgE
+   VAPID_PRIVATE_KEY = nMYEw23J5MugsFmFF-nuPWLcRPFbgvx_4ZQMTcAOtUk
+   VAPID_SUBJECT = mailto:centralproapp@gmail.com
+
+3) Faça o deploy. Cada usuário deve abrir Bilhetes em cada dispositivo e clicar uma vez em “Ativar notificações”.
+
+4) Depois disso, sempre que a administradora publicar um bilhete manual, o servidor dispara o push para todos os dispositivos inscritos.
+
+IMPORTANTE:
+- Android e PC: funciona em navegadores compatíveis com Web Push.
+- iPhone/iPad: o site precisa ser adicionado à Tela de Início e a permissão deve ser concedida pelo app instalado (iOS/iPadOS 16.4+).
+- O cron de geração automática foi removido/desativado. Green/Red continuam exclusivamente manuais.

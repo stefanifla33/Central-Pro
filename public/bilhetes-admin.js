@@ -2,7 +2,15 @@
   const create=document.querySelector('#createManualTicket'),modal=document.querySelector('#manualTicketModal'),form=document.querySelector('#manualTicketForm'),list=document.querySelector('#manualSelections'),error=document.querySelector('#manualTicketError');
   if(!create||!modal||!form)return;
   let token='';
-  try{const {data}=await window.CentralProAuth.getSession();token=data.session?.access_token||'';if(!token)return;const r=await fetch('/api/bilhetes/admin/status',{headers:{Authorization:`Bearer ${token}`},cache:'no-store'});if(!(await r.json()).admin)return;}catch{return;}
+  const isLocal=['localhost','127.0.0.1'].includes(location.hostname);
+  if(isLocal) create.hidden=false;
+  for(let i=0;i<50&&!window.CentralProAuth;i++) await new Promise(resolve=>setTimeout(resolve,100));
+  try{
+    if(!window.CentralProAuth)return;
+    const {data}=await window.CentralProAuth.getSession();token=data.session?.access_token||'';if(!token)return;
+    const r=await fetch('/api/bilhetes/admin/status',{headers:{Authorization:`Bearer ${token}`},cache:'no-store'});
+    if(!(await r.json()).admin){if(!isLocal) return;}
+  }catch{if(!isLocal)return;}
   create.hidden=false;
   const esc=v=>String(v??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
   const add=(values={})=>{const row=document.createElement('div');row.className='manual-pick-form';row.innerHTML=`<label>Jogo<input name="displayMatch" placeholder="Ex.: Flamengo x Fluminense" value="${esc(values.displayMatch||'')}" required></label><label>Mercado<input name="market" placeholder="Ex.: Total de gols" value="${esc(values.market||'')}" required></label><label>Seleção<input name="displaySelection" placeholder="Ex.: Mais de 1.5 gols" value="${esc(values.displaySelection||'')}" required></label><label>Odd da seleção (opcional)<input name="odd" type="number" min="1.01" max="1000" step="0.01" placeholder="Ex.: 1.55" value="${esc(values.odd||'')}"></label><label>Casa (opcional)<input name="bookmakerName" placeholder="Ex.: Betano" value="${esc(values.bookmakerName||'')}"></label><button type="button" class="remove-pick">Remover seleção</button>`;row.querySelector('.remove-pick').onclick=()=>{row.remove();if(!list.children.length)add()};list.appendChild(row)};

@@ -14,6 +14,7 @@ const { createSerializedJsonPersister } = require("./lib/serialized-json-persist
 const { createConfiguredBilhetesStore } = require("./lib/bilhetes-storage");
 const { createUserAccessService } = require("./lib/user-access");
 const { authenticateAdmin, buildManualTicket, editablePatch } = require("./lib/bilhetes-admin");
+const { authenticateUser: authenticatePushUser, configured: pushConfigured, config: pushConfig, saveSubscription, removeSubscription, sendNewTicketNotification } = require("./lib/push-notifications");
 const { createAsaasPaymentService } = require("./lib/asaas-payments");
 const { createPagBankPaymentService } = require("./lib/pagbank-payments");
 const { createInfinitePayPaymentService, infinitePayCallbackBase } = require("./lib/infinitepay-payments");
@@ -1210,6 +1211,29 @@ app.post("/api/payments/infinitepay/webhook", express.json({ limit: "64kb" }), a
     }
 });
 
+app.get("/api/push/config", async (_req, res) => {
+    res.set("Cache-Control", "no-store");
+    const cfg = pushConfig();
+    res.json({ enabled: pushConfigured(), publicKey: pushConfigured() ? cfg.publicKey : null });
+});
+app.post("/api/push/subscribe", express.json({ limit: "16kb" }), async (req, res) => {
+    try {
+        const user = await authenticatePushUser(req.get("Authorization"));
+        if (!user) return res.status(401).json({ erro: "Faça login para ativar as notificações." });
+        if (!pushConfigured()) return res.status(503).json({ erro: "Push ainda não configurado no servidor." });
+        await saveSubscription(user, req.body?.subscription, { userAgent: req.get("User-Agent") });
+        res.status(201).json({ ok: true });
+    } catch (error) { res.status(error.status || 500).json({ erro: error.status ? error.message : "Não foi possível salvar a notificação." }); }
+});
+app.post("/api/push/unsubscribe", express.json({ limit: "8kb" }), async (req, res) => {
+    try {
+        const user = await authenticatePushUser(req.get("Authorization"));
+        if (!user) return res.status(401).json({ erro: "Faça login para alterar as notificações." });
+        await removeSubscription(user, req.body?.endpoint);
+        res.json({ ok: true });
+    } catch (_error) { res.status(500).json({ erro: "Não foi possível desativar a notificação." }); }
+});
+
 app.get("/api/bilhetes/admin/status", async (req, res) => {
     res.set("Cache-Control", "no-store");
     try { res.json({ admin: Boolean(await authenticateAdmin(req.get("Authorization"))) }); }
@@ -1221,7 +1245,8 @@ app.post("/api/bilhetes/manual", express.json({ limit: "32kb" }), async (req, re
         await bilhetesReady;
         const ticket = buildManualTicket(req.body || {});
         const created = await bilhetesStore.create(ticket);
-        res.status(201).json({ ticket: created });
+        const push = await sendNewTicketNotification(created).catch(error => { console.error("[PUSH] Novo bilhete sem notificação:", error.message); return { configured: pushConfigured(), sent: 0, failed: 1 }; });
+        res.status(201).json({ ticket: created, push });
     } catch (error) { res.status(error.status || 500).json({ erro: error.status ? error.message : "Não foi possível publicar o bilhete." }); }
 });
 app.patch("/api/bilhetes/manual/:id", express.json({ limit: "16kb" }), async (req, res) => {
@@ -1646,13 +1671,7 @@ async function runBilhetesDailyMaintenance(date = new Intl.DateTimeFormat("en-CA
     try { return await bilhetesDailyRun; } finally { bilhetesDailyRun = null; }
 }
 app.locals.runBilhetesDailyMaintenance = runBilhetesDailyMaintenance;
-app.get("/api/bilhetes/cron", async (req, res) => {
-    const secret = String(process.env.CRON_SECRET || "").trim();
-    if (secret && req.get("authorization") !== `Bearer ${secret}`) return res.status(401).json({ erro: "Não autorizado." });
-    if (!secret && (process.env.NODE_ENV === "production" || process.env.VERCEL === "1")) return res.status(503).json({ erro: "CRON_SECRET não configurado." });
-    try { res.json(await runBilhetesDailyMaintenance()); }
-    catch (erro) { console.error("[BILHETES-DAILY]", erro); res.status(500).json({ erro: erro.message }); }
-});
+app.get("/api/bilhetes/cron", (_req, res) => res.status(410).json({ ok: false, mode: "manual", message: "Geração automática de bilhetes desativada." }));
 app.get("/api/partidas/:id/odds", async (req, res) => {
     res.set("Cache-Control", "no-store");
     const id = Number(req.params.id);
