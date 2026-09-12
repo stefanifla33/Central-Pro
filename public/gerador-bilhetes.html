@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Gerador de Bilhetes | Central Pro</title>
+  <script src="auth-guard.js?v=2"></script>
+  <link rel="stylesheet" href="app-shell.css?v=2">
+  <link rel="stylesheet" href="design-system.css?v=1">
+  <link rel="stylesheet" href="gerador-bilhetes.css?v=4">
+</head>
+<body class="generator-page">
+  <button class="menu-button" id="menuButton">☰</button>
+  <aside class="sidebar" id="sidebar">
+    <a class="brand" href="index.html"><img class="sidebar-logo" src="assets/central-pro-logo.png" alt="Central Pro"></a>
+    <div class="user-card"><span class="avatar">S</span><span><strong>Stefani</strong><small>Analista</small></span><span class="status-dot"></span></div>
+    <nav class="main-nav">
+      <a href="index.html"><span>⌂</span>Início</a>
+      <a href="top-day.html"><span>🏆</span>Top do Dia</a>
+      <a class="active" href="bilhetes.html"><span>🎟</span>Bilhetes</a>
+      <a href="games.html"><span>◫</span>Jogos</a>
+      <a href="analysis.html"><span>⌁</span>Análises</a>
+      <a href="opportunities.html"><span>↗</span>Melhores Oportunidades</a>
+      <a href="bankroll.html"><span>◈</span>Minha Banca</a>
+    </nav>
+  </aside>
+  <div class="app-frame">
+    <header class="app-header"><div class="generator-top-title">Ferramenta interna · somente administradora</div><div class="header-actions"><a class="back-link" href="bilhetes.html">← Voltar aos bilhetes</a></div></header>
+    <main class="page-content generator-wrap">
+      <section class="generator-hero">
+        <div><p class="eyebrow">ADMIN · CENTRAL PRO</p><h1>Gerador de Bilhetes</h1><p>Gera sugestões usando os dados do seu próprio projeto. Nada é publicado automaticamente: você revisa e envia para o formulário manual.</p></div>
+        <span class="private-chip">🔒 INTERNO</span>
+      </section>
+
+      <section class="generator-panel">
+        <div class="generator-grid">
+          <label>Data<input id="gDate" type="date"></label>
+          <label>Fonte<select id="gSource" disabled><option value="games" selected>Mercados de jogo</option></select></label>
+          <label>Escopo<select id="gScope"><option value="all" selected>Todos os jogos</option><option value="specific">Um jogo específico</option><option value="fixed">Jogo fixo + completar com outros</option></select></label>
+          <label class="game-focus-field" hidden>Jogo para dar atenção<select id="gFixture"><option value="">Carregando jogos...</option></select></label>
+          <label>Perfil<select id="gProfile"><option value="CONSERVADOR">Conservador</option><option value="MODERADO" selected>Moderado</option><option value="AGRESSIVO">Agressivo</option><option value="LIVRE">Livre</option></select></label>
+          <label>Quantidade<input id="gCount" type="number" min="1" max="50" value="5"></label>
+          <label>Formato<select id="gFormat"><option value="1">Simples</option><option value="2" selected>Dupla</option><option value="3">Tripla</option><option value="4">4 seleções</option><option value="5">Bingo · 5 seleções</option><option value="6">Bingo · 6 seleções</option><option value="free">Livre</option></select></label>
+          <label class="free-field" hidden>Mín. seleções<input id="gMinLegs" type="number" min="1" max="12" value="2"></label>
+          <label class="free-field" hidden>Máx. seleções<input id="gMaxLegs" type="number" min="1" max="12" value="6"></label>
+          <label>Score mínimo<input id="gMinScore" type="number" min="0" max="100" value="70"></label>
+          <label>Odd total mínima<input id="gOddMin" type="number" min="1.01" step="0.01" value="1.50"></label>
+          <label>Odd total máxima<input id="gOddMax" type="number" min="1.01" step="0.01" value="8.00"></label>
+        </div>
+        <div class="generator-actions"><button id="generateTickets" class="primary-generator">⚡ Gerar sugestões</button><small>O gerador não força quantidade: se não houver combinações acima do filtro, ele entrega menos.</small></div>
+        <div id="generatorError" class="generator-error" hidden></div>
+      </section>
+
+      <section id="generatorStatus" class="generator-status" hidden></section>
+      <section id="generatorResults" class="generator-results"></section>
+    </main>
+  </div>
+  <script src="app-shell.js?v=3"></script>
+  <script src="gerador-bilhetes.js?v=4"></script>
+</body>
+</html>

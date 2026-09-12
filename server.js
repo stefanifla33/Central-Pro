@@ -14,6 +14,8 @@ const { createSerializedJsonPersister } = require("./lib/serialized-json-persist
 const { createConfiguredBilhetesStore } = require("./lib/bilhetes-storage");
 const { createUserAccessService } = require("./lib/user-access");
 const { authenticateAdmin, buildManualTicket, editablePatch } = require("./lib/bilhetes-admin");
+const { generateInternalTickets } = require("./lib/bilhetes-internal-generator");
+const { MARKET_SELECTIONS } = require("./lib/bilhetes-preview");
 const { authenticateUser: authenticatePushUser, configured: pushConfigured, config: pushConfig, saveSubscription, removeSubscription, sendNewTicketNotification } = require("./lib/push-notifications");
 const { createAsaasPaymentService } = require("./lib/asaas-payments");
 const { createPagBankPaymentService } = require("./lib/pagbank-payments");
@@ -1245,6 +1247,252 @@ app.get("/api/bilhetes/admin/status", async (req, res) => {
     res.set("Cache-Control", "no-store");
     try { res.json({ admin: Boolean(await authenticateAdmin(req.get("Authorization"))) }); }
     catch (_error) { res.json({ admin: false }); }
+});
+
+
+function generatorEvidencePercentage(candidate) {
+    const metric = candidate?.evidence?.evidence || candidate?.evidence;
+    return Number(metric?.value || 0);
+}
+function normalizeGeneratorGameCandidates(report) {
+    return (report?.approvedCandidates || []).map(candidate => ({
+        id: `GAME:${candidate.fixtureId}:${candidate.marketKey}`,
+        kind: 'game',
+        fixtureId: Number(candidate.fixtureId),
+        fixtureDate: candidate.fixtureDate || null,
+        competitionName: candidate.competition || null,
+        match: `${candidate.homeTeam?.name || 'Mandante'} x ${candidate.awayTeam?.name || 'Visitante'}`,
+        marketKey: candidate.marketKey,
+        market: candidate.marketName || candidate.market || candidate.marketKey,
+        selection: candidate.selectionDisplay || candidate.selection || candidate.marketKey,
+        odd: Number(candidate.odd),
+        bookmakerName: candidate.bookmakerName || null,
+        score: Number(candidate.analysis?.score || generatorEvidencePercentage(candidate)),
+        evidencePct: generatorEvidencePercentage(candidate),
+        reason: candidate.analysis?.whyApproved || null,
+        metadata: { source: 'central-pro-game-model' }
+    })).filter(item => Number.isFinite(item.score) && Number.isFinite(item.odd));
+}
+
+function normalizeGeneratorStatisticalCandidates(report, fixtureId = null) {
+    return (report?.statisticalShortlist || [])
+        .filter(candidate => !fixtureId || Number(candidate.fixtureId) === Number(fixtureId))
+        .map(candidate => {
+            const labels = MARKET_SELECTIONS[candidate.marketKey] || [candidate.marketKey, candidate.marketKey];
+            const metric = candidate?.evidence?.[candidate.marketKey]?.evidence || candidate?.evidence?.[candidate.marketKey] || null;
+            const score = Number(candidate.analysis?.score || metric?.value || 0);
+            return {
+                id: `GAME-FALLBACK:${candidate.fixtureId}:${candidate.marketKey}`,
+                kind: 'game',
+                fixtureId: Number(candidate.fixtureId),
+                fixtureDate: candidate.fixtureDate || null,
+                competitionName: candidate.competition || null,
+                match: `${candidate.homeTeam?.name || 'Mandante'} x ${candidate.awayTeam?.name || 'Visitante'}`,
+                marketKey: candidate.marketKey,
+                market: labels[0],
+                selection: labels[1],
+                odd: null,
+                bookmakerName: null,
+                score,
+                evidencePct: Number(metric?.value || 0),
+                reason: candidate.analysis?.whyApproved || `${Number(metric?.value || 0).toFixed(0)}% de frequência na amostra analisada. Odd precisa ser conferida manualmente.`,
+                metadata: { source: 'central-pro-game-model', oddsPending: true }
+            };
+        })
+        .filter(item => Number.isFinite(item.score));
+}
+
+function recentTeamPlayerIds(teamId, before, maximum = 18) {
+    const beforeTime = new Date(before || Date.now()).getTime();
+    const rows = Object.values(playerHistoryStore.fixtures)
+        .filter(record => record.complete && record.fixture?.date && new Date(record.fixture.date).getTime() < beforeTime)
+        .sort((a, b) => new Date(b.fixture.date) - new Date(a.fixture.date));
+    const ids = [], seen = new Set();
+    for (const record of rows) {
+        for (const player of Object.values(record.players || {})) {
+            if (Number(player.teamId) !== Number(teamId) || !player.playerId || seen.has(Number(player.playerId))) continue;
+            seen.add(Number(player.playerId)); ids.push(Number(player.playerId));
+            if (ids.length >= maximum) return ids;
+        }
+    }
+    return ids;
+}
+function playerMarketGeneratorCandidates(games, maximumFixtures = 12) {
+    const rules = [
+        ['shotsOnGoal', 'Finalizações no alvo', 1, '1+ finalização no alvo', 4, 55],
+        ['shotsTotal', 'Finalizações', 2, '2+ finalizações', 4, 60],
+        ['goals', 'Gol do jogador', 1, '1+ gol', 5, 40],
+        ['assists', 'Assistência do jogador', 1, '1+ assistência', 5, 35],
+        ['tackles', 'Desarmes', 2, '2+ desarmes', 4, 55],
+        ['foulsCommitted', 'Faltas cometidas', 1, '1+ falta cometida', 4, 60],
+        ['foulsDrawn', 'Faltas sofridas', 1, '1+ falta sofrida', 4, 60],
+        ['saves', 'Defesas do goleiro', 2, '2+ defesas', 4, 55]
+    ];
+    const candidates = [];
+    for (const game of (games || []).filter(item => ['NS','TBD'].includes(item.fixture?.status?.short)).slice(0, maximumFixtures)) {
+        const fixtureId = Number(game.fixture?.id);
+        const fixtureDate = game.fixture?.date;
+        for (const team of [game.teams?.home, game.teams?.away].filter(Boolean)) {
+            for (const playerId of recentTeamPlayerIds(team.id, fixtureDate, 18)) {
+                const payload = buildPlayerRecentPayload(playerId, team.id, fixtureDate, 5);
+                if (!payload?.player?.name || payload.rotation?.eligible === false || Number(payload.summary?.minutesAverage || 0) < 35) continue;
+                for (const [marketKey, market, threshold, selectionSuffix, minCoverage, minHitPct] of rules) {
+                    const summary = payload.markets?.[marketKey];
+                    if (!summary || Number(summary.coverage || 0) < minCoverage) continue;
+                    const values = (summary.games || []).map(row => Number(row.value)).filter(Number.isFinite);
+                    if (!values.length) continue;
+                    const hits = values.filter(value => value >= threshold).length;
+                    const hitPct = hits / values.length * 100;
+                    if (hitPct < minHitPct) continue;
+                    const avg = Number(summary.average || 0);
+                    const score = Math.min(96, hitPct * .82 + Math.min(9, values.length * 1.4) + Math.min(8, Math.max(0, avg / Math.max(threshold, .5) - .7) * 10));
+                    candidates.push({
+                        id: `PLAYER:${fixtureId}:${playerId}:${marketKey}:${threshold}`,
+                        kind: 'player', fixtureId, fixtureDate,
+                        competitionName: game.league?.name || null,
+                        match: `${game.teams?.home?.name || 'Mandante'} x ${game.teams?.away?.name || 'Visitante'}`,
+                        playerId, playerName: payload.player.name,
+                        marketKey: `player_${marketKey}`,
+                        market,
+                        selection: `${payload.player.name} — ${selectionSuffix}`,
+                        odd: null, bookmakerName: null,
+                        score: Number(score.toFixed(1)), evidencePct: Number(hitPct.toFixed(1)),
+                        reason: `${payload.player.name}: bateu ${threshold}+ em ${hits}/${values.length} jogos recentes com dado; média ${avg.toFixed(2)}. Confirmar escalação e odd antes de publicar.`,
+                        metadata: { source: 'central-pro-player-history', threshold, average: avg, coverage: values.length, lineupConfirmationRequired: true }
+                    });
+                }
+            }
+        }
+    }
+    return [...new Map(candidates.sort((a,b) => b.score-a.score).map(item => [item.id, item])).values()].slice(0, 80);
+}
+
+async function prepareGeneratorPlayerHistory(games, { scopeMode = 'all', targetFixtureId = null } = {}) {
+    const upcoming = (games || []).filter(game => ['NS','TBD'].includes(game.fixture?.status?.short));
+    const targetId = Number(targetFixtureId) || null;
+    let selected = upcoming;
+    if (targetId) {
+        const focus = upcoming.find(game => Number(game.fixture?.id) === targetId);
+        selected = focus ? [focus] : [];
+    } else {
+        // No modo geral, prepara poucos jogos por vez para proteger a cota da API.
+        selected = upcoming.slice(0, 3);
+    }
+    const diagnostics = { fixturesPrepared: 0, teamsPrepared: 0, lineupPlayers: 0, historyPlayersBefore: 0, historyPlayersAfter: 0, errors: [] };
+    const countPlayersForTeam = (teamId, before) => recentTeamPlayerIds(teamId, before, 50).length;
+    for (const game of selected) {
+        diagnostics.fixturesPrepared++;
+        const fixtureId = Number(game.fixture?.id);
+        let lineupData = { response: [] };
+        try { lineupData = await rateLimitedPlayerFootball(`/fixtures/lineups?fixture=${fixtureId}`, 300_000); } catch (_) {}
+        for (const team of [game.teams?.home, game.teams?.away].filter(Boolean)) {
+            diagnostics.teamsPrepared++;
+            diagnostics.historyPlayersBefore += countPlayersForTeam(team.id, game.fixture?.date);
+            const lineup = (lineupData.response || []).find(item => Number(item.team?.id) === Number(team.id));
+            let ids = new Set([...(lineup?.startXI || []), ...(lineup?.substitutes || [])]
+                .map(item => Number(item.player?.id)).filter(Number.isSafeInteger));
+            diagnostics.lineupPlayers += ids.size;
+            if (!ids.size) ids = new Set(recentTeamPlayerIds(team.id, game.fixture?.date, 18));
+            if (!ids.size) {
+                try {
+                    const squad = await rateLimitedPlayerFootball(`/players/squads?team=${team.id}`, 3_600_000);
+                    const row = (squad.response || []).find(item => Number(item.team?.id) === Number(team.id)) || squad.response?.[0];
+                    ids = new Set((row?.players || []).map(player => Number(player.id)).filter(Number.isSafeInteger).slice(0, 22));
+                } catch (_) {}
+            }
+            try {
+                await ensureTeamPlayerHistory(game, team, ids, 4, 24);
+            } catch (error) {
+                diagnostics.errors.push(`${team.name || team.id}: ${error.code || error.message}`);
+            }
+            diagnostics.historyPlayersAfter += countPlayersForTeam(team.id, game.fixture?.date);
+        }
+    }
+    return diagnostics;
+}
+
+app.get("/api/bilhetes/gerador/jogos", async (req, res) => {
+    try {
+        if (!(await authenticateAdmin(req.get("Authorization")))) return res.status(403).json({ erro: "Acesso administrativo necessário." });
+        const date = /^\d{4}-\d{2}-\d{2}$/.test(String(req.query.date || '')) ? String(req.query.date) : new Intl.DateTimeFormat('en-CA', { timeZone: APP_TIMEZONE }).format(new Date());
+        if (typeof app.locals.bilhetesFixturesLoader !== 'function') return res.status(503).json({ erro: "Gerador ainda não inicializado." });
+        const fixturePayload = await app.locals.bilhetesFixturesLoader(date);
+        const games = (fixturePayload?.response || [])
+            .filter(game => ['NS','TBD'].includes(game.fixture?.status?.short))
+            .map(game => ({
+                fixtureId: Number(game.fixture?.id),
+                fixtureDate: game.fixture?.date || null,
+                time: game.fixture?.date ? new Intl.DateTimeFormat('pt-BR', { timeZone: APP_TIMEZONE, hour: '2-digit', minute: '2-digit' }).format(new Date(game.fixture.date)) : '',
+                match: `${game.teams?.home?.name || 'Mandante'} x ${game.teams?.away?.name || 'Visitante'}`,
+                competition: game.league?.name || null
+            }))
+            .filter(game => Number.isFinite(game.fixtureId));
+        res.set("Cache-Control", "no-store");
+        res.json({ ok: true, date, games });
+    } catch (error) {
+        console.error('[BILHETES-GERADOR-JOGOS]', error);
+        res.status(error.status || 500).json({ erro: error.status ? error.message : `Não foi possível carregar os jogos: ${error.message}` });
+    }
+});
+
+app.post("/api/bilhetes/gerador", express.json({ limit: "32kb" }), async (req, res) => {
+    try {
+        if (!(await authenticateAdmin(req.get("Authorization")))) return res.status(403).json({ erro: "Acesso administrativo necessário." });
+        const body = req.body || {};
+        const date = /^\d{4}-\d{2}-\d{2}$/.test(String(body.date || '')) ? String(body.date) : new Intl.DateTimeFormat('en-CA', { timeZone: APP_TIMEZONE }).format(new Date());
+        const sourceMode = 'games';
+        const scopeMode = ['all','specific','fixed'].includes(body.scopeMode) ? body.scopeMode : 'all';
+        const targetFixtureId = scopeMode === 'all' ? null : Number(body.targetFixtureId) || null;
+        if (scopeMode !== 'all' && !targetFixtureId) return res.status(400).json({ erro: "Escolha o jogo que você quer destacar." });
+        if (typeof app.locals.bilhetesFixturesLoader !== 'function') return res.status(503).json({ erro: "Gerador ainda não inicializado." });
+        const fixturePayload = await app.locals.bilhetesFixturesLoader(date);
+        const games = fixturePayload?.response || [];
+        const focusGameRaw = targetFixtureId ? games.find(game => Number(game.fixture?.id) === targetFixtureId) : null;
+        if (scopeMode !== 'all' && !focusGameRaw) return res.status(400).json({ erro: "O jogo escolhido não foi encontrado para essa data." });
+        const focusGame = focusGameRaw ? { fixtureId: targetFixtureId, match: `${focusGameRaw.teams?.home?.name || 'Mandante'} x ${focusGameRaw.teams?.away?.name || 'Visitante'}`, competition: focusGameRaw.league?.name || null } : null;
+        let gameCandidates = [], previewReport = null;
+        if (typeof app.locals.bilhetesPreviewGenerator !== 'function') return res.status(503).json({ erro: "Modelo de bilhetes ainda não inicializado." });
+        previewReport = await app.locals.bilhetesPreviewGenerator({
+            games,
+            date,
+            apiUsageDiagnostic,
+            focusFixtureId: targetFixtureId,
+            forceFocusFixture: scopeMode === 'specific'
+        });
+        gameCandidates = normalizeGeneratorGameCandidates(previewReport);
+
+        // Em jogo específico, não devolve vazio só porque a casa/API não trouxe uma odd exata.
+        // Se a análise estatística aprovou o mercado, ele entra com odd pendente para revisão manual.
+        if (scopeMode === 'specific' && targetFixtureId) {
+            const approvedForFocus = gameCandidates.filter(item => Number(item.fixtureId) === targetFixtureId);
+            const fallback = normalizeGeneratorStatisticalCandidates(previewReport, targetFixtureId);
+            const merged = new Map(approvedForFocus.map(item => [`${item.fixtureId}:${item.marketKey}`, item]));
+            for (const item of fallback) if (!merged.has(`${item.fixtureId}:${item.marketKey}`)) merged.set(`${item.fixtureId}:${item.marketKey}`, item);
+            gameCandidates = [...merged.values()];
+        }
+        const candidates = gameCandidates;
+        const result = generateInternalTickets({
+            candidates,
+            count: body.count,
+            minLegs: body.minLegs,
+            maxLegs: body.maxLegs,
+            profile: body.profile,
+            minScore: body.minScore,
+            oddMin: body.oddMin,
+            oddMax: body.oddMax,
+            scopeMode,
+            targetFixtureId
+        });
+        res.set("Cache-Control", "no-store");
+        const warnings = [];
+        const pendingOdds = gameCandidates.filter(item => !Number.isFinite(Number(item.odd))).length;
+        if (pendingOdds) warnings.push(`${pendingOdds} seleção(ões) passaram na análise, mas estão sem odd automática. Confira a odd na casa antes de publicar.`);
+        if (scopeMode === 'specific' && !gameCandidates.length) warnings.push('Este confronto não apresentou nenhum mercado com evidência estatística suficiente no modelo atual. O gerador não vai inventar uma seleção só para preencher o bilhete.');
+        res.json({ ok: true, date, sourceMode, scopeMode, focusGame, ...result, candidates: { games: gameCandidates.length, players: 0 }, warnings, playerDiagnostics: null, diagnostics: previewReport ? { fixturesFound: previewReport.fixturesFound, approvedGameCandidates: gameCandidates.filter(item => Number.isFinite(Number(item.odd))).length, statisticalShortlist: (previewReport.statisticalShortlist || []).length, pendingOdds, oddsExternalCalls: previewReport.oddsExternalCalls, statisticsExternalCalls: previewReport.statisticsExternalCalls, rejectionReasons: previewReport.rejectionReasons || {} } : { fixturesFound: games.length } });
+    } catch (error) {
+        console.error('[BILHETES-GERADOR]', error);
+        res.status(error.status || 500).json({ erro: error.status ? error.message : `Não foi possível gerar sugestões: ${error.message}` });
+    }
 });
 app.post("/api/bilhetes/manual", express.json({ limit: "32kb" }), async (req, res) => {
     try {
