@@ -122,8 +122,16 @@
       form.elements.profile.value=draft.profile||'MODERADO';
       form.elements.reason.value=draft.reason||'';
       form.elements.totalOdd.value=draft.totalOdd||'';
+      if(form.elements.ticketUrl)form.elements.ticketUrl.value=draft.ticketUrl||'';
       list.innerHTML='';(draft.selections||[]).forEach(add);if(!list.children.length)add();
-      invalidatePreview();error.textContent='Sugestão carregada do Gerador Interno. Confira as odds, escalações e o link antes de publicar.';modal.hidden=false;
+      invalidatePreview();
+      const missingOdds=[...list.querySelectorAll('[name="odd"]')].filter(input=>!input.value);
+      missingOdds.forEach(input=>{input.placeholder='Preencha a odd manualmente';input.dataset.needsManual='1';});
+      error.textContent=missingOdds.length
+        ? `Bilhete carregado. ${missingOdds.length} odd(s) ficaram para você preencher manualmente; depois cole o link do bilhete e publique.`
+        : 'Bilhete carregado. Confira as odds, cole o link do bilhete e publique.';
+      modal.hidden=false;
+      requestAnimationFrame(()=>{(missingOdds[0]||form.elements.ticketUrl||form.elements.totalOdd)?.focus();});
       localStorage.removeItem('centralPro.generatorDraft.v1');
       history.replaceState({},'',location.pathname);
     }catch{}

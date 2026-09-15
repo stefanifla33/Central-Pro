@@ -1461,12 +1461,18 @@ app.post("/api/bilhetes/gerador", express.json({ limit: "32kb" }), async (req, r
         });
         gameCandidates = normalizeGeneratorGameCandidates(previewReport);
 
-        // Em jogo específico, não devolve vazio só porque a casa/API não trouxe uma odd exata.
-        // Se a análise estatística aprovou o mercado, ele entra com odd pendente para revisão manual.
+        // Aproveita também mercados que passaram pela análise estatística mas ficaram sem odd automática.
+        // Isso aumenta a quantidade de PARTIDAS que o gerador consegue descobrir sem inventar mercado:
+        // a seleção entra como "odd pendente" para revisão manual antes da publicação.
         if (scopeMode === 'specific' && targetFixtureId) {
             const approvedForFocus = gameCandidates.filter(item => Number(item.fixtureId) === targetFixtureId);
             const fallback = normalizeGeneratorStatisticalCandidates(previewReport, targetFixtureId);
             const merged = new Map(approvedForFocus.map(item => [`${item.fixtureId}:${item.marketKey}`, item]));
+            for (const item of fallback) if (!merged.has(`${item.fixtureId}:${item.marketKey}`)) merged.set(`${item.fixtureId}:${item.marketKey}`, item);
+            gameCandidates = [...merged.values()];
+        } else {
+            const fallback = normalizeGeneratorStatisticalCandidates(previewReport);
+            const merged = new Map(gameCandidates.map(item => [`${item.fixtureId}:${item.marketKey}`, item]));
             for (const item of fallback) if (!merged.has(`${item.fixtureId}:${item.marketKey}`)) merged.set(`${item.fixtureId}:${item.marketKey}`, item);
             gameCandidates = [...merged.values()];
         }
@@ -1485,8 +1491,9 @@ app.post("/api/bilhetes/gerador", express.json({ limit: "32kb" }), async (req, r
         });
         res.set("Cache-Control", "no-store");
         const warnings = [];
-        const pendingOdds = gameCandidates.filter(item => !Number.isFinite(Number(item.odd))).length;
+        const pendingOdds = gameCandidates.filter(item => item.odd == null || item.odd === '' || !Number.isFinite(Number(item.odd)) || Number(item.odd) <= 1).length;
         if (pendingOdds) warnings.push(`${pendingOdds} seleção(ões) passaram na análise, mas estão sem odd automática. Confira a odd na casa antes de publicar.`);
+        if (result?.diversity?.insufficientUniqueFixtures) warnings.push(`Foram gerados ${result.generated} de ${result.requested} bilhetes. Após os filtros atuais, o gerador recebeu ${result?.diversity?.availableUniqueFixtures ?? result?.diversity?.uniqueFixtures ?? 0} partida(s) diferente(s) utilizável(is); não repetimos jogo para preencher artificialmente.`);
         if (scopeMode === 'specific' && !gameCandidates.length) warnings.push('Este confronto não apresentou nenhum mercado com evidência estatística suficiente no modelo atual. O gerador não vai inventar uma seleção só para preencher o bilhete.');
         res.json({ ok: true, date, sourceMode, scopeMode, focusGame, ...result, candidates: { games: gameCandidates.length, players: 0 }, warnings, playerDiagnostics: null, diagnostics: previewReport ? { fixturesFound: previewReport.fixturesFound, approvedGameCandidates: gameCandidates.filter(item => Number.isFinite(Number(item.odd))).length, statisticalShortlist: (previewReport.statisticalShortlist || []).length, pendingOdds, oddsExternalCalls: previewReport.oddsExternalCalls, statisticsExternalCalls: previewReport.statisticsExternalCalls, rejectionReasons: previewReport.rejectionReasons || {} } : { fixturesFound: games.length } });
     } catch (error) {
