@@ -70,5 +70,5 @@ document.addEventListener('DOMContentLoaded',()=>{
   document.querySelector('#closeAnalysis').addEventListener('click',close);
   m.addEventListener('click',x=>{if(x.target===m)close()});
   document.addEventListener('keydown',x=>{if(x.key==='Escape'&&!m.hidden)close()});
-  fetch('/api/bilhetes').then(r=>r.json()).then(p=>{ts=(p.tickets||[]).map(n);upd();render('Todos');hist();const z=document.querySelector('.history-section .section-heading>span');if(z&&ts.every(t=>t.source==='real'))z.textContent='REAL'}).catch(()=>g.innerHTML='<div class="empty-state">Não foi possível carregar os bilhetes persistidos.</div>');
+  fetch('/api/bilhetes').then(r=>r.json()).then(p=>{ts=(p.tickets||[]).map(n).filter(t=>!(t.status==='OPEN'&&t.date!==today()));upd();render('Todos');hist();const z=document.querySelector('.history-section .section-heading>span');if(z&&ts.every(t=>t.source==='real'))z.textContent='REAL'}).catch(()=>g.innerHTML='<div class="empty-state">Não foi possível carregar os bilhetes persistidos.</div>');
 });
