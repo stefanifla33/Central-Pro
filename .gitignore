@@ -5,3 +5,10 @@ node_modules/
 __pycache__/
 *.pyc
 data/*.tmp
+# Cache e arquivos gerados
+data/remote-football-cache.json
+outputs/bilhetes-preview.json
+outputs/bilhetes-real-preview.json
+
+# Logs
+*.log
