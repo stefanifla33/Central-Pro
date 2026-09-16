@@ -22,7 +22,7 @@
       <a href="bankroll.html#history"><span>↺</span>Histórico</a>
     </nav>
     <div class="sidebar-future"><small>CONTA</small><span>Perfil</span><span>Configurações</span><span>Plano Premium</span></div>
-    <div class="api-state"><span><i></i> Armazenamento local</span><small>Dados salvos neste navegador</small></div>
+    <div class="api-state" id="bankrollSyncState"><span><i></i> <b id="bankrollSyncLabel">Sincronizando banca</b></span><small id="bankrollSyncDetail">Conectando à sua conta…</small></div>
   </aside>
 
   <div class="app-frame">
@@ -162,10 +162,10 @@
   </dialog>
 
   <script src="/vendor/exceljs/exceljs.min.js"></script>
-  <script src="bankroll-store.js?v=5"></script>
+  <script src="bankroll-store.js?v=6"></script>
   <script src="bankroll-slip-reader.js?v=7"></script>
   <script src="bankroll-export.js"></script>
-  <script src="bankroll.js?v=8"></script>
+  <script src="bankroll.js?v=9"></script>
   <script src="app-shell.js?v=2"></script>
 </body>
 </html>

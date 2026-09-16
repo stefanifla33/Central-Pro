@@ -23,6 +23,7 @@ const { createInfinitePayPaymentService, infinitePayCallbackBase } = require("./
 const { createMetricSampleCoverage, selectStatisticsItems, mergeMissingMetricValues, createConcurrencyLimiter, createExpiringCache } = require("./lib/metric-sample-coverage");
 const { CP_MAIN_LEAGUES: MAIN_LEAGUES, cpIsScannerEligibleLeagueId } = require("./public/competition-config");
 const { analyzeSlipWithGemini } = require("./lib/bankroll-slip-ai");
+const { createBankrollCloudStore } = require("./lib/bankroll-cloud-store");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -1073,6 +1074,66 @@ app.get("/api/auth/access", async (req, res) => {
     } catch (_error) {
         console.error("[AUTH-ACCESS] unexpected failure");
         res.status(503).json({ error: "access_unavailable" });
+    }
+});
+
+function bankrollCloudStore() {
+    return createBankrollCloudStore({
+        supabaseUrl: process.env.SUPABASE_URL,
+        publishableKey: process.env.SUPABASE_PUBLISHABLE_KEY || process.env.SUPABASE_ANON_KEY,
+        serviceRoleKey: process.env.SUPABASE_SERVICE_ROLE_KEY
+    });
+}
+
+async function authenticatedBankrollUser(req, res) {
+    const store = bankrollCloudStore();
+    if (!store.configured) {
+        res.status(503).json({ error: "bankroll_sync_not_configured" });
+        return null;
+    }
+    const userId = await store.resolveUserId(req.get("Authorization"));
+    if (!userId) {
+        res.status(401).json({ error: "unauthorized" });
+        return null;
+    }
+    return { store, userId };
+}
+
+app.get("/api/bankroll/state", async (req, res) => {
+    res.set("Cache-Control", "no-store");
+    try {
+        const auth = await authenticatedBankrollUser(req, res);
+        if (!auth) return;
+        res.json(await auth.store.getState(auth.userId));
+    } catch (error) {
+        console.error("[BANKROLL-SYNC] state failed", error?.message || error);
+        res.status(503).json({ error: "bankroll_sync_unavailable" });
+    }
+});
+
+app.post("/api/bankroll/sync", express.json({ limit: "512kb" }), async (req, res) => {
+    res.set("Cache-Control", "no-store");
+    try {
+        const auth = await authenticatedBankrollUser(req, res);
+        if (!auth) return;
+        const operations = Array.isArray(req.body?.operations) ? req.body.operations : [];
+        if (operations.length > 200) return res.status(400).json({ error: "too_many_operations" });
+        res.json(await auth.store.applyOperations(auth.userId, operations));
+    } catch (error) {
+        console.error("[BANKROLL-SYNC] operations failed", error?.message || error);
+        res.status(503).json({ error: "bankroll_sync_unavailable" });
+    }
+});
+
+app.post("/api/bankroll/import", express.json({ limit: "2mb" }), async (req, res) => {
+    res.set("Cache-Control", "no-store");
+    try {
+        const auth = await authenticatedBankrollUser(req, res);
+        if (!auth) return;
+        res.json(await auth.store.importState(auth.userId, req.body?.state || {}));
+    } catch (error) {
+        console.error("[BANKROLL-SYNC] import failed", error?.message || error);
+        res.status(503).json({ error: "bankroll_sync_unavailable" });
     }
 });
 

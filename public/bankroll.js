@@ -428,8 +428,32 @@
     renderTable(store.load());
   });
   byId('entrySearch').addEventListener('input', () => renderTable(store.load()));
+  function renderSyncStatus(status = store.getSyncStatus?.() || {}) {
+    const box = byId('bankrollSyncState');
+    const label = byId('bankrollSyncLabel');
+    const detail = byId('bankrollSyncDetail');
+    if (!box || !label || !detail) return;
+    box.dataset.syncState = status.state || 'local';
+    if (status.state === 'synced') label.textContent = 'Banca sincronizada';
+    else if (status.state === 'syncing') label.textContent = 'Sincronizando banca';
+    else if (status.state === 'error') label.textContent = 'Banca salva localmente';
+    else label.textContent = 'Minha Banca';
+    detail.textContent = status.message || 'Dados vinculados à sua conta';
+  }
+
+  window.addEventListener('bankroll:changed', () => render());
+  window.addEventListener('bankroll:sync-status', (event) => renderSyncStatus(event.detail));
+
   let resizeTimer;
   window.addEventListener('resize', () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(() => drawChart(store.load()), 100); });
-  render();
-  openPrefilledEntryFromQuery();
+
+  async function bootstrapBankroll() {
+    renderSyncStatus();
+    await store.initialize?.();
+    renderSyncStatus();
+    render();
+    openPrefilledEntryFromQuery();
+  }
+
+  bootstrapBankroll();
 }());
