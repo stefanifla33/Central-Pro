@@ -7,6 +7,8 @@
   const decimal = new Intl.NumberFormat('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   const resultLabels = { pending: 'Pendente', green: 'Green', red: 'Red', void: 'Void' };
   const byId = (id) => document.getElementById(id);
+  let selectedSlipFile = null;
+  let entrySource = 'manual';
 
   document.addEventListener('keydown', (event) => {
     if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') {
@@ -129,7 +131,7 @@
     const term = byId('entrySearch').value.trim().toLocaleLowerCase('pt-BR');
     return entries
       .filter((entry) => activeFilter === 'all' || entry.result === activeFilter)
-      .filter((entry) => !term || [entry.match, entry.market, entry.selection].some((value) => String(value).toLocaleLowerCase('pt-BR').includes(term)))
+      .filter((entry) => !term || [entry.match, entry.market, entry.selection, ...(Array.isArray(entry.legs) ? entry.legs.flatMap((leg) => [leg.match, leg.market, leg.selection]) : [])].some((value) => String(value).toLocaleLowerCase('pt-BR').includes(term)))
       .slice()
       .sort((a, b) => `${b.date}|${b.createdAt}`.localeCompare(`${a.date}|${a.createdAt}`));
   }
@@ -142,8 +144,9 @@
       const profitClass = profit > 0 ? 'profit-positive' : profit < 0 ? 'profit-negative' : '';
       return `<tr>
         <td data-label="Data">${dateLabel(entry.date)}</td>
-        <td class="match-cell" data-label="Partida"><strong>${escapeHtml(entry.match)}</strong><small><b>Competição</b>${escapeHtml(entry.competition)}</small></td>
-        <td data-label="Mercado">${escapeHtml(entry.market)}</td><td data-label="Seleção">${escapeHtml(entry.selection)}</td>
+        <td class="match-cell" data-label="Partida"><strong>${escapeHtml(entry.match)}</strong><small><b>Competição</b>${escapeHtml(entry.competition)}</small>${entry.source === 'screenshot' ? '<span class="source-pill">via print</span>' : ''}</td>
+        <td data-label="Mercado">${Array.isArray(entry.legs) && entry.legs.length > 1 ? `<span class="bet-legs-count">Múltipla · ${entry.legs.length} seleções</span>` : escapeHtml(entry.legs?.[0]?.market || entry.market)}</td>
+        <td data-label="Seleção">${Array.isArray(entry.legs) && entry.legs.length ? `<div class="bet-legs-list">${entry.legs.map((leg, index) => `<span><b>${index + 1}. ${escapeHtml(leg.selection || '—')}</b>${leg.match ? `<small class="leg-match">${escapeHtml(leg.match)}</small>` : ''}<small>${escapeHtml(leg.market || 'Mercado não identificado')}</small></span>`).join('')}</div>` : escapeHtml(entry.selection)}</td>
         <td class="odd-value" data-label="Odd">${decimal.format(entry.odd)}</td><td class="money-value" data-label="Stake">${currency.format(entry.stake)}</td>
         <td data-label="Resultado"><span class="result-badge ${entry.result}">${resultLabels[entry.result]}</span></td>
         <td class="money-value ${profitClass}" data-label="Lucro/Prejuízo">${entry.result === 'pending' ? '—' : currency.format(profit)}</td>
@@ -202,6 +205,101 @@
     byId('initialBankrollDialog').showModal();
   }
 
+  function legTemplate(leg = {}, index = 0) {
+    return `<div class="entry-leg" data-leg-index="${index}">
+      <label class="entry-leg-match-field"><span>Partida desta seleção</span><input class="entry-leg-match" type="text" maxlength="120" placeholder="Ex.: Atlético de Madrid x Osasuna" value="${escapeHtml(leg.match || '')}"></label>
+      <label><span>Mercado / jogador</span><input class="entry-leg-market" type="text" maxlength="120" required placeholder="Ex.: Jonathan David — Chutes no gol" value="${escapeHtml(leg.market || '')}"></label>
+      <label><span>Seleção</span><input class="entry-leg-selection" type="text" maxlength="80" required placeholder="Ex.: 1+" value="${escapeHtml(leg.selection || '')}"></label>
+      <button class="entry-leg-remove" type="button" aria-label="Remover seleção" title="Remover seleção">×</button>
+    </div>`;
+  }
+
+  function setEntryLegs(legs) {
+    const normalized = Array.isArray(legs) && legs.length ? legs : [{ market: '', selection: '' }];
+    byId('entryLegs').innerHTML = normalized.map(legTemplate).join('');
+    updateLegRemoveButtons();
+  }
+
+  function updateLegRemoveButtons() {
+    const rows = [...byId('entryLegs').querySelectorAll('.entry-leg')];
+    rows.forEach((row) => { row.querySelector('.entry-leg-remove').disabled = rows.length === 1; });
+  }
+
+  function addEntryLeg(leg = {}) {
+    const index = byId('entryLegs').children.length;
+    byId('entryLegs').insertAdjacentHTML('beforeend', legTemplate(leg, index));
+    updateLegRemoveButtons();
+  }
+
+  function collectEntryLegs() {
+    return [...byId('entryLegs').querySelectorAll('.entry-leg')].map((row) => ({
+      match: row.querySelector('.entry-leg-match')?.value.trim() || '',
+      market: row.querySelector('.entry-leg-market').value.trim(),
+      selection: row.querySelector('.entry-leg-selection').value.trim()
+    })).filter((leg) => leg.market || leg.selection || leg.match);
+  }
+
+  function resetSlipReader() {
+    selectedSlipFile = null;
+    byId('slipImageInput').value = '';
+    byId('slipPreview').src = '';
+    byId('slipPreview').hidden = true;
+    byId('slipDropzoneCopy').hidden = false;
+    byId('changeSlipImageButton').hidden = true;
+    byId('analyzeSlipButton').disabled = true;
+    byId('slipReaderStatus').hidden = true;
+    byId('slipReaderReview').hidden = true;
+  }
+
+  function setSlipFile(file) {
+    if (!file || !/^image\/(png|jpeg|webp)$/i.test(file.type)) {
+      window.alert('Escolha uma imagem PNG, JPG ou WEBP.'); return;
+    }
+    if (file.size > 12 * 1024 * 1024) { window.alert('O print é muito grande. Use uma imagem de até 12 MB.'); return; }
+    selectedSlipFile = file;
+    const url = URL.createObjectURL(file);
+    byId('slipPreview').src = url;
+    byId('slipPreview').onload = () => URL.revokeObjectURL(url);
+    byId('slipPreview').hidden = false;
+    byId('slipDropzoneCopy').hidden = true;
+    byId('changeSlipImageButton').hidden = false;
+    byId('analyzeSlipButton').disabled = false;
+    byId('slipReaderReview').hidden = true;
+  }
+
+  function applySlipData(data) {
+    // Cada nova leitura substitui o que estava no formulário. Assim um OCR parcial
+    // nunca reaproveita odd, stake, partida ou seleções de uma aposta anterior.
+    byId('entryCompetition').value = '';
+    byId('entryMatch').value = '';
+    byId('entryOdd').value = '';
+    byId('entryStake').value = '';
+    setEntryLegs([{ match: '', market: '', selection: '' }]);
+
+    if (data.date) byId('entryDate').value = data.date;
+    if (data.competition) byId('entryCompetition').value = data.competition;
+    if (data.match) byId('entryMatch').value = data.match;
+    if (data.odd && data.odd > 1) byId('entryOdd').value = data.odd;
+    if (data.stake && data.stake > 0) byId('entryStake').value = data.stake;
+    if (Array.isArray(data.legs) && data.legs.length) setEntryLegs(data.legs);
+    entrySource = 'screenshot';
+    updateStakeRisk();
+    const missing = [];
+    if (!data.match) missing.push('partida/resumo');
+    if (!data.competition) missing.push('competição');
+    if (!data.odd) missing.push('odd');
+    if (!data.stake) missing.push('stake');
+    if (!data.legs?.length) missing.push('seleções');
+    if (data.expectedLegs && (data.legs?.length || 0) < data.expectedLegs) missing.push(`o print parece ter ${data.expectedLegs} seleções, mas ${data.legs?.length || 0} foram reconhecidas`);
+    const incompleteLegs = (data.legs || []).filter((leg) => !leg.market || !leg.selection).length;
+    if (incompleteLegs) missing.push(`${incompleteLegs} seleção(ões) incompleta(s)`);
+    const house = data.bookmaker ? ` Casa identificada: ${data.bookmaker}.` : '';
+    byId('slipReaderReviewText').textContent = missing.length
+      ? `${house} Confira especialmente: ${missing.join(', ')}. A leitura por IA pode ter incertezas; corrija qualquer campo antes de salvar.`.trim()
+      : `${house} Foram identificadas ${data.legs.length} ${data.legs.length === 1 ? 'seleção' : 'seleções'}, odd ${decimal.format(data.odd)} e stake ${currency.format(data.stake)}. Confira e salve.`.trim();
+    byId('slipReaderReview').hidden = false;
+  }
+
   function openEntryDialog(entry) {
     byId('entryForm').reset();
     byId('entryId').value = entry?.id || '';
@@ -209,11 +307,14 @@
     byId('entryDate').value = entry?.date || new Date().toISOString().slice(0, 10);
     byId('entryCompetition').value = entry?.competition || '';
     byId('entryMatch').value = entry?.match || '';
-    byId('entryMarket').value = entry?.market || '';
-    byId('entrySelection').value = entry?.selection || '';
+    setEntryLegs(Array.isArray(entry?.legs) && entry.legs.length ? entry.legs : [{ market: entry?.market || '', selection: entry?.selection || '' }]);
     byId('entryOdd').value = entry?.odd || '';
     byId('entryStake').value = entry?.stake || '';
     byId('entryResult').value = entry?.result || 'pending';
+    entrySource = entry?.source || 'manual';
+    resetSlipReader();
+    byId('slipReaderBody').hidden = true;
+    byId('toggleSlipReaderButton').textContent = 'Ler print da aposta';
     updateStakeRisk();
     byId('entryDialog').showModal();
   }
@@ -238,6 +339,44 @@
   byId('newEntryButton').addEventListener('click', () => openEntryDialog());
   byId('firstEntryButton').addEventListener('click', () => openEntryDialog());
   byId('entryStake').addEventListener('input', updateStakeRisk);
+  byId('addEntryLegButton').addEventListener('click', () => addEntryLeg());
+  byId('entryLegs').addEventListener('click', (event) => {
+    const remove = event.target.closest('.entry-leg-remove');
+    if (!remove || remove.disabled) return;
+    remove.closest('.entry-leg').remove(); updateLegRemoveButtons();
+  });
+  byId('toggleSlipReaderButton').addEventListener('click', () => {
+    const body = byId('slipReaderBody');
+    body.hidden = !body.hidden;
+    byId('toggleSlipReaderButton').textContent = body.hidden ? 'Ler print da aposta' : 'Fechar leitor';
+  });
+  byId('slipDropzone').addEventListener('click', () => byId('slipImageInput').click());
+  byId('slipDropzone').addEventListener('keydown', (event) => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); byId('slipImageInput').click(); } });
+  byId('changeSlipImageButton').addEventListener('click', () => byId('slipImageInput').click());
+  byId('slipImageInput').addEventListener('change', (event) => setSlipFile(event.target.files?.[0]));
+  ['dragenter', 'dragover'].forEach((name) => byId('slipDropzone').addEventListener(name, (event) => { event.preventDefault(); byId('slipDropzone').classList.add('is-dragging'); }));
+  ['dragleave', 'drop'].forEach((name) => byId('slipDropzone').addEventListener(name, (event) => { event.preventDefault(); byId('slipDropzone').classList.remove('is-dragging'); }));
+  byId('slipDropzone').addEventListener('drop', (event) => setSlipFile(event.dataTransfer?.files?.[0]));
+  byId('analyzeSlipButton').addEventListener('click', async () => {
+    if (!selectedSlipFile || !window.BankrollSlipReader) return;
+    const button = byId('analyzeSlipButton');
+    button.disabled = true;
+    byId('slipReaderStatus').hidden = false;
+    byId('slipReaderReview').hidden = true;
+    byId('slipReaderStatusTitle').textContent = 'Enviando para análise por IA…';
+    byId('slipReaderStatusText').textContent = 'A IA vai identificar jogos, mercados, seleções, odd e stake.';
+    try {
+      const data = await window.BankrollSlipReader.analyze(selectedSlipFile, (progress) => {
+        byId('slipReaderStatusTitle').textContent = progress < 70 ? 'Analisando o bilhete com IA…' : 'Organizando as seleções…';
+        byId('slipReaderStatusText').textContent = `Processamento: ${progress}%`;
+      });
+      applySlipData(data);
+      byId('slipReaderStatus').hidden = true;
+    } catch (error) {
+      byId('slipReaderStatusTitle').textContent = 'Não consegui ler este print';
+      byId('slipReaderStatusText').textContent = error?.message || 'Tente outro print ou preencha manualmente.';
+    } finally { button.disabled = false; }
+  });
   document.querySelectorAll('.close-dialog').forEach((button) => button.addEventListener('click', () => button.closest('dialog').close()));
 
   byId('initialBankrollForm').addEventListener('submit', (event) => {
@@ -268,7 +407,9 @@
 
   byId('entryForm').addEventListener('submit', (event) => {
     event.preventDefault();
-    store.upsertEntry({ id: byId('entryId').value || undefined, date: byId('entryDate').value, competition: byId('entryCompetition').value, match: byId('entryMatch').value, market: byId('entryMarket').value, selection: byId('entrySelection').value, odd: byId('entryOdd').value, stake: byId('entryStake').value, result: byId('entryResult').value });
+    const legs = collectEntryLegs();
+    if (!legs.length || legs.some((leg) => !leg.market || !leg.selection)) { window.alert('Confira as seleções da aposta antes de salvar.'); return; }
+    store.upsertEntry({ id: byId('entryId').value || undefined, date: byId('entryDate').value, competition: byId('entryCompetition').value, match: byId('entryMatch').value, market: legs.map((leg) => leg.market).join(' | '), selection: legs.map((leg) => leg.selection).join(' | '), legs, source: entrySource, odd: byId('entryOdd').value, stake: byId('entryStake').value, result: byId('entryResult').value });
     byId('entryDialog').close(); render();
   });
 

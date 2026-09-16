@@ -1836,6 +1836,819 @@
         }
       }
     },
+    "1492363": {
+      "fixture": {
+        "id": 1492363,
+        "date": "2026-09-06T11:00:00-03:00",
+        "league": {
+          "id": 71,
+          "name": "Serie A",
+          "country": "Brazil",
+          "logo": "https://media.api-sports.io/football/leagues/71.png",
+          "flag": "https://media.api-sports.io/flags/br.svg",
+          "season": 2026,
+          "round": "Regular Season - 26",
+          "standings": true
+        },
+        "teams": {
+          "home": {
+            "id": 147,
+            "name": "Coritiba",
+            "logo": "https://media.api-sports.io/football/teams/147.png",
+            "winner": false
+          },
+          "away": {
+            "id": 7848,
+            "name": "Mirassol",
+            "logo": "https://media.api-sports.io/football/teams/7848.png",
+            "winner": true
+          }
+        },
+        "status": "FT"
+      },
+      "fulltime": {
+        "capturedAt": "2026-09-06T22:48:26.852Z",
+        "elapsed": 90,
+        "status": "FT",
+        "statistics": {
+          "147": {
+            "team": {
+              "id": 147,
+              "name": "Coritiba",
+              "logo": "https://media.api-sports.io/football/teams/147.png"
+            },
+            "values": {
+              "Passes accurate": 340,
+              "Shots insidebox": 11,
+              "Shots outsidebox": 6,
+              "Blocked Shots": 5,
+              "Free Kicks": 9,
+              "Shots on Goal": 6,
+              "Goalkeeper Saves": 4,
+              "Shots off Goal": 6,
+              "Offsides": 1,
+              "Total passes": 414,
+              "Total Shots": 17,
+              "Yellow Cards": 2,
+              "Corner Kicks": 5,
+              "Fouls": 14,
+              "Red Cards": 0,
+              "Ball Possession": "48%"
+            }
+          },
+          "7848": {
+            "team": {
+              "id": 7848,
+              "name": "Mirassol",
+              "logo": "https://media.api-sports.io/football/teams/7848.png"
+            },
+            "values": {
+              "Passes accurate": 401,
+              "Shots insidebox": 13,
+              "Shots outsidebox": 7,
+              "Blocked Shots": 5,
+              "Free Kicks": 13,
+              "Shots on Goal": 7,
+              "Goalkeeper Saves": 5,
+              "Shots off Goal": 8,
+              "Offsides": 2,
+              "Total passes": 472,
+              "Total Shots": 20,
+              "Yellow Cards": 4,
+              "Corner Kicks": 7,
+              "Fouls": 10,
+              "Red Cards": 0,
+              "Ball Possession": "52%"
+            }
+          }
+        }
+      }
+    },
+    "1492364": {
+      "fixture": {
+        "id": 1492364,
+        "date": "2026-09-06T16:00:00-03:00",
+        "league": {
+          "id": 71,
+          "name": "Serie A",
+          "country": "Brazil",
+          "logo": "https://media.api-sports.io/football/leagues/71.png",
+          "flag": "https://media.api-sports.io/flags/br.svg",
+          "season": 2026,
+          "round": "Regular Season - 26",
+          "standings": true
+        },
+        "teams": {
+          "home": {
+            "id": 135,
+            "name": "Cruzeiro",
+            "logo": "https://media.api-sports.io/football/teams/135.png",
+            "winner": true
+          },
+          "away": {
+            "id": 134,
+            "name": "Atletico Paranaense",
+            "logo": "https://media.api-sports.io/football/teams/134.png",
+            "winner": false
+          }
+        },
+        "status": "FT"
+      },
+      "fulltime": {
+        "capturedAt": "2026-09-06T22:48:36.276Z",
+        "elapsed": 90,
+        "status": "FT",
+        "statistics": {
+          "134": {
+            "team": {
+              "id": 134,
+              "name": "Atletico Paranaense",
+              "logo": "https://media.api-sports.io/football/teams/134.png"
+            },
+            "values": {
+              "Passes accurate": 313,
+              "Shots insidebox": 8,
+              "Shots outsidebox": 9,
+              "Blocked Shots": 4,
+              "Free Kicks": 9,
+              "Shots on Goal": 7,
+              "Goalkeeper Saves": 3,
+              "Shots off Goal": 6,
+              "Offsides": 2,
+              "Total passes": 381,
+              "Total Shots": 17,
+              "Yellow Cards": 2,
+              "Corner Kicks": 2,
+              "Fouls": 14,
+              "Red Cards": 0,
+              "Ball Possession": "39%"
+            }
+          },
+          "135": {
+            "team": {
+              "id": 135,
+              "name": "Cruzeiro",
+              "logo": "https://media.api-sports.io/football/teams/135.png"
+            },
+            "values": {
+              "Passes accurate": 515,
+              "Shots insidebox": 13,
+              "Shots outsidebox": 6,
+              "Blocked Shots": 2,
+              "Free Kicks": 13,
+              "Shots on Goal": 6,
+              "Goalkeeper Saves": 6,
+              "Shots off Goal": 11,
+              "Offsides": 1,
+              "Total passes": 590,
+              "Total Shots": 19,
+              "Yellow Cards": 2,
+              "Corner Kicks": 7,
+              "Fouls": 9,
+              "Red Cards": 0,
+              "Ball Possession": "61%"
+            }
+          }
+        }
+      }
+    },
+    "1492366": {
+      "fixture": {
+        "id": 1492366,
+        "date": "2026-09-06T16:00:00-03:00",
+        "league": {
+          "id": 71,
+          "name": "Serie A",
+          "country": "Brazil",
+          "logo": "https://media.api-sports.io/football/leagues/71.png",
+          "flag": "https://media.api-sports.io/flags/br.svg",
+          "season": 2026,
+          "round": "Regular Season - 26",
+          "standings": true
+        },
+        "teams": {
+          "home": {
+            "id": 119,
+            "name": "Internacional",
+            "logo": "https://media.api-sports.io/football/teams/119.png",
+            "winner": false
+          },
+          "away": {
+            "id": 128,
+            "name": "Santos",
+            "logo": "https://media.api-sports.io/football/teams/128.png",
+            "winner": true
+          }
+        },
+        "status": "FT"
+      },
+      "fulltime": {
+        "capturedAt": "2026-09-06T22:48:36.826Z",
+        "elapsed": 90,
+        "status": "FT",
+        "statistics": {
+          "119": {
+            "team": {
+              "id": 119,
+              "name": "Internacional",
+              "logo": "https://media.api-sports.io/football/teams/119.png"
+            },
+            "values": {
+              "Passes accurate": 331,
+              "Shots insidebox": 8,
+              "Shots outsidebox": 7,
+              "Blocked Shots": 7,
+              "Free Kicks": 13,
+              "Shots on Goal": 6,
+              "Shots off Goal": 2,
+              "Total passes": 411,
+              "Red Cards": 1,
+              "Total Shots": 15,
+              "Yellow Cards": 4,
+              "Corner Kicks": 7,
+              "Goalkeeper Saves": 0,
+              "Offsides": 0,
+              "Fouls": 18,
+              "Ball Possession": "41%"
+            }
+          },
+          "128": {
+            "team": {
+              "id": 128,
+              "name": "Santos",
+              "logo": "https://media.api-sports.io/football/teams/128.png"
+            },
+            "values": {
+              "Passes accurate": 546,
+              "Shots insidebox": 5,
+              "Shots outsidebox": 0,
+              "Blocked Shots": 2,
+              "Free Kicks": 17,
+              "Shots on Goal": 3,
+              "Shots off Goal": 0,
+              "Total passes": 634,
+              "Red Cards": 0,
+              "Total Shots": 5,
+              "Yellow Cards": 4,
+              "Corner Kicks": 2,
+              "Goalkeeper Saves": 4,
+              "Offsides": 3,
+              "Fouls": 15,
+              "Ball Possession": "59%"
+            }
+          }
+        }
+      }
+    },
+    "1492367": {
+      "fixture": {
+        "id": 1492367,
+        "date": "2026-09-06T16:00:00-03:00",
+        "league": {
+          "id": 71,
+          "name": "Serie A",
+          "country": "Brazil",
+          "logo": "https://media.api-sports.io/football/leagues/71.png",
+          "flag": "https://media.api-sports.io/flags/br.svg",
+          "season": 2026,
+          "round": "Regular Season - 26",
+          "standings": true
+        },
+        "teams": {
+          "home": {
+            "id": 1198,
+            "name": "Remo",
+            "logo": "https://media.api-sports.io/football/teams/1198.png",
+            "winner": false
+          },
+          "away": {
+            "id": 127,
+            "name": "Flamengo",
+            "logo": "https://media.api-sports.io/football/teams/127.png",
+            "winner": true
+          }
+        },
+        "status": "FT"
+      },
+      "fulltime": {
+        "capturedAt": "2026-09-06T22:48:37.601Z",
+        "elapsed": 90,
+        "status": "FT",
+        "statistics": {
+          "127": {
+            "team": {
+              "id": 127,
+              "name": "Flamengo",
+              "logo": "https://media.api-sports.io/football/teams/127.png"
+            },
+            "values": {
+              "Passes accurate": 599,
+              "Shots insidebox": 14,
+              "Shots outsidebox": 7,
+              "Blocked Shots": 6,
+              "Free Kicks": 9,
+              "Shots on Goal": 5,
+              "Goalkeeper Saves": 1,
+              "Shots off Goal": 10,
+              "Offsides": 1,
+              "Total passes": 664,
+              "Red Cards": 0,
+              "Total Shots": 21,
+              "Yellow Cards": 2,
+              "Corner Kicks": 9,
+              "Fouls": 13,
+              "Ball Possession": "64%"
+            }
+          },
+          "1198": {
+            "team": {
+              "id": 1198,
+              "name": "Remo",
+              "logo": "https://media.api-sports.io/football/teams/1198.png"
+            },
+            "values": {
+              "Passes accurate": 287,
+              "Shots insidebox": 4,
+              "Shots outsidebox": 3,
+              "Blocked Shots": 3,
+              "Free Kicks": 13,
+              "Shots on Goal": 1,
+              "Goalkeeper Saves": 4,
+              "Shots off Goal": 3,
+              "Offsides": 1,
+              "Total passes": 359,
+              "Red Cards": 1,
+              "Total Shots": 7,
+              "Yellow Cards": 2,
+              "Corner Kicks": 7,
+              "Fouls": 9,
+              "Ball Possession": "36%"
+            }
+          }
+        }
+      }
+    },
+    "1492369": {
+      "fixture": {
+        "id": 1492369,
+        "date": "2026-09-07T20:00:00-03:00",
+        "league": {
+          "id": 71,
+          "name": "Serie A",
+          "country": "Brazil",
+          "logo": "https://media.api-sports.io/football/leagues/71.png",
+          "flag": "https://media.api-sports.io/flags/br.svg",
+          "season": 2026,
+          "round": "Regular Season - 26",
+          "standings": true
+        },
+        "teams": {
+          "home": {
+            "id": 136,
+            "name": "Vitoria",
+            "logo": "https://media.api-sports.io/football/teams/136.png",
+            "winner": true
+          },
+          "away": {
+            "id": 130,
+            "name": "Gremio",
+            "logo": "https://media.api-sports.io/football/teams/130.png",
+            "winner": false
+          }
+        },
+        "status": "FT"
+      },
+      "halftime": {
+        "capturedAt": "2026-09-08T00:08:07.817Z",
+        "elapsed": 45,
+        "status": "HT",
+        "statistics": {
+          "130": {
+            "team": {
+              "id": 130,
+              "name": "Gremio",
+              "logo": "https://media.api-sports.io/football/teams/130.png"
+            },
+            "values": {
+              "Passes accurate": 167,
+              "Shots insidebox": 2,
+              "Shots outsidebox": 3,
+              "Blocked Shots": 0,
+              "Free Kicks": 5,
+              "Shots on Goal": 4,
+              "Goalkeeper Saves": 3,
+              "Shots off Goal": 1,
+              "Offsides": 1,
+              "Total passes": 207,
+              "Total Shots": 5,
+              "Corner Kicks": 0,
+              "Yellow Cards": 2,
+              "Fouls": 9,
+              "Red Cards": 0,
+              "Ball Possession": "44%"
+            }
+          },
+          "136": {
+            "team": {
+              "id": 136,
+              "name": "Vitoria",
+              "logo": "https://media.api-sports.io/football/teams/136.png"
+            },
+            "values": {
+              "Passes accurate": 222,
+              "Shots insidebox": 5,
+              "Shots outsidebox": 5,
+              "Blocked Shots": 2,
+              "Free Kicks": 8,
+              "Shots on Goal": 3,
+              "Goalkeeper Saves": 4,
+              "Shots off Goal": 5,
+              "Offsides": 1,
+              "Total passes": 257,
+              "Total Shots": 10,
+              "Corner Kicks": 5,
+              "Yellow Cards": 0,
+              "Fouls": 5,
+              "Red Cards": 0,
+              "Ball Possession": "56%"
+            }
+          }
+        }
+      },
+      "fulltime": {
+        "capturedAt": "2026-09-08T01:47:13.303Z",
+        "elapsed": 90,
+        "status": "FT",
+        "statistics": {
+          "130": {
+            "team": {
+              "id": 130,
+              "name": "Gremio",
+              "logo": "https://media.api-sports.io/football/teams/130.png"
+            },
+            "values": {
+              "Passes accurate": 400,
+              "Shots insidebox": 4,
+              "Shots outsidebox": 7,
+              "Blocked Shots": 2,
+              "Free Kicks": 12,
+              "Shots on Goal": 5,
+              "Goalkeeper Saves": 5,
+              "Shots off Goal": 4,
+              "Offsides": 1,
+              "Total passes": 480,
+              "Total Shots": 11,
+              "Yellow Cards": 5,
+              "Corner Kicks": 1,
+              "Fouls": 19,
+              "Red Cards": 0,
+              "Ball Possession": "54%"
+            }
+          },
+          "136": {
+            "team": {
+              "id": 136,
+              "name": "Vitoria",
+              "logo": "https://media.api-sports.io/football/teams/136.png"
+            },
+            "values": {
+              "Passes accurate": 322,
+              "Shots insidebox": 10,
+              "Shots outsidebox": 10,
+              "Blocked Shots": 4,
+              "Free Kicks": 18,
+              "Shots on Goal": 6,
+              "Goalkeeper Saves": 5,
+              "Shots off Goal": 10,
+              "Offsides": 1,
+              "Total passes": 394,
+              "Total Shots": 20,
+              "Yellow Cards": 2,
+              "Corner Kicks": 6,
+              "Fouls": 13,
+              "Red Cards": 0,
+              "Ball Possession": "46%"
+            }
+          }
+        }
+      },
+      "secondHalf": {
+        "capturedAt": "2026-09-08T01:47:13.303Z",
+        "status": "FT",
+        "statistics": {
+          "130": {
+            "team": {
+              "id": 130,
+              "name": "Gremio",
+              "logo": "https://media.api-sports.io/football/teams/130.png"
+            },
+            "values": {
+              "Passes accurate": 233,
+              "Shots insidebox": 2,
+              "Shots outsidebox": 4,
+              "Blocked Shots": 2,
+              "Shots on Goal": 1,
+              "Goalkeeper Saves": 2,
+              "Shots off Goal": 3,
+              "Offsides": 0,
+              "Total passes": 273,
+              "Total Shots": 6,
+              "Yellow Cards": 3,
+              "Corner Kicks": 1,
+              "Fouls": 10,
+              "Red Cards": 0
+            }
+          },
+          "136": {
+            "team": {
+              "id": 136,
+              "name": "Vitoria",
+              "logo": "https://media.api-sports.io/football/teams/136.png"
+            },
+            "values": {
+              "Passes accurate": 100,
+              "Shots insidebox": 5,
+              "Shots outsidebox": 5,
+              "Blocked Shots": 2,
+              "Shots on Goal": 3,
+              "Goalkeeper Saves": 1,
+              "Shots off Goal": 5,
+              "Offsides": 0,
+              "Total passes": 137,
+              "Total Shots": 10,
+              "Yellow Cards": 2,
+              "Corner Kicks": 1,
+              "Fouls": 8,
+              "Red Cards": 0
+            }
+          }
+        }
+      }
+    },
+    "1492370": {
+      "fixture": {
+        "id": 1492370,
+        "date": "2026-09-12T16:00:00-03:00",
+        "league": {
+          "id": 71,
+          "name": "Serie A",
+          "country": "Brazil",
+          "logo": "https://media.api-sports.io/football/leagues/71.png",
+          "flag": "https://media.api-sports.io/flags/br.svg",
+          "season": 2026,
+          "round": "Regular Season - 27",
+          "standings": true
+        },
+        "teams": {
+          "home": {
+            "id": 1062,
+            "name": "Atletico-MG",
+            "logo": "https://media.api-sports.io/football/teams/1062.png",
+            "winner": true
+          },
+          "away": {
+            "id": 124,
+            "name": "Fluminense",
+            "logo": "https://media.api-sports.io/football/teams/124.png",
+            "winner": false
+          }
+        },
+        "status": "FT"
+      },
+      "fulltime": {
+        "capturedAt": "2026-09-12T21:29:29.631Z",
+        "elapsed": 90,
+        "status": "FT",
+        "statistics": {
+          "124": {
+            "team": {
+              "id": 124,
+              "name": "Fluminense",
+              "logo": "https://media.api-sports.io/football/teams/124.png"
+            },
+            "values": {
+              "Passes accurate": 470,
+              "Shots insidebox": 5,
+              "Shots outsidebox": 5,
+              "Blocked Shots": 1,
+              "Free Kicks": 8,
+              "Shots on Goal": 3,
+              "Goalkeeper Saves": 5,
+              "Shots off Goal": 6,
+              "Offsides": 0,
+              "Total passes": 535,
+              "Total Shots": 10,
+              "Yellow Cards": 2,
+              "Corner Kicks": 2,
+              "Fouls": 11,
+              "Red Cards": 0,
+              "Ball Possession": "52%"
+            }
+          },
+          "1062": {
+            "team": {
+              "id": 1062,
+              "name": "Atletico-MG",
+              "logo": "https://media.api-sports.io/football/teams/1062.png"
+            },
+            "values": {
+              "Passes accurate": 433,
+              "Shots insidebox": 6,
+              "Shots outsidebox": 9,
+              "Blocked Shots": 5,
+              "Free Kicks": 10,
+              "Shots on Goal": 7,
+              "Goalkeeper Saves": 2,
+              "Shots off Goal": 3,
+              "Offsides": 2,
+              "Total passes": 495,
+              "Total Shots": 15,
+              "Yellow Cards": 1,
+              "Corner Kicks": 5,
+              "Fouls": 8,
+              "Red Cards": 0,
+              "Ball Possession": "48%"
+            }
+          }
+        }
+      }
+    },
+    "1492373": {
+      "fixture": {
+        "id": 1492373,
+        "date": "2026-09-12T17:00:00-03:00",
+        "league": {
+          "id": 71,
+          "name": "Serie A",
+          "country": "Brazil",
+          "logo": "https://media.api-sports.io/football/leagues/71.png",
+          "flag": "https://media.api-sports.io/flags/br.svg",
+          "season": 2026,
+          "round": "Regular Season - 27",
+          "standings": true
+        },
+        "teams": {
+          "home": {
+            "id": 132,
+            "name": "Chapecoense-sc",
+            "logo": "https://media.api-sports.io/football/teams/132.png",
+            "winner": false
+          },
+          "away": {
+            "id": 119,
+            "name": "Internacional",
+            "logo": "https://media.api-sports.io/football/teams/119.png",
+            "winner": true
+          }
+        },
+        "status": "FT"
+      },
+      "fulltime": {
+        "capturedAt": "2026-09-12T22:03:47.297Z",
+        "elapsed": 90,
+        "status": "FT",
+        "statistics": {
+          "119": {
+            "team": {
+              "id": 119,
+              "name": "Internacional",
+              "logo": "https://media.api-sports.io/football/teams/119.png"
+            },
+            "values": {
+              "Passes accurate": 220,
+              "Shots insidebox": 3,
+              "Shots outsidebox": 1,
+              "Blocked Shots": 2,
+              "Free Kicks": 19,
+              "Shots on Goal": 2,
+              "Shots off Goal": 0,
+              "Offsides": 2,
+              "Total passes": 299,
+              "Total Shots": 4,
+              "Yellow Cards": 3,
+              "Corner Kicks": 2,
+              "Goalkeeper Saves": 1,
+              "Fouls": 11,
+              "Red Cards": 0,
+              "Ball Possession": "37%"
+            }
+          },
+          "132": {
+            "team": {
+              "id": 132,
+              "name": "Chapecoense-sc",
+              "logo": "https://media.api-sports.io/football/teams/132.png"
+            },
+            "values": {
+              "Passes accurate": 442,
+              "Shots insidebox": 11,
+              "Shots outsidebox": 2,
+              "Blocked Shots": 3,
+              "Free Kicks": 10,
+              "Shots on Goal": 2,
+              "Shots off Goal": 8,
+              "Offsides": 2,
+              "Total passes": 511,
+              "Total Shots": 13,
+              "Yellow Cards": 4,
+              "Corner Kicks": 4,
+              "Goalkeeper Saves": 0,
+              "Fouls": 19,
+              "Red Cards": 0,
+              "Ball Possession": "63%"
+            }
+          }
+        }
+      }
+    },
+    "1492376": {
+      "fixture": {
+        "id": 1492376,
+        "date": "2026-09-12T16:00:00-03:00",
+        "league": {
+          "id": 71,
+          "name": "Serie A",
+          "country": "Brazil",
+          "logo": "https://media.api-sports.io/football/leagues/71.png",
+          "flag": "https://media.api-sports.io/flags/br.svg",
+          "season": 2026,
+          "round": "Regular Season - 27",
+          "standings": true
+        },
+        "teams": {
+          "home": {
+            "id": 130,
+            "name": "Gremio",
+            "logo": "https://media.api-sports.io/football/teams/130.png",
+            "winner": false
+          },
+          "away": {
+            "id": 133,
+            "name": "Vasco DA Gama",
+            "logo": "https://media.api-sports.io/football/teams/133.png",
+            "winner": true
+          }
+        },
+        "status": "FT"
+      },
+      "fulltime": {
+        "capturedAt": "2026-09-12T21:29:30.302Z",
+        "elapsed": 90,
+        "status": "FT",
+        "statistics": {
+          "130": {
+            "team": {
+              "id": 130,
+              "name": "Gremio",
+              "logo": "https://media.api-sports.io/football/teams/130.png"
+            },
+            "values": {
+              "Passes accurate": 396,
+              "Shots insidebox": 7,
+              "Shots outsidebox": 7,
+              "Blocked Shots": 4,
+              "Free Kicks": 14,
+              "Shots on Goal": 4,
+              "Goalkeeper Saves": 3,
+              "Shots off Goal": 6,
+              "Total passes": 484,
+              "Total Shots": 14,
+              "Yellow Cards": 3,
+              "Corner Kicks": 3,
+              "Offsides": 0,
+              "Fouls": 10,
+              "Red Cards": 0,
+              "Ball Possession": "51%"
+            }
+          },
+          "133": {
+            "team": {
+              "id": 133,
+              "name": "Vasco DA Gama",
+              "logo": "https://media.api-sports.io/football/teams/133.png"
+            },
+            "values": {
+              "Passes accurate": 387,
+              "Shots insidebox": 12,
+              "Shots outsidebox": 5,
+              "Blocked Shots": 7,
+              "Free Kicks": 10,
+              "Shots on Goal": 5,
+              "Goalkeeper Saves": 3,
+              "Shots off Goal": 5,
+              "Total passes": 463,
+              "Total Shots": 17,
+              "Yellow Cards": 3,
+              "Corner Kicks": 5,
+              "Offsides": 1,
+              "Fouls": 14,
+              "Red Cards": 0,
+              "Ball Possession": "49%"
+            }
+          }
+        }
+      }
+    },
     "1520810": {
       "fixture": {
         "id": 1520810,
@@ -3699,6 +4512,94 @@
               "Passes %": "83%",
               "expected_goals": "0.59",
               "goals_prevented": "0.52"
+            }
+          }
+        }
+      }
+    },
+    "1520856": {
+      "fixture": {
+        "id": 1520856,
+        "date": "2026-09-06T11:00:00-03:00",
+        "league": {
+          "id": 72,
+          "name": "Serie B",
+          "country": "Brazil",
+          "logo": "https://media.api-sports.io/football/leagues/72.png",
+          "flag": "https://media.api-sports.io/flags/br.svg",
+          "season": 2026,
+          "round": "Regular Season - 26",
+          "standings": true
+        },
+        "teams": {
+          "home": {
+            "id": 148,
+            "name": "Londrina",
+            "logo": "https://media.api-sports.io/football/teams/148.png",
+            "winner": false
+          },
+          "away": {
+            "id": 1223,
+            "name": "Operario-PR",
+            "logo": "https://media.api-sports.io/football/teams/1223.png",
+            "winner": true
+          }
+        },
+        "status": "FT"
+      },
+      "fulltime": {
+        "capturedAt": "2026-09-06T22:48:27.586Z",
+        "elapsed": 90,
+        "status": "FT",
+        "statistics": {
+          "148": {
+            "team": {
+              "id": 148,
+              "name": "Londrina",
+              "logo": "https://media.api-sports.io/football/teams/148.png"
+            },
+            "values": {
+              "Passes accurate": 364,
+              "Shots insidebox": 13,
+              "Shots outsidebox": 8,
+              "Blocked Shots": 6,
+              "Free Kicks": 22,
+              "Shots on Goal": 5,
+              "Goalkeeper Saves": 2,
+              "Shots off Goal": 10,
+              "Offsides": 1,
+              "Total passes": 427,
+              "Total Shots": 21,
+              "Yellow Cards": 5,
+              "Corner Kicks": 7,
+              "Fouls": 17,
+              "Red Cards": 0,
+              "Ball Possession": "58%"
+            }
+          },
+          "1223": {
+            "team": {
+              "id": 1223,
+              "name": "Operario-PR",
+              "logo": "https://media.api-sports.io/football/teams/1223.png"
+            },
+            "values": {
+              "Passes accurate": 243,
+              "Shots insidebox": 9,
+              "Shots outsidebox": 8,
+              "Blocked Shots": 6,
+              "Free Kicks": 17,
+              "Shots on Goal": 4,
+              "Goalkeeper Saves": 4,
+              "Shots off Goal": 7,
+              "Offsides": 0,
+              "Total passes": 317,
+              "Total Shots": 17,
+              "Yellow Cards": 7,
+              "Corner Kicks": 3,
+              "Fouls": 24,
+              "Red Cards": 0,
+              "Ball Possession": "42%"
             }
           }
         }
@@ -6018,6 +6919,810 @@
         }
       }
     },
+    "1550108": {
+      "fixture": {
+        "id": 1550108,
+        "date": "2026-09-06T13:00:00-03:00",
+        "league": {
+          "id": 135,
+          "name": "Serie A",
+          "country": "Italy",
+          "logo": "https://media.api-sports.io/football/leagues/135.png",
+          "flag": "https://media.api-sports.io/flags/it.svg",
+          "season": 2026,
+          "round": "Regular Season - 3",
+          "standings": true
+        },
+        "teams": {
+          "home": {
+            "id": 500,
+            "name": "Bologna",
+            "logo": "https://media.api-sports.io/football/teams/500.png",
+            "winner": null
+          },
+          "away": {
+            "id": 488,
+            "name": "Sassuolo",
+            "logo": "https://media.api-sports.io/football/teams/488.png",
+            "winner": null
+          }
+        },
+        "status": "FT"
+      },
+      "fulltime": {
+        "capturedAt": "2026-09-06T22:48:32.818Z",
+        "elapsed": 90,
+        "status": "FT",
+        "statistics": {
+          "488": {
+            "team": {
+              "id": 488,
+              "name": "Sassuolo",
+              "logo": "https://media.api-sports.io/football/teams/488.png"
+            },
+            "values": {
+              "Passes accurate": 305,
+              "Shots insidebox": 9,
+              "Shots outsidebox": 6,
+              "Blocked Shots": 8,
+              "Free Kicks": 14,
+              "Shots on Goal": 6,
+              "Goalkeeper Saves": 3,
+              "Shots off Goal": 1,
+              "Total passes": 356,
+              "Total Shots": 15,
+              "Yellow Cards": 1,
+              "Corner Kicks": 7,
+              "Offsides": 2,
+              "Fouls": 8,
+              "Red Cards": 0,
+              "Ball Possession": "38%"
+            }
+          },
+          "500": {
+            "team": {
+              "id": 500,
+              "name": "Bologna",
+              "logo": "https://media.api-sports.io/football/teams/500.png"
+            },
+            "values": {
+              "Passes accurate": 519,
+              "Shots insidebox": 14,
+              "Shots outsidebox": 7,
+              "Blocked Shots": 9,
+              "Free Kicks": 8,
+              "Shots on Goal": 5,
+              "Goalkeeper Saves": 4,
+              "Shots off Goal": 7,
+              "Total passes": 555,
+              "Total Shots": 21,
+              "Yellow Cards": 3,
+              "Corner Kicks": 10,
+              "Offsides": 0,
+              "Fouls": 14,
+              "Red Cards": 0,
+              "Ball Possession": "62%"
+            }
+          }
+        }
+      }
+    },
+    "1550109": {
+      "fixture": {
+        "id": 1550109,
+        "date": "2026-09-07T13:30:00-03:00",
+        "league": {
+          "id": 135,
+          "name": "Serie A",
+          "country": "Italy",
+          "logo": "https://media.api-sports.io/football/leagues/135.png",
+          "flag": "https://media.api-sports.io/flags/it.svg",
+          "season": 2026,
+          "round": "Regular Season - 3",
+          "standings": true
+        },
+        "teams": {
+          "home": {
+            "id": 490,
+            "name": "Cagliari",
+            "logo": "https://media.api-sports.io/football/teams/490.png",
+            "winner": true
+          },
+          "away": {
+            "id": 867,
+            "name": "Lecce",
+            "logo": "https://media.api-sports.io/football/teams/867.png",
+            "winner": false
+          }
+        },
+        "status": "FT"
+      },
+      "fulltime": {
+        "capturedAt": "2026-09-08T00:08:08.466Z",
+        "elapsed": 90,
+        "status": "FT",
+        "statistics": {
+          "490": {
+            "team": {
+              "id": 490,
+              "name": "Cagliari",
+              "logo": "https://media.api-sports.io/football/teams/490.png"
+            },
+            "values": {
+              "Passes accurate": 304,
+              "Shots insidebox": 11,
+              "Shots outsidebox": 9,
+              "Blocked Shots": 4,
+              "Free Kicks": 13,
+              "Shots on Goal": 9,
+              "Goalkeeper Saves": 3,
+              "Shots off Goal": 7,
+              "Offsides": 5,
+              "Total passes": 370,
+              "Total Shots": 20,
+              "Yellow Cards": 1,
+              "Corner Kicks": 7,
+              "Fouls": 9,
+              "Red Cards": 0,
+              "Ball Possession": "42%"
+            }
+          },
+          "867": {
+            "team": {
+              "id": 867,
+              "name": "Lecce",
+              "logo": "https://media.api-sports.io/football/teams/867.png"
+            },
+            "values": {
+              "Passes accurate": 425,
+              "Shots insidebox": 4,
+              "Shots outsidebox": 6,
+              "Blocked Shots": 3,
+              "Free Kicks": 8,
+              "Shots on Goal": 3,
+              "Goalkeeper Saves": 8,
+              "Shots off Goal": 4,
+              "Offsides": 1,
+              "Total passes": 516,
+              "Total Shots": 10,
+              "Yellow Cards": 3,
+              "Corner Kicks": 5,
+              "Fouls": 13,
+              "Red Cards": 0,
+              "Ball Possession": "58%"
+            }
+          }
+        }
+      }
+    },
+    "1550111": {
+      "fixture": {
+        "id": 1550111,
+        "date": "2026-09-06T10:00:00-03:00",
+        "league": {
+          "id": 135,
+          "name": "Serie A",
+          "country": "Italy",
+          "logo": "https://media.api-sports.io/football/leagues/135.png",
+          "flag": "https://media.api-sports.io/flags/it.svg",
+          "season": 2026,
+          "round": "Regular Season - 3",
+          "standings": true
+        },
+        "teams": {
+          "home": {
+            "id": 512,
+            "name": "Frosinone",
+            "logo": "https://media.api-sports.io/football/teams/512.png",
+            "winner": true
+          },
+          "away": {
+            "id": 517,
+            "name": "Venezia",
+            "logo": "https://media.api-sports.io/football/teams/517.png",
+            "winner": false
+          }
+        },
+        "status": "FT"
+      },
+      "fulltime": {
+        "capturedAt": "2026-09-06T22:48:23.587Z",
+        "elapsed": 90,
+        "status": "FT",
+        "statistics": {
+          "512": {
+            "team": {
+              "id": 512,
+              "name": "Frosinone",
+              "logo": "https://media.api-sports.io/football/teams/512.png"
+            },
+            "values": {
+              "Passes accurate": 161,
+              "Shots insidebox": 9,
+              "Shots outsidebox": 4,
+              "Blocked Shots": 3,
+              "Free Kicks": 14,
+              "Shots on Goal": 8,
+              "Goalkeeper Saves": 2,
+              "Shots off Goal": 2,
+              "Offsides": 6,
+              "Total passes": 247,
+              "Total Shots": 13,
+              "Yellow Cards": 2,
+              "Corner Kicks": 5,
+              "Fouls": 18,
+              "Red Cards": 0,
+              "Ball Possession": "39%"
+            }
+          },
+          "517": {
+            "team": {
+              "id": 517,
+              "name": "Venezia",
+              "logo": "https://media.api-sports.io/football/teams/517.png"
+            },
+            "values": {
+              "Passes accurate": 298,
+              "Shots insidebox": 8,
+              "Shots outsidebox": 7,
+              "Blocked Shots": 5,
+              "Free Kicks": 14,
+              "Shots on Goal": 4,
+              "Goalkeeper Saves": 5,
+              "Shots off Goal": 6,
+              "Offsides": 1,
+              "Total passes": 387,
+              "Total Shots": 15,
+              "Yellow Cards": 4,
+              "Corner Kicks": 2,
+              "Fouls": 14,
+              "Red Cards": 0,
+              "Ball Possession": "61%"
+            }
+          }
+        }
+      }
+    },
+    "1550114": {
+      "fixture": {
+        "id": 1550114,
+        "date": "2026-09-06T15:45:00-03:00",
+        "league": {
+          "id": 135,
+          "name": "Serie A",
+          "country": "Italy",
+          "logo": "https://media.api-sports.io/football/leagues/135.png",
+          "flag": "https://media.api-sports.io/flags/it.svg",
+          "season": 2026,
+          "round": "Regular Season - 3",
+          "standings": true
+        },
+        "teams": {
+          "home": {
+            "id": 496,
+            "name": "Juventus",
+            "logo": "https://media.api-sports.io/football/teams/496.png",
+            "winner": null
+          },
+          "away": {
+            "id": 489,
+            "name": "AC Milan",
+            "logo": "https://media.api-sports.io/football/teams/489.png",
+            "winner": null
+          }
+        },
+        "status": "FT"
+      },
+      "fulltime": {
+        "capturedAt": "2026-09-06T22:48:35.212Z",
+        "elapsed": 90,
+        "status": "FT",
+        "statistics": {
+          "489": {
+            "team": {
+              "id": 489,
+              "name": "AC Milan",
+              "logo": "https://media.api-sports.io/football/teams/489.png"
+            },
+            "values": {
+              "Passes accurate": 413,
+              "Shots insidebox": 1,
+              "Shots outsidebox": 2,
+              "Blocked Shots": 1,
+              "Free Kicks": 9,
+              "Shots on Goal": 1,
+              "Shots off Goal": 1,
+              "Offsides": 1,
+              "Total passes": 480,
+              "Total Shots": 3,
+              "Yellow Cards": 3,
+              "Corner Kicks": 1,
+              "Goalkeeper Saves": 4,
+              "Fouls": 11,
+              "Red Cards": 0,
+              "Ball Possession": "51%"
+            }
+          },
+          "496": {
+            "team": {
+              "id": 496,
+              "name": "Juventus",
+              "logo": "https://media.api-sports.io/football/teams/496.png"
+            },
+            "values": {
+              "Passes accurate": 379,
+              "Shots insidebox": 6,
+              "Shots outsidebox": 8,
+              "Blocked Shots": 3,
+              "Free Kicks": 10,
+              "Shots on Goal": 5,
+              "Shots off Goal": 6,
+              "Offsides": 5,
+              "Total passes": 452,
+              "Total Shots": 14,
+              "Yellow Cards": 1,
+              "Corner Kicks": 7,
+              "Goalkeeper Saves": 0,
+              "Fouls": 10,
+              "Red Cards": 0,
+              "Ball Possession": "49%"
+            }
+          }
+        }
+      }
+    },
+    "1550115": {
+      "fixture": {
+        "id": 1550115,
+        "date": "2026-09-06T10:00:00-03:00",
+        "league": {
+          "id": 135,
+          "name": "Serie A",
+          "country": "Italy",
+          "logo": "https://media.api-sports.io/football/leagues/135.png",
+          "flag": "https://media.api-sports.io/flags/it.svg",
+          "season": 2026,
+          "round": "Regular Season - 3",
+          "standings": true
+        },
+        "teams": {
+          "home": {
+            "id": 523,
+            "name": "Parma",
+            "logo": "https://media.api-sports.io/football/teams/523.png",
+            "winner": null
+          },
+          "away": {
+            "id": 1579,
+            "name": "Monza",
+            "logo": "https://media.api-sports.io/football/teams/1579.png",
+            "winner": null
+          }
+        },
+        "status": "FT"
+      },
+      "fulltime": {
+        "capturedAt": "2026-09-06T22:48:24.245Z",
+        "elapsed": 90,
+        "status": "FT",
+        "statistics": {
+          "523": {
+            "team": {
+              "id": 523,
+              "name": "Parma",
+              "logo": "https://media.api-sports.io/football/teams/523.png"
+            },
+            "values": {
+              "Passes accurate": 269,
+              "Shots insidebox": 7,
+              "Blocked Shots": 2,
+              "Free Kicks": 16,
+              "Shots on Goal": 3,
+              "Goalkeeper Saves": 4,
+              "Shots off Goal": 2,
+              "Total passes": 347,
+              "Total Shots": 7,
+              "Yellow Cards": 2,
+              "Corner Kicks": 6,
+              "Shots outsidebox": 0,
+              "Offsides": 0,
+              "Fouls": 16,
+              "Red Cards": 0,
+              "Ball Possession": "46%"
+            }
+          },
+          "1579": {
+            "team": {
+              "id": 1579,
+              "name": "Monza",
+              "logo": "https://media.api-sports.io/football/teams/1579.png"
+            },
+            "values": {
+              "Passes accurate": 346,
+              "Shots insidebox": 13,
+              "Blocked Shots": 2,
+              "Free Kicks": 16,
+              "Shots on Goal": 5,
+              "Goalkeeper Saves": 2,
+              "Shots off Goal": 9,
+              "Total passes": 410,
+              "Total Shots": 16,
+              "Yellow Cards": 2,
+              "Corner Kicks": 3,
+              "Shots outsidebox": 3,
+              "Offsides": 4,
+              "Fouls": 16,
+              "Red Cards": 0,
+              "Ball Possession": "54%"
+            }
+          }
+        }
+      }
+    },
+    "1550116": {
+      "fixture": {
+        "id": 1550116,
+        "date": "2026-09-07T15:45:00-03:00",
+        "league": {
+          "id": 135,
+          "name": "Serie A",
+          "country": "Italy",
+          "logo": "https://media.api-sports.io/football/leagues/135.png",
+          "flag": "https://media.api-sports.io/flags/it.svg",
+          "season": 2026,
+          "round": "Regular Season - 3",
+          "standings": true
+        },
+        "teams": {
+          "home": {
+            "id": 494,
+            "name": "Udinese",
+            "logo": "https://media.api-sports.io/football/teams/494.png",
+            "winner": false
+          },
+          "away": {
+            "id": 487,
+            "name": "Lazio",
+            "logo": "https://media.api-sports.io/football/teams/487.png",
+            "winner": true
+          }
+        },
+        "status": "FT"
+      },
+      "fulltime": {
+        "capturedAt": "2026-09-08T00:08:09.772Z",
+        "elapsed": 90,
+        "status": "FT",
+        "statistics": {
+          "487": {
+            "team": {
+              "id": 487,
+              "name": "Lazio",
+              "logo": "https://media.api-sports.io/football/teams/487.png"
+            },
+            "values": {
+              "Passes accurate": 479,
+              "Shots insidebox": 10,
+              "Shots outsidebox": 9,
+              "Blocked Shots": 6,
+              "Free Kicks": 12,
+              "Shots on Goal": 6,
+              "Goalkeeper Saves": 5,
+              "Shots off Goal": 7,
+              "Offsides": 1,
+              "Total passes": 542,
+              "Total Shots": 19,
+              "Yellow Cards": 1,
+              "Corner Kicks": 8,
+              "Fouls": 9,
+              "Red Cards": 0,
+              "Ball Possession": "60%"
+            }
+          },
+          "494": {
+            "team": {
+              "id": 494,
+              "name": "Udinese",
+              "logo": "https://media.api-sports.io/football/teams/494.png"
+            },
+            "values": {
+              "Passes accurate": 292,
+              "Shots insidebox": 6,
+              "Shots outsidebox": 4,
+              "Blocked Shots": 3,
+              "Free Kicks": 9,
+              "Shots on Goal": 6,
+              "Goalkeeper Saves": 4,
+              "Shots off Goal": 1,
+              "Offsides": 1,
+              "Total passes": 359,
+              "Total Shots": 10,
+              "Yellow Cards": 5,
+              "Corner Kicks": 2,
+              "Fouls": 13,
+              "Red Cards": 0,
+              "Ball Possession": "40%"
+            }
+          }
+        }
+      }
+    },
+    "1550117": {
+      "fixture": {
+        "id": 1550117,
+        "date": "2026-09-12T15:45:00-03:00",
+        "league": {
+          "id": 135,
+          "name": "Serie A",
+          "country": "Italy",
+          "logo": "https://media.api-sports.io/football/leagues/135.png",
+          "flag": "https://media.api-sports.io/flags/it.svg",
+          "season": 2026,
+          "round": "Regular Season - 4",
+          "standings": true
+        },
+        "teams": {
+          "home": {
+            "id": 499,
+            "name": "Atalanta",
+            "logo": "https://media.api-sports.io/football/teams/499.png",
+            "winner": false
+          },
+          "away": {
+            "id": 490,
+            "name": "Cagliari",
+            "logo": "https://media.api-sports.io/football/teams/490.png",
+            "winner": true
+          }
+        },
+        "status": "FT"
+      },
+      "fulltime": {
+        "capturedAt": "2026-09-12T21:29:26.360Z",
+        "elapsed": 90,
+        "status": "FT",
+        "statistics": {
+          "490": {
+            "team": {
+              "id": 490,
+              "name": "Cagliari",
+              "logo": "https://media.api-sports.io/football/teams/490.png"
+            },
+            "values": {
+              "Shots on Goal": 5,
+              "Shots off Goal": 0,
+              "Total Shots": 5,
+              "Blocked Shots": 0,
+              "Shots insidebox": 3,
+              "Shots outsidebox": 2,
+              "Fouls": 8,
+              "Corner Kicks": 2,
+              "Offsides": 2,
+              "Ball Possession": "39%",
+              "Yellow Cards": null,
+              "Red Cards": null,
+              "Goalkeeper Saves": 3,
+              "Total passes": 439,
+              "Passes accurate": 375,
+              "Passes %": "85%",
+              "expected_goals": "1.10",
+              "goals_prevented": "0.59"
+            }
+          },
+          "499": {
+            "team": {
+              "id": 499,
+              "name": "Atalanta",
+              "logo": "https://media.api-sports.io/football/teams/499.png"
+            },
+            "values": {
+              "Shots on Goal": 4,
+              "Shots off Goal": 10,
+              "Total Shots": 22,
+              "Blocked Shots": 8,
+              "Shots insidebox": 13,
+              "Shots outsidebox": 9,
+              "Fouls": 9,
+              "Corner Kicks": 3,
+              "Offsides": 1,
+              "Ball Possession": "61%",
+              "Yellow Cards": null,
+              "Red Cards": null,
+              "Goalkeeper Saves": 3,
+              "Total passes": 690,
+              "Passes accurate": 631,
+              "Passes %": "91%",
+              "expected_goals": "1.22",
+              "goals_prevented": "0.59"
+            }
+          }
+        }
+      }
+    },
+    "1550119": {
+      "fixture": {
+        "id": 1550119,
+        "date": "2026-09-12T10:00:00-03:00",
+        "league": {
+          "id": 135,
+          "name": "Serie A",
+          "country": "Italy",
+          "logo": "https://media.api-sports.io/football/leagues/135.png",
+          "flag": "https://media.api-sports.io/flags/it.svg",
+          "season": 2026,
+          "round": "Regular Season - 4",
+          "standings": true
+        },
+        "teams": {
+          "home": {
+            "id": 495,
+            "name": "Genoa",
+            "logo": "https://media.api-sports.io/football/teams/495.png",
+            "winner": null
+          },
+          "away": {
+            "id": 512,
+            "name": "Frosinone",
+            "logo": "https://media.api-sports.io/football/teams/512.png",
+            "winner": null
+          }
+        },
+        "status": "FT"
+      },
+      "fulltime": {
+        "capturedAt": "2026-09-12T18:52:16.633Z",
+        "elapsed": 90,
+        "status": "FT",
+        "statistics": {
+          "495": {
+            "team": {
+              "id": 495,
+              "name": "Genoa",
+              "logo": "https://media.api-sports.io/football/teams/495.png"
+            },
+            "values": {
+              "Shots on Goal": 5,
+              "Shots off Goal": 6,
+              "Total Shots": 17,
+              "Blocked Shots": 6,
+              "Shots insidebox": 12,
+              "Shots outsidebox": 5,
+              "Fouls": 12,
+              "Corner Kicks": 8,
+              "Offsides": 2,
+              "Ball Possession": "44%",
+              "Yellow Cards": 3,
+              "Red Cards": 1,
+              "Goalkeeper Saves": 5,
+              "Total passes": 275,
+              "Passes accurate": 176,
+              "Passes %": "64%",
+              "expected_goals": "1.86",
+              "goals_prevented": "-0.12"
+            }
+          },
+          "512": {
+            "team": {
+              "id": 512,
+              "name": "Frosinone",
+              "logo": "https://media.api-sports.io/football/teams/512.png"
+            },
+            "values": {
+              "Shots on Goal": 6,
+              "Shots off Goal": 8,
+              "Total Shots": 27,
+              "Blocked Shots": 13,
+              "Shots insidebox": 16,
+              "Shots outsidebox": 11,
+              "Fouls": 12,
+              "Corner Kicks": 9,
+              "Offsides": 3,
+              "Ball Possession": "56%",
+              "Yellow Cards": 2,
+              "Red Cards": 0,
+              "Goalkeeper Saves": 4,
+              "Total passes": 355,
+              "Passes accurate": 277,
+              "Passes %": "78%",
+              "expected_goals": "2.03",
+              "goals_prevented": "-0.12"
+            }
+          }
+        }
+      }
+    },
+    "1550121": {
+      "fixture": {
+        "id": 1550121,
+        "date": "2026-09-12T13:00:00-03:00",
+        "league": {
+          "id": 135,
+          "name": "Serie A",
+          "country": "Italy",
+          "logo": "https://media.api-sports.io/football/leagues/135.png",
+          "flag": "https://media.api-sports.io/flags/it.svg",
+          "season": 2026,
+          "round": "Regular Season - 4",
+          "standings": true
+        },
+        "teams": {
+          "home": {
+            "id": 487,
+            "name": "Lazio",
+            "logo": "https://media.api-sports.io/football/teams/487.png",
+            "winner": null
+          },
+          "away": {
+            "id": 489,
+            "name": "AC Milan",
+            "logo": "https://media.api-sports.io/football/teams/489.png",
+            "winner": null
+          }
+        },
+        "status": "FT"
+      },
+      "fulltime": {
+        "capturedAt": "2026-09-12T18:52:25.607Z",
+        "elapsed": 90,
+        "status": "FT",
+        "statistics": {
+          "487": {
+            "team": {
+              "id": 487,
+              "name": "Lazio",
+              "logo": "https://media.api-sports.io/football/teams/487.png"
+            },
+            "values": {
+              "Shots on Goal": 6,
+              "Shots off Goal": 2,
+              "Total Shots": 8,
+              "Blocked Shots": 0,
+              "Shots insidebox": 7,
+              "Shots outsidebox": 1,
+              "Fouls": 15,
+              "Corner Kicks": 2,
+              "Offsides": 2,
+              "Ball Possession": "34%",
+              "Yellow Cards": 2,
+              "Red Cards": null,
+              "Goalkeeper Saves": 5,
+              "Total passes": 317,
+              "Passes accurate": 261,
+              "Passes %": "82%",
+              "expected_goals": "2.05",
+              "goals_prevented": "0.72"
+            }
+          },
+          "489": {
+            "team": {
+              "id": 489,
+              "name": "AC Milan",
+              "logo": "https://media.api-sports.io/football/teams/489.png"
+            },
+            "values": {
+              "Shots on Goal": 7,
+              "Shots off Goal": 5,
+              "Total Shots": 16,
+              "Blocked Shots": 4,
+              "Shots insidebox": 11,
+              "Shots outsidebox": 5,
+              "Fouls": 14,
+              "Corner Kicks": 5,
+              "Offsides": 1,
+              "Ball Possession": "66%",
+              "Yellow Cards": 3,
+              "Red Cards": null,
+              "Goalkeeper Saves": 4,
+              "Total passes": 629,
+              "Passes accurate": 571,
+              "Passes %": "91%",
+              "expected_goals": "1.09",
+              "goals_prevented": "0.72"
+            }
+          }
+        }
+      }
+    },
     "1552733": {
       "fixture": {
         "id": 1552733,
@@ -7471,6 +9176,710 @@
               "Passes %": "85%",
               "expected_goals": "2.89",
               "goals_prevented": "-0.06"
+            }
+          }
+        }
+      }
+    },
+    "1552747": {
+      "fixture": {
+        "id": 1552747,
+        "date": "2026-09-06T12:15:00-03:00",
+        "league": {
+          "id": 61,
+          "name": "Ligue 1",
+          "country": "France",
+          "logo": "https://media.api-sports.io/football/leagues/61.png",
+          "flag": "https://media.api-sports.io/flags/fr.svg",
+          "season": 2026,
+          "round": "Regular Season - 3",
+          "standings": true
+        },
+        "teams": {
+          "home": {
+            "id": 77,
+            "name": "Angers",
+            "logo": "https://media.api-sports.io/football/teams/77.png",
+            "winner": false
+          },
+          "away": {
+            "id": 94,
+            "name": "Rennes",
+            "logo": "https://media.api-sports.io/football/teams/94.png",
+            "winner": true
+          }
+        },
+        "status": "FT"
+      },
+      "fulltime": {
+        "capturedAt": "2026-09-06T22:48:30.787Z",
+        "elapsed": 90,
+        "status": "FT",
+        "statistics": {
+          "77": {
+            "team": {
+              "id": 77,
+              "name": "Angers",
+              "logo": "https://media.api-sports.io/football/teams/77.png"
+            },
+            "values": {
+              "Passes accurate": 327,
+              "Shots insidebox": 12,
+              "Shots outsidebox": 7,
+              "Blocked Shots": 11,
+              "Free Kicks": 14,
+              "Shots on Goal": 3,
+              "Goalkeeper Saves": 4,
+              "Shots off Goal": 5,
+              "Total passes": 399,
+              "Total Shots": 19,
+              "Yellow Cards": 1,
+              "Corner Kicks": 12,
+              "Offsides": 0,
+              "Fouls": 10,
+              "Red Cards": 0,
+              "Ball Possession": "44%"
+            }
+          },
+          "94": {
+            "team": {
+              "id": 94,
+              "name": "Rennes",
+              "logo": "https://media.api-sports.io/football/teams/94.png"
+            },
+            "values": {
+              "Passes accurate": 475,
+              "Shots insidebox": 15,
+              "Shots outsidebox": 2,
+              "Blocked Shots": 5,
+              "Free Kicks": 9,
+              "Shots on Goal": 5,
+              "Goalkeeper Saves": 2,
+              "Shots off Goal": 7,
+              "Total passes": 542,
+              "Total Shots": 17,
+              "Yellow Cards": 1,
+              "Corner Kicks": 6,
+              "Offsides": 2,
+              "Fouls": 15,
+              "Red Cards": 0,
+              "Ball Possession": "56%"
+            }
+          }
+        }
+      }
+    },
+    "1552751": {
+      "fixture": {
+        "id": 1552751,
+        "date": "2026-09-06T15:45:00-03:00",
+        "league": {
+          "id": 61,
+          "name": "Ligue 1",
+          "country": "France",
+          "logo": "https://media.api-sports.io/football/leagues/61.png",
+          "flag": "https://media.api-sports.io/flags/fr.svg",
+          "season": 2026,
+          "round": "Regular Season - 3",
+          "standings": true
+        },
+        "teams": {
+          "home": {
+            "id": 81,
+            "name": "Marseille",
+            "logo": "https://media.api-sports.io/football/teams/81.png",
+            "winner": false
+          },
+          "away": {
+            "id": 114,
+            "name": "Paris FC",
+            "logo": "https://media.api-sports.io/football/teams/114.png",
+            "winner": true
+          }
+        },
+        "status": "FT"
+      },
+      "fulltime": {
+        "capturedAt": "2026-09-06T22:48:35.476Z",
+        "elapsed": 90,
+        "status": "FT",
+        "statistics": {
+          "81": {
+            "team": {
+              "id": 81,
+              "name": "Marseille",
+              "logo": "https://media.api-sports.io/football/teams/81.png"
+            },
+            "values": {
+              "Passes accurate": 595,
+              "Shots insidebox": 10,
+              "Shots outsidebox": 4,
+              "Blocked Shots": 2,
+              "Free Kicks": 12,
+              "Shots on Goal": 5,
+              "Goalkeeper Saves": 4,
+              "Shots off Goal": 7,
+              "Offsides": 2,
+              "Total passes": 642,
+              "Total Shots": 14,
+              "Corner Kicks": 5,
+              "Yellow Cards": 0,
+              "Fouls": 10,
+              "Red Cards": 0,
+              "Ball Possession": "60%"
+            }
+          },
+          "114": {
+            "team": {
+              "id": 114,
+              "name": "Paris FC",
+              "logo": "https://media.api-sports.io/football/teams/114.png"
+            },
+            "values": {
+              "Passes accurate": 347,
+              "Shots insidebox": 12,
+              "Shots outsidebox": 6,
+              "Blocked Shots": 3,
+              "Free Kicks": 9,
+              "Shots on Goal": 7,
+              "Goalkeeper Saves": 3,
+              "Shots off Goal": 8,
+              "Offsides": 1,
+              "Total passes": 419,
+              "Total Shots": 18,
+              "Corner Kicks": 4,
+              "Yellow Cards": 2,
+              "Fouls": 12,
+              "Red Cards": 0,
+              "Ball Possession": "40%"
+            }
+          }
+        }
+      }
+    },
+    "1552755": {
+      "fixture": {
+        "id": 1552755,
+        "date": "2026-09-06T10:00:00-03:00",
+        "league": {
+          "id": 61,
+          "name": "Ligue 1",
+          "country": "France",
+          "logo": "https://media.api-sports.io/football/leagues/61.png",
+          "flag": "https://media.api-sports.io/flags/fr.svg",
+          "season": 2026,
+          "round": "Regular Season - 3",
+          "standings": true
+        },
+        "teams": {
+          "home": {
+            "id": 110,
+            "name": "Estac Troyes",
+            "logo": "https://media.api-sports.io/football/teams/110.png",
+            "winner": false
+          },
+          "away": {
+            "id": 95,
+            "name": "Strasbourg",
+            "logo": "https://media.api-sports.io/football/teams/95.png",
+            "winner": true
+          }
+        },
+        "status": "FT"
+      },
+      "fulltime": {
+        "capturedAt": "2026-09-06T22:48:24.890Z",
+        "elapsed": 90,
+        "status": "FT",
+        "statistics": {
+          "95": {
+            "team": {
+              "id": 95,
+              "name": "Strasbourg",
+              "logo": "https://media.api-sports.io/football/teams/95.png"
+            },
+            "values": {
+              "Passes accurate": 451,
+              "Shots insidebox": 16,
+              "Shots outsidebox": 3,
+              "Blocked Shots": 4,
+              "Free Kicks": 6,
+              "Shots on Goal": 12,
+              "Goalkeeper Saves": 4,
+              "Shots off Goal": 3,
+              "Offsides": 1,
+              "Total passes": 518,
+              "Total Shots": 19,
+              "Yellow Cards": 1,
+              "Corner Kicks": 0,
+              "Fouls": 16,
+              "Red Cards": 0,
+              "Ball Possession": "55%"
+            }
+          },
+          "110": {
+            "team": {
+              "id": 110,
+              "name": "Estac Troyes",
+              "logo": "https://media.api-sports.io/football/teams/110.png"
+            },
+            "values": {
+              "Passes accurate": 301,
+              "Shots insidebox": 19,
+              "Shots outsidebox": 8,
+              "Blocked Shots": 11,
+              "Free Kicks": 16,
+              "Shots on Goal": 6,
+              "Goalkeeper Saves": 6,
+              "Shots off Goal": 10,
+              "Offsides": 3,
+              "Total passes": 376,
+              "Total Shots": 27,
+              "Yellow Cards": 1,
+              "Corner Kicks": 11,
+              "Fouls": 6,
+              "Red Cards": 0,
+              "Ball Possession": "45%"
+            }
+          }
+        }
+      }
+    },
+    "1552756": {
+      "fixture": {
+        "id": 1552756,
+        "date": "2026-09-12T15:45:00-03:00",
+        "league": {
+          "id": 61,
+          "name": "Ligue 1",
+          "country": "France",
+          "logo": "https://media.api-sports.io/football/leagues/61.png",
+          "flag": "https://media.api-sports.io/flags/fr.svg",
+          "season": 2026,
+          "round": "Regular Season - 4",
+          "standings": true
+        },
+        "teams": {
+          "home": {
+            "id": 108,
+            "name": "Auxerre",
+            "logo": "https://media.api-sports.io/football/teams/108.png",
+            "winner": true
+          },
+          "away": {
+            "id": 84,
+            "name": "Nice",
+            "logo": "https://media.api-sports.io/football/teams/84.png",
+            "winner": false
+          }
+        },
+        "status": "FT"
+      },
+      "fulltime": {
+        "capturedAt": "2026-09-12T21:29:27.012Z",
+        "elapsed": 90,
+        "status": "FT",
+        "statistics": {
+          "84": {
+            "team": {
+              "id": 84,
+              "name": "Nice",
+              "logo": "https://media.api-sports.io/football/teams/84.png"
+            },
+            "values": {
+              "Passes accurate": 565,
+              "Shots insidebox": 7,
+              "Blocked Shots": 3,
+              "Free Kicks": 8,
+              "Shots on Goal": 4,
+              "Goalkeeper Saves": 4,
+              "Shots off Goal": 5,
+              "Total passes": 643,
+              "Total Shots": 12,
+              "Yellow Cards": 1,
+              "Corner Kicks": 8,
+              "Shots outsidebox": 5,
+              "Offsides": 3,
+              "Fouls": 7,
+              "Red Cards": 0,
+              "Ball Possession": "68%"
+            }
+          },
+          "108": {
+            "team": {
+              "id": 108,
+              "name": "Auxerre",
+              "logo": "https://media.api-sports.io/football/teams/108.png"
+            },
+            "values": {
+              "Passes accurate": 205,
+              "Shots insidebox": 11,
+              "Blocked Shots": 1,
+              "Free Kicks": 6,
+              "Shots on Goal": 7,
+              "Goalkeeper Saves": 4,
+              "Shots off Goal": 3,
+              "Total passes": 295,
+              "Total Shots": 11,
+              "Yellow Cards": 1,
+              "Corner Kicks": 3,
+              "Shots outsidebox": 0,
+              "Offsides": 0,
+              "Fouls": 8,
+              "Red Cards": 0,
+              "Ball Possession": "32%"
+            }
+          }
+        }
+      }
+    },
+    "1552758": {
+      "fixture": {
+        "id": 1552758,
+        "date": "2026-09-12T15:45:00-03:00",
+        "league": {
+          "id": 61,
+          "name": "Ligue 1",
+          "country": "France",
+          "logo": "https://media.api-sports.io/football/leagues/61.png",
+          "flag": "https://media.api-sports.io/flags/fr.svg",
+          "season": 2026,
+          "round": "Regular Season - 4",
+          "standings": true
+        },
+        "teams": {
+          "home": {
+            "id": 111,
+            "name": "Le Havre",
+            "logo": "https://media.api-sports.io/football/teams/111.png",
+            "winner": null
+          },
+          "away": {
+            "id": 77,
+            "name": "Angers",
+            "logo": "https://media.api-sports.io/football/teams/77.png",
+            "winner": null
+          }
+        },
+        "status": "FT"
+      },
+      "fulltime": {
+        "capturedAt": "2026-09-12T21:29:27.668Z",
+        "elapsed": 90,
+        "status": "FT",
+        "statistics": {
+          "77": {
+            "team": {
+              "id": 77,
+              "name": "Angers",
+              "logo": "https://media.api-sports.io/football/teams/77.png"
+            },
+            "values": {
+              "Passes accurate": 377,
+              "Shots insidebox": 5,
+              "Shots outsidebox": 4,
+              "Blocked Shots": 4,
+              "Free Kicks": 15,
+              "Shots on Goal": 1,
+              "Goalkeeper Saves": 6,
+              "Shots off Goal": 4,
+              "Offsides": 0,
+              "Total passes": 447,
+              "Total Shots": 9,
+              "Yellow Cards": 1,
+              "Corner Kicks": 6,
+              "Fouls": 13,
+              "Red Cards": 0,
+              "Ball Possession": "54%"
+            }
+          },
+          "111": {
+            "team": {
+              "id": 111,
+              "name": "Le Havre",
+              "logo": "https://media.api-sports.io/football/teams/111.png"
+            },
+            "values": {
+              "Passes accurate": 321,
+              "Shots insidebox": 10,
+              "Shots outsidebox": 6,
+              "Blocked Shots": 4,
+              "Free Kicks": 13,
+              "Shots on Goal": 6,
+              "Goalkeeper Saves": 1,
+              "Shots off Goal": 6,
+              "Offsides": 1,
+              "Total passes": 378,
+              "Total Shots": 16,
+              "Yellow Cards": 1,
+              "Corner Kicks": 4,
+              "Fouls": 15,
+              "Red Cards": 0,
+              "Ball Possession": "46%"
+            }
+          }
+        }
+      }
+    },
+    "1552761": {
+      "fixture": {
+        "id": 1552761,
+        "date": "2026-09-12T15:45:00-03:00",
+        "league": {
+          "id": 61,
+          "name": "Ligue 1",
+          "country": "France",
+          "logo": "https://media.api-sports.io/football/leagues/61.png",
+          "flag": "https://media.api-sports.io/flags/fr.svg",
+          "season": 2026,
+          "round": "Regular Season - 4",
+          "standings": true
+        },
+        "teams": {
+          "home": {
+            "id": 97,
+            "name": "Lorient",
+            "logo": "https://media.api-sports.io/football/teams/97.png",
+            "winner": null
+          },
+          "away": {
+            "id": 96,
+            "name": "Toulouse",
+            "logo": "https://media.api-sports.io/football/teams/96.png",
+            "winner": null
+          }
+        },
+        "status": "FT"
+      },
+      "fulltime": {
+        "capturedAt": "2026-09-12T21:29:28.313Z",
+        "elapsed": 90,
+        "status": "FT",
+        "statistics": {
+          "96": {
+            "team": {
+              "id": 96,
+              "name": "Toulouse",
+              "logo": "https://media.api-sports.io/football/teams/96.png"
+            },
+            "values": {
+              "Passes accurate": 578,
+              "Shots insidebox": 13,
+              "Shots outsidebox": 0,
+              "Blocked Shots": 3,
+              "Free Kicks": 8,
+              "Shots on Goal": 4,
+              "Goalkeeper Saves": 1,
+              "Shots off Goal": 6,
+              "Offsides": 1,
+              "Total passes": 654,
+              "Total Shots": 13,
+              "Yellow Cards": 0,
+              "Corner Kicks": 3,
+              "Fouls": 18,
+              "Red Cards": 0,
+              "Ball Possession": "59%"
+            }
+          },
+          "97": {
+            "team": {
+              "id": 97,
+              "name": "Lorient",
+              "logo": "https://media.api-sports.io/football/teams/97.png"
+            },
+            "values": {
+              "Passes accurate": 372,
+              "Shots insidebox": 6,
+              "Shots outsidebox": 4,
+              "Blocked Shots": 3,
+              "Free Kicks": 18,
+              "Shots on Goal": 3,
+              "Goalkeeper Saves": 2,
+              "Shots off Goal": 4,
+              "Offsides": 2,
+              "Total passes": 445,
+              "Total Shots": 10,
+              "Yellow Cards": 1,
+              "Corner Kicks": 4,
+              "Fouls": 8,
+              "Red Cards": 0,
+              "Ball Possession": "41%"
+            }
+          }
+        }
+      }
+    },
+    "1552762": {
+      "fixture": {
+        "id": 1552762,
+        "date": "2026-09-12T15:45:00-03:00",
+        "league": {
+          "id": 61,
+          "name": "Ligue 1",
+          "country": "France",
+          "logo": "https://media.api-sports.io/football/leagues/61.png",
+          "flag": "https://media.api-sports.io/flags/fr.svg",
+          "season": 2026,
+          "round": "Regular Season - 4",
+          "standings": true
+        },
+        "teams": {
+          "home": {
+            "id": 114,
+            "name": "Paris FC",
+            "logo": "https://media.api-sports.io/football/teams/114.png",
+            "winner": null
+          },
+          "away": {
+            "id": 80,
+            "name": "Lyon",
+            "logo": "https://media.api-sports.io/football/teams/80.png",
+            "winner": null
+          }
+        },
+        "status": "FT"
+      },
+      "fulltime": {
+        "capturedAt": "2026-09-12T21:29:28.969Z",
+        "elapsed": 90,
+        "status": "FT",
+        "statistics": {
+          "80": {
+            "team": {
+              "id": 80,
+              "name": "Lyon",
+              "logo": "https://media.api-sports.io/football/teams/80.png"
+            },
+            "values": {
+              "Passes accurate": 392,
+              "Shots insidebox": 3,
+              "Shots outsidebox": 2,
+              "Blocked Shots": 2,
+              "Free Kicks": 18,
+              "Shots on Goal": 1,
+              "Shots off Goal": 2,
+              "Offsides": 1,
+              "Total passes": 457,
+              "Total Shots": 5,
+              "Yellow Cards": 1,
+              "Corner Kicks": 3,
+              "Goalkeeper Saves": 4,
+              "Fouls": 13,
+              "Red Cards": 0,
+              "Ball Possession": "44%"
+            }
+          },
+          "114": {
+            "team": {
+              "id": 114,
+              "name": "Paris FC",
+              "logo": "https://media.api-sports.io/football/teams/114.png"
+            },
+            "values": {
+              "Passes accurate": 533,
+              "Shots insidebox": 3,
+              "Shots outsidebox": 3,
+              "Blocked Shots": 1,
+              "Free Kicks": 13,
+              "Shots on Goal": 4,
+              "Shots off Goal": 1,
+              "Offsides": 2,
+              "Total passes": 594,
+              "Total Shots": 6,
+              "Yellow Cards": 2,
+              "Corner Kicks": 4,
+              "Goalkeeper Saves": 0,
+              "Fouls": 19,
+              "Red Cards": 0,
+              "Ball Possession": "56%"
+            }
+          }
+        }
+      }
+    },
+    "1552764": {
+      "fixture": {
+        "id": 1552764,
+        "date": "2026-09-12T12:15:00-03:00",
+        "league": {
+          "id": 61,
+          "name": "Ligue 1",
+          "country": "France",
+          "logo": "https://media.api-sports.io/football/leagues/61.png",
+          "flag": "https://media.api-sports.io/flags/fr.svg",
+          "season": 2026,
+          "round": "Regular Season - 4",
+          "standings": true
+        },
+        "teams": {
+          "home": {
+            "id": 95,
+            "name": "Strasbourg",
+            "logo": "https://media.api-sports.io/football/teams/95.png",
+            "winner": null
+          },
+          "away": {
+            "id": 91,
+            "name": "Monaco",
+            "logo": "https://media.api-sports.io/football/teams/91.png",
+            "winner": null
+          }
+        },
+        "status": "FT"
+      },
+      "fulltime": {
+        "capturedAt": "2026-09-12T18:52:24.936Z",
+        "elapsed": 90,
+        "status": "FT",
+        "statistics": {
+          "91": {
+            "team": {
+              "id": 91,
+              "name": "Monaco",
+              "logo": "https://media.api-sports.io/football/teams/91.png"
+            },
+            "values": {
+              "Passes accurate": 510,
+              "Shots insidebox": 8,
+              "Shots outsidebox": 4,
+              "Blocked Shots": 3,
+              "Free Kicks": 9,
+              "Shots on Goal": 3,
+              "Goalkeeper Saves": 2,
+              "Shots off Goal": 6,
+              "Total passes": 562,
+              "Total Shots": 12,
+              "Yellow Cards": 1,
+              "Corner Kicks": 7,
+              "Offsides": 3,
+              "Fouls": 10,
+              "Red Cards": 0,
+              "Ball Possession": "56%"
+            }
+          },
+          "95": {
+            "team": {
+              "id": 95,
+              "name": "Strasbourg",
+              "logo": "https://media.api-sports.io/football/teams/95.png"
+            },
+            "values": {
+              "Passes accurate": 369,
+              "Shots insidebox": 6,
+              "Shots outsidebox": 7,
+              "Blocked Shots": 3,
+              "Free Kicks": 10,
+              "Shots on Goal": 2,
+              "Goalkeeper Saves": 2,
+              "Shots off Goal": 8,
+              "Total passes": 440,
+              "Total Shots": 13,
+              "Yellow Cards": 1,
+              "Corner Kicks": 2,
+              "Offsides": 0,
+              "Fouls": 9,
+              "Red Cards": 0,
+              "Ball Possession": "44%"
             }
           }
         }
@@ -9035,6 +11444,798 @@
               "Fouls": 15,
               "Red Cards": 0,
               "Ball Possession": "58%"
+            }
+          }
+        }
+      }
+    },
+    "1557387": {
+      "fixture": {
+        "id": 1557387,
+        "date": "2026-09-06T12:30:00-03:00",
+        "league": {
+          "id": 39,
+          "name": "Premier League",
+          "country": "England",
+          "logo": "https://media.api-sports.io/football/leagues/39.png",
+          "flag": "https://media.api-sports.io/flags/gb-eng.svg",
+          "season": 2026,
+          "round": "Regular Season - 3",
+          "standings": true
+        },
+        "teams": {
+          "home": {
+            "id": 42,
+            "name": "Arsenal",
+            "logo": "https://media.api-sports.io/football/teams/42.png",
+            "winner": true
+          },
+          "away": {
+            "id": 49,
+            "name": "Chelsea",
+            "logo": "https://media.api-sports.io/football/teams/49.png",
+            "winner": false
+          }
+        },
+        "status": "FT"
+      },
+      "fulltime": {
+        "capturedAt": "2026-09-06T22:48:31.562Z",
+        "elapsed": 90,
+        "status": "FT",
+        "statistics": {
+          "42": {
+            "team": {
+              "id": 42,
+              "name": "Arsenal",
+              "logo": "https://media.api-sports.io/football/teams/42.png"
+            },
+            "values": {
+              "Passes accurate": 390,
+              "Shots insidebox": 13,
+              "Shots outsidebox": 3,
+              "Blocked Shots": 6,
+              "Free Kicks": 16,
+              "Shots on Goal": 9,
+              "Goalkeeper Saves": 4,
+              "Shots off Goal": 1,
+              "Offsides": 3,
+              "Total passes": 461,
+              "Total Shots": 16,
+              "Yellow Cards": 2,
+              "Corner Kicks": 5,
+              "Fouls": 13,
+              "Red Cards": 0,
+              "Ball Possession": "55%"
+            }
+          },
+          "49": {
+            "team": {
+              "id": 49,
+              "name": "Chelsea",
+              "logo": "https://media.api-sports.io/football/teams/49.png"
+            },
+            "values": {
+              "Passes accurate": 314,
+              "Shots insidebox": 5,
+              "Shots outsidebox": 8,
+              "Blocked Shots": 2,
+              "Free Kicks": 13,
+              "Shots on Goal": 5,
+              "Goalkeeper Saves": 8,
+              "Shots off Goal": 6,
+              "Offsides": 0,
+              "Total passes": 384,
+              "Total Shots": 13,
+              "Yellow Cards": 4,
+              "Corner Kicks": 3,
+              "Fouls": 16,
+              "Red Cards": 0,
+              "Ball Possession": "45%"
+            }
+          }
+        }
+      }
+    },
+    "1557390": {
+      "fixture": {
+        "id": 1557390,
+        "date": "2026-09-06T10:00:00-03:00",
+        "league": {
+          "id": 39,
+          "name": "Premier League",
+          "country": "England",
+          "logo": "https://media.api-sports.io/football/leagues/39.png",
+          "flag": "https://media.api-sports.io/flags/gb-eng.svg",
+          "season": 2026,
+          "round": "Regular Season - 3",
+          "standings": true
+        },
+        "teams": {
+          "home": {
+            "id": 45,
+            "name": "Everton",
+            "logo": "https://media.api-sports.io/football/teams/45.png",
+            "winner": null
+          },
+          "away": {
+            "id": 33,
+            "name": "Manchester United",
+            "logo": "https://media.api-sports.io/football/teams/33.png",
+            "winner": null
+          }
+        },
+        "status": "FT"
+      },
+      "fulltime": {
+        "capturedAt": "2026-09-06T22:48:25.584Z",
+        "elapsed": 90,
+        "status": "FT",
+        "statistics": {
+          "33": {
+            "team": {
+              "id": 33,
+              "name": "Manchester United",
+              "logo": "https://media.api-sports.io/football/teams/33.png"
+            },
+            "values": {
+              "Passes accurate": 458,
+              "Shots insidebox": 6,
+              "Shots outsidebox": 8,
+              "Blocked Shots": 6,
+              "Free Kicks": 7,
+              "Shots on Goal": 3,
+              "Goalkeeper Saves": 4,
+              "Shots off Goal": 5,
+              "Offsides": 1,
+              "Total passes": 527,
+              "Total Shots": 14,
+              "Yellow Cards": 3,
+              "Corner Kicks": 3,
+              "Fouls": 11,
+              "Red Cards": 0,
+              "Ball Possession": "55%"
+            }
+          },
+          "45": {
+            "team": {
+              "id": 45,
+              "name": "Everton",
+              "logo": "https://media.api-sports.io/football/teams/45.png"
+            },
+            "values": {
+              "Passes accurate": 361,
+              "Shots insidebox": 14,
+              "Shots outsidebox": 4,
+              "Blocked Shots": 7,
+              "Free Kicks": 11,
+              "Shots on Goal": 6,
+              "Goalkeeper Saves": 1,
+              "Shots off Goal": 5,
+              "Offsides": 3,
+              "Total passes": 418,
+              "Total Shots": 18,
+              "Yellow Cards": 3,
+              "Corner Kicks": 4,
+              "Fouls": 7,
+              "Red Cards": 0,
+              "Ball Possession": "45%"
+            }
+          }
+        }
+      }
+    },
+    "1557397": {
+      "fixture": {
+        "id": 1557397,
+        "date": "2026-09-12T11:00:00-03:00",
+        "league": {
+          "id": 39,
+          "name": "Premier League",
+          "country": "England",
+          "logo": "https://media.api-sports.io/football/leagues/39.png",
+          "flag": "https://media.api-sports.io/flags/gb-eng.svg",
+          "season": 2026,
+          "round": "Regular Season - 4",
+          "standings": true
+        },
+        "teams": {
+          "home": {
+            "id": 66,
+            "name": "Aston Villa",
+            "logo": "https://media.api-sports.io/football/teams/66.png",
+            "winner": false
+          },
+          "away": {
+            "id": 65,
+            "name": "Nottingham Forest",
+            "logo": "https://media.api-sports.io/football/teams/65.png",
+            "winner": true
+          }
+        },
+        "status": "FT"
+      },
+      "fulltime": {
+        "capturedAt": "2026-09-12T18:52:20.983Z",
+        "elapsed": 90,
+        "status": "FT",
+        "statistics": {
+          "65": {
+            "team": {
+              "id": 65,
+              "name": "Nottingham Forest",
+              "logo": "https://media.api-sports.io/football/teams/65.png"
+            },
+            "values": {
+              "Passes accurate": 308,
+              "Shots insidebox": 14,
+              "Shots outsidebox": 8,
+              "Blocked Shots": 3,
+              "Free Kicks": 11,
+              "Shots on Goal": 7,
+              "Goalkeeper Saves": 5,
+              "Shots off Goal": 12,
+              "Total passes": 359,
+              "Total Shots": 22,
+              "Yellow Cards": 5,
+              "Corner Kicks": 1,
+              "Offsides": 4,
+              "Fouls": 16,
+              "Red Cards": 0,
+              "Ball Possession": "47%"
+            }
+          },
+          "66": {
+            "team": {
+              "id": 66,
+              "name": "Aston Villa",
+              "logo": "https://media.api-sports.io/football/teams/66.png"
+            },
+            "values": {
+              "Passes accurate": 344,
+              "Shots insidebox": 6,
+              "Shots outsidebox": 1,
+              "Blocked Shots": 1,
+              "Free Kicks": 16,
+              "Shots on Goal": 5,
+              "Goalkeeper Saves": 5,
+              "Shots off Goal": 1,
+              "Total passes": 415,
+              "Total Shots": 7,
+              "Yellow Cards": 2,
+              "Corner Kicks": 6,
+              "Offsides": 0,
+              "Fouls": 11,
+              "Red Cards": 0,
+              "Ball Possession": "53%"
+            }
+          }
+        }
+      }
+    },
+    "1557398": {
+      "fixture": {
+        "id": 1557398,
+        "date": "2026-09-12T11:00:00-03:00",
+        "league": {
+          "id": 39,
+          "name": "Premier League",
+          "country": "England",
+          "logo": "https://media.api-sports.io/football/leagues/39.png",
+          "flag": "https://media.api-sports.io/flags/gb-eng.svg",
+          "season": 2026,
+          "round": "Regular Season - 4",
+          "standings": true
+        },
+        "teams": {
+          "home": {
+            "id": 35,
+            "name": "Bournemouth",
+            "logo": "https://media.api-sports.io/football/teams/35.png",
+            "winner": null
+          },
+          "away": {
+            "id": 55,
+            "name": "Brentford",
+            "logo": "https://media.api-sports.io/football/teams/55.png",
+            "winner": null
+          }
+        },
+        "status": "FT"
+      },
+      "fulltime": {
+        "capturedAt": "2026-09-12T18:52:21.647Z",
+        "elapsed": 90,
+        "status": "FT",
+        "statistics": {
+          "35": {
+            "team": {
+              "id": 35,
+              "name": "Bournemouth",
+              "logo": "https://media.api-sports.io/football/teams/35.png"
+            },
+            "values": {
+              "Passes accurate": 395,
+              "Shots insidebox": 11,
+              "Shots outsidebox": 9,
+              "Blocked Shots": 2,
+              "Free Kicks": 13,
+              "Shots on Goal": 10,
+              "Shots off Goal": 8,
+              "Offsides": 3,
+              "Total passes": 480,
+              "Total Shots": 20,
+              "Yellow Cards": 5,
+              "Corner Kicks": 2,
+              "Goalkeeper Saves": 0,
+              "Fouls": 10,
+              "Red Cards": 0,
+              "Ball Possession": "56%"
+            }
+          },
+          "55": {
+            "team": {
+              "id": 55,
+              "name": "Brentford",
+              "logo": "https://media.api-sports.io/football/teams/55.png"
+            },
+            "values": {
+              "Passes accurate": 260,
+              "Shots insidebox": 6,
+              "Shots outsidebox": 2,
+              "Blocked Shots": 1,
+              "Free Kicks": 10,
+              "Shots on Goal": 2,
+              "Shots off Goal": 5,
+              "Offsides": 1,
+              "Total passes": 370,
+              "Total Shots": 8,
+              "Yellow Cards": 1,
+              "Corner Kicks": 1,
+              "Goalkeeper Saves": 8,
+              "Fouls": 13,
+              "Red Cards": 0,
+              "Ball Possession": "44%"
+            }
+          }
+        }
+      }
+    },
+    "1557399": {
+      "fixture": {
+        "id": 1557399,
+        "date": "2026-09-12T11:00:00-03:00",
+        "league": {
+          "id": 39,
+          "name": "Premier League",
+          "country": "England",
+          "logo": "https://media.api-sports.io/football/leagues/39.png",
+          "flag": "https://media.api-sports.io/flags/gb-eng.svg",
+          "season": 2026,
+          "round": "Regular Season - 4",
+          "standings": true
+        },
+        "teams": {
+          "home": {
+            "id": 49,
+            "name": "Chelsea",
+            "logo": "https://media.api-sports.io/football/teams/49.png",
+            "winner": null
+          },
+          "away": {
+            "id": 64,
+            "name": "Hull City",
+            "logo": "https://media.api-sports.io/football/teams/64.png",
+            "winner": null
+          }
+        },
+        "status": "FT"
+      },
+      "fulltime": {
+        "capturedAt": "2026-09-12T18:52:22.305Z",
+        "elapsed": 90,
+        "status": "FT",
+        "statistics": {
+          "49": {
+            "team": {
+              "id": 49,
+              "name": "Chelsea",
+              "logo": "https://media.api-sports.io/football/teams/49.png"
+            },
+            "values": {
+              "Passes accurate": 479,
+              "Shots insidebox": 6,
+              "Shots outsidebox": 6,
+              "Blocked Shots": 1,
+              "Free Kicks": 12,
+              "Shots on Goal": 7,
+              "Goalkeeper Saves": 3,
+              "Shots off Goal": 4,
+              "Offsides": 1,
+              "Total passes": 553,
+              "Total Shots": 12,
+              "Yellow Cards": 1,
+              "Corner Kicks": 11,
+              "Fouls": 7,
+              "Red Cards": 0,
+              "Ball Possession": "68%"
+            }
+          },
+          "64": {
+            "team": {
+              "id": 64,
+              "name": "Hull City",
+              "logo": "https://media.api-sports.io/football/teams/64.png"
+            },
+            "values": {
+              "Passes accurate": 182,
+              "Shots insidebox": 9,
+              "Shots outsidebox": 4,
+              "Blocked Shots": 4,
+              "Free Kicks": 7,
+              "Shots on Goal": 5,
+              "Goalkeeper Saves": 5,
+              "Shots off Goal": 5,
+              "Offsides": 1,
+              "Total passes": 258,
+              "Total Shots": 14,
+              "Yellow Cards": 5,
+              "Corner Kicks": 4,
+              "Fouls": 12,
+              "Red Cards": 0,
+              "Ball Possession": "32%"
+            }
+          }
+        }
+      }
+    },
+    "1557401": {
+      "fixture": {
+        "id": 1557401,
+        "date": "2026-09-12T11:00:00-03:00",
+        "league": {
+          "id": 39,
+          "name": "Premier League",
+          "country": "England",
+          "logo": "https://media.api-sports.io/football/leagues/39.png",
+          "flag": "https://media.api-sports.io/flags/gb-eng.svg",
+          "season": 2026,
+          "round": "Regular Season - 4",
+          "standings": true
+        },
+        "teams": {
+          "home": {
+            "id": 52,
+            "name": "Crystal Palace",
+            "logo": "https://media.api-sports.io/football/teams/52.png",
+            "winner": false
+          },
+          "away": {
+            "id": 57,
+            "name": "Ipswich",
+            "logo": "https://media.api-sports.io/football/teams/57.png",
+            "winner": true
+          }
+        },
+        "status": "FT"
+      },
+      "fulltime": {
+        "capturedAt": "2026-09-12T18:52:22.973Z",
+        "elapsed": 90,
+        "status": "FT",
+        "statistics": {
+          "52": {
+            "team": {
+              "id": 52,
+              "name": "Crystal Palace",
+              "logo": "https://media.api-sports.io/football/teams/52.png"
+            },
+            "values": {
+              "Passes accurate": 314,
+              "Shots insidebox": 9,
+              "Shots outsidebox": 2,
+              "Blocked Shots": 1,
+              "Free Kicks": 16,
+              "Shots on Goal": 4,
+              "Goalkeeper Saves": 3,
+              "Shots off Goal": 6,
+              "Total passes": 388,
+              "Red Cards": 1,
+              "Total Shots": 11,
+              "Yellow Cards": 1,
+              "Corner Kicks": 6,
+              "Offsides": 0,
+              "Fouls": 6,
+              "Ball Possession": "46%"
+            }
+          },
+          "57": {
+            "team": {
+              "id": 57,
+              "name": "Ipswich",
+              "logo": "https://media.api-sports.io/football/teams/57.png"
+            },
+            "values": {
+              "Passes accurate": 365,
+              "Shots insidebox": 8,
+              "Shots outsidebox": 4,
+              "Blocked Shots": 1,
+              "Free Kicks": 6,
+              "Shots on Goal": 6,
+              "Goalkeeper Saves": 2,
+              "Shots off Goal": 5,
+              "Total passes": 445,
+              "Red Cards": 0,
+              "Total Shots": 12,
+              "Yellow Cards": 3,
+              "Corner Kicks": 3,
+              "Offsides": 1,
+              "Fouls": 16,
+              "Ball Possession": "54%"
+            }
+          }
+        }
+      }
+    },
+    "1557403": {
+      "fixture": {
+        "id": 1557403,
+        "date": "2026-09-12T11:00:00-03:00",
+        "league": {
+          "id": 39,
+          "name": "Premier League",
+          "country": "England",
+          "logo": "https://media.api-sports.io/football/leagues/39.png",
+          "flag": "https://media.api-sports.io/flags/gb-eng.svg",
+          "season": 2026,
+          "round": "Regular Season - 4",
+          "standings": true
+        },
+        "teams": {
+          "home": {
+            "id": 40,
+            "name": "Liverpool",
+            "logo": "https://media.api-sports.io/football/teams/40.png",
+            "winner": null
+          },
+          "away": {
+            "id": 36,
+            "name": "Fulham",
+            "logo": "https://media.api-sports.io/football/teams/36.png",
+            "winner": null
+          }
+        },
+        "status": "FT"
+      },
+      "fulltime": {
+        "capturedAt": "2026-09-12T18:52:23.634Z",
+        "elapsed": 90,
+        "status": "FT",
+        "statistics": {
+          "36": {
+            "team": {
+              "id": 36,
+              "name": "Fulham",
+              "logo": "https://media.api-sports.io/football/teams/36.png"
+            },
+            "values": {
+              "Passes accurate": 302,
+              "Shots insidebox": 8,
+              "Shots outsidebox": 2,
+              "Blocked Shots": 3,
+              "Free Kicks": 10,
+              "Shots on Goal": 4,
+              "Goalkeeper Saves": 3,
+              "Shots off Goal": 3,
+              "Offsides": 1,
+              "Total passes": 395,
+              "Total Shots": 10,
+              "Corner Kicks": 8,
+              "Yellow Cards": 1,
+              "Fouls": 8,
+              "Red Cards": 0,
+              "Ball Possession": "44%"
+            }
+          },
+          "40": {
+            "team": {
+              "id": 40,
+              "name": "Liverpool",
+              "logo": "https://media.api-sports.io/football/teams/40.png"
+            },
+            "values": {
+              "Passes accurate": 412,
+              "Shots insidebox": 9,
+              "Shots outsidebox": 5,
+              "Blocked Shots": 5,
+              "Free Kicks": 8,
+              "Shots on Goal": 3,
+              "Goalkeeper Saves": 3,
+              "Shots off Goal": 6,
+              "Offsides": 1,
+              "Total passes": 495,
+              "Total Shots": 14,
+              "Corner Kicks": 5,
+              "Yellow Cards": 0,
+              "Fouls": 11,
+              "Red Cards": 0,
+              "Ball Possession": "56%"
+            }
+          }
+        }
+      }
+    },
+    "1557405": {
+      "fixture": {
+        "id": 1557405,
+        "date": "2026-09-12T16:00:00-03:00",
+        "league": {
+          "id": 39,
+          "name": "Premier League",
+          "country": "England",
+          "logo": "https://media.api-sports.io/football/leagues/39.png",
+          "flag": "https://media.api-sports.io/flags/gb-eng.svg",
+          "season": 2026,
+          "round": "Regular Season - 4",
+          "standings": true
+        },
+        "teams": {
+          "home": {
+            "id": 746,
+            "name": "Sunderland",
+            "logo": "https://media.api-sports.io/football/teams/746.png",
+            "winner": false
+          },
+          "away": {
+            "id": 42,
+            "name": "Arsenal",
+            "logo": "https://media.api-sports.io/football/teams/42.png",
+            "winner": true
+          }
+        },
+        "status": "FT"
+      },
+      "fulltime": {
+        "capturedAt": "2026-09-12T21:29:30.963Z",
+        "elapsed": 90,
+        "status": "FT",
+        "statistics": {
+          "42": {
+            "team": {
+              "id": 42,
+              "name": "Arsenal",
+              "logo": "https://media.api-sports.io/football/teams/42.png"
+            },
+            "values": {
+              "Passes accurate": 321,
+              "Shots insidebox": 8,
+              "Shots outsidebox": 3,
+              "Blocked Shots": 2,
+              "Free Kicks": 18,
+              "Shots on Goal": 5,
+              "Goalkeeper Saves": 2,
+              "Shots off Goal": 4,
+              "Offsides": 2,
+              "Total passes": 388,
+              "Red Cards": 0,
+              "Total Shots": 11,
+              "Yellow Cards": 2,
+              "Corner Kicks": 2,
+              "Fouls": 11,
+              "Ball Possession": "58%"
+            }
+          },
+          "746": {
+            "team": {
+              "id": 746,
+              "name": "Sunderland",
+              "logo": "https://media.api-sports.io/football/teams/746.png"
+            },
+            "values": {
+              "Passes accurate": 217,
+              "Shots insidebox": 7,
+              "Shots outsidebox": 5,
+              "Blocked Shots": 4,
+              "Free Kicks": 10,
+              "Shots on Goal": 3,
+              "Goalkeeper Saves": 3,
+              "Shots off Goal": 5,
+              "Offsides": 2,
+              "Total passes": 282,
+              "Red Cards": 1,
+              "Total Shots": 12,
+              "Yellow Cards": 4,
+              "Corner Kicks": 4,
+              "Fouls": 18,
+              "Ball Possession": "42%"
+            }
+          }
+        }
+      }
+    },
+    "1557406": {
+      "fixture": {
+        "id": 1557406,
+        "date": "2026-09-12T13:30:00-03:00",
+        "league": {
+          "id": 39,
+          "name": "Premier League",
+          "country": "England",
+          "logo": "https://media.api-sports.io/football/leagues/39.png",
+          "flag": "https://media.api-sports.io/flags/gb-eng.svg",
+          "season": 2026,
+          "round": "Regular Season - 4",
+          "standings": true
+        },
+        "teams": {
+          "home": {
+            "id": 47,
+            "name": "Tottenham",
+            "logo": "https://media.api-sports.io/football/teams/47.png",
+            "winner": null
+          },
+          "away": {
+            "id": 45,
+            "name": "Everton",
+            "logo": "https://media.api-sports.io/football/teams/45.png",
+            "winner": null
+          }
+        },
+        "status": "FT"
+      },
+      "fulltime": {
+        "capturedAt": "2026-09-12T18:52:26.285Z",
+        "elapsed": 90,
+        "status": "FT",
+        "statistics": {
+          "45": {
+            "team": {
+              "id": 45,
+              "name": "Everton",
+              "logo": "https://media.api-sports.io/football/teams/45.png"
+            },
+            "values": {
+              "Passes accurate": 319,
+              "Shots insidebox": 9,
+              "Shots outsidebox": 3,
+              "Blocked Shots": 6,
+              "Free Kicks": 12,
+              "Shots on Goal": 3,
+              "Goalkeeper Saves": 2,
+              "Shots off Goal": 3,
+              "Offsides": 1,
+              "Total passes": 381,
+              "Total Shots": 12,
+              "Corner Kicks": 6,
+              "Yellow Cards": 2,
+              "Fouls": 8,
+              "Red Cards": 0,
+              "Ball Possession": "38%"
+            }
+          },
+          "47": {
+            "team": {
+              "id": 47,
+              "name": "Tottenham",
+              "logo": "https://media.api-sports.io/football/teams/47.png"
+            },
+            "values": {
+              "Passes accurate": 598,
+              "Shots insidebox": 8,
+              "Shots outsidebox": 6,
+              "Blocked Shots": 8,
+              "Free Kicks": 8,
+              "Shots on Goal": 2,
+              "Goalkeeper Saves": 3,
+              "Shots off Goal": 4,
+              "Offsides": 2,
+              "Total passes": 643,
+              "Total Shots": 14,
+              "Corner Kicks": 5,
+              "Yellow Cards": 0,
+              "Fouls": 14,
+              "Red Cards": 0,
+              "Ball Possession": "62%"
             }
           }
         }
@@ -11346,6 +14547,1056 @@
         }
       }
     },
+    "1570363": {
+      "fixture": {
+        "id": 1570363,
+        "date": "2026-09-06T13:30:00-03:00",
+        "league": {
+          "id": 140,
+          "name": "La Liga",
+          "country": "Spain",
+          "logo": "https://media.api-sports.io/football/leagues/140.png",
+          "flag": "https://media.api-sports.io/flags/es.svg",
+          "season": 2026,
+          "round": "Regular Season - 4",
+          "standings": true
+        },
+        "teams": {
+          "home": {
+            "id": 542,
+            "name": "Alaves",
+            "logo": "https://media.api-sports.io/football/teams/542.png",
+            "winner": true
+          },
+          "away": {
+            "id": 727,
+            "name": "Osasuna",
+            "logo": "https://media.api-sports.io/football/teams/727.png",
+            "winner": false
+          }
+        },
+        "status": "FT"
+      },
+      "fulltime": {
+        "capturedAt": "2026-09-06T22:48:33.440Z",
+        "elapsed": 90,
+        "status": "FT",
+        "statistics": {
+          "542": {
+            "team": {
+              "id": 542,
+              "name": "Alaves",
+              "logo": "https://media.api-sports.io/football/teams/542.png"
+            },
+            "values": {
+              "Passes accurate": 331,
+              "Shots insidebox": 7,
+              "Shots outsidebox": 5,
+              "Blocked Shots": 1,
+              "Free Kicks": 13,
+              "Shots on Goal": 7,
+              "Goalkeeper Saves": 3,
+              "Shots off Goal": 4,
+              "Offsides": 2,
+              "Total passes": 392,
+              "Total Shots": 12,
+              "Yellow Cards": 1,
+              "Corner Kicks": 4,
+              "Fouls": 14,
+              "Red Cards": 0,
+              "Ball Possession": "51%"
+            }
+          },
+          "727": {
+            "team": {
+              "id": 727,
+              "name": "Osasuna",
+              "logo": "https://media.api-sports.io/football/teams/727.png"
+            },
+            "values": {
+              "Passes accurate": 330,
+              "Shots insidebox": 6,
+              "Shots outsidebox": 1,
+              "Blocked Shots": 1,
+              "Free Kicks": 13,
+              "Shots on Goal": 5,
+              "Goalkeeper Saves": 2,
+              "Shots off Goal": 1,
+              "Offsides": 2,
+              "Total passes": 400,
+              "Total Shots": 7,
+              "Yellow Cards": 2,
+              "Corner Kicks": 2,
+              "Fouls": 13,
+              "Red Cards": 0,
+              "Ball Possession": "49%"
+            }
+          }
+        }
+      }
+    },
+    "1570366": {
+      "fixture": {
+        "id": 1570366,
+        "date": "2026-09-07T16:30:00-03:00",
+        "league": {
+          "id": 140,
+          "name": "La Liga",
+          "country": "Spain",
+          "logo": "https://media.api-sports.io/football/leagues/140.png",
+          "flag": "https://media.api-sports.io/flags/es.svg",
+          "season": 2026,
+          "round": "Regular Season - 4",
+          "standings": true
+        },
+        "teams": {
+          "home": {
+            "id": 797,
+            "name": "Elche",
+            "logo": "https://media.api-sports.io/football/teams/797.png",
+            "winner": false
+          },
+          "away": {
+            "id": 548,
+            "name": "Real Sociedad",
+            "logo": "https://media.api-sports.io/football/teams/548.png",
+            "winner": true
+          }
+        },
+        "status": "FT"
+      },
+      "fulltime": {
+        "capturedAt": "2026-09-08T00:08:12.394Z",
+        "elapsed": 90,
+        "status": "FT",
+        "statistics": {
+          "548": {
+            "team": {
+              "id": 548,
+              "name": "Real Sociedad",
+              "logo": "https://media.api-sports.io/football/teams/548.png"
+            },
+            "values": {
+              "Passes accurate": 300,
+              "Shots insidebox": 8,
+              "Shots outsidebox": 5,
+              "Blocked Shots": 2,
+              "Free Kicks": 9,
+              "Shots on Goal": 6,
+              "Goalkeeper Saves": 8,
+              "Shots off Goal": 5,
+              "Offsides": 1,
+              "Total passes": 361,
+              "Total Shots": 13,
+              "Yellow Cards": 1,
+              "Corner Kicks": 7,
+              "Red Cards": 1,
+              "Fouls": 8,
+              "Ball Possession": "42%"
+            }
+          },
+          "797": {
+            "team": {
+              "id": 797,
+              "name": "Elche",
+              "logo": "https://media.api-sports.io/football/teams/797.png"
+            },
+            "values": {
+              "Passes accurate": 439,
+              "Shots insidebox": 15,
+              "Shots outsidebox": 5,
+              "Blocked Shots": 2,
+              "Free Kicks": 7,
+              "Shots on Goal": 10,
+              "Goalkeeper Saves": 3,
+              "Shots off Goal": 8,
+              "Offsides": 2,
+              "Total passes": 494,
+              "Total Shots": 20,
+              "Yellow Cards": 4,
+              "Corner Kicks": 6,
+              "Red Cards": 0,
+              "Fouls": 9,
+              "Ball Possession": "58%"
+            }
+          }
+        }
+      }
+    },
+    "1570367": {
+      "fixture": {
+        "id": 1570367,
+        "date": "2026-09-06T16:00:00-03:00",
+        "league": {
+          "id": 140,
+          "name": "La Liga",
+          "country": "Spain",
+          "logo": "https://media.api-sports.io/football/leagues/140.png",
+          "flag": "https://media.api-sports.io/flags/es.svg",
+          "season": 2026,
+          "round": "Regular Season - 4",
+          "standings": true
+        },
+        "teams": {
+          "home": {
+            "id": 540,
+            "name": "Espanyol",
+            "logo": "https://media.api-sports.io/football/teams/540.png",
+            "winner": null
+          },
+          "away": {
+            "id": 536,
+            "name": "Sevilla",
+            "logo": "https://media.api-sports.io/football/teams/536.png",
+            "winner": null
+          }
+        },
+        "status": "FT"
+      },
+      "fulltime": {
+        "capturedAt": "2026-09-06T22:48:38.139Z",
+        "elapsed": 90,
+        "status": "FT",
+        "statistics": {
+          "536": {
+            "team": {
+              "id": 536,
+              "name": "Sevilla",
+              "logo": "https://media.api-sports.io/football/teams/536.png"
+            },
+            "values": {
+              "Passes accurate": 230,
+              "Shots insidebox": 3,
+              "Shots outsidebox": 3,
+              "Blocked Shots": 0,
+              "Free Kicks": 16,
+              "Shots on Goal": 3,
+              "Goalkeeper Saves": 2,
+              "Shots off Goal": 3,
+              "Offsides": 2,
+              "Total passes": 311,
+              "Total Shots": 6,
+              "Yellow Cards": 3,
+              "Red Cards": 1,
+              "Corner Kicks": 4,
+              "Fouls": 13,
+              "Ball Possession": "44%"
+            }
+          },
+          "540": {
+            "team": {
+              "id": 540,
+              "name": "Espanyol",
+              "logo": "https://media.api-sports.io/football/teams/540.png"
+            },
+            "values": {
+              "Passes accurate": 305,
+              "Shots insidebox": 7,
+              "Shots outsidebox": 5,
+              "Blocked Shots": 3,
+              "Free Kicks": 11,
+              "Shots on Goal": 3,
+              "Goalkeeper Saves": 2,
+              "Shots off Goal": 6,
+              "Offsides": 5,
+              "Total passes": 379,
+              "Total Shots": 12,
+              "Yellow Cards": 2,
+              "Red Cards": 0,
+              "Corner Kicks": 0,
+              "Fouls": 17,
+              "Ball Possession": "56%"
+            }
+          }
+        }
+      }
+    },
+    "1570368": {
+      "fixture": {
+        "id": 1570368,
+        "date": "2026-09-07T14:00:00-03:00",
+        "league": {
+          "id": 140,
+          "name": "La Liga",
+          "country": "Spain",
+          "logo": "https://media.api-sports.io/football/leagues/140.png",
+          "flag": "https://media.api-sports.io/flags/es.svg",
+          "season": 2026,
+          "round": "Regular Season - 4",
+          "standings": true
+        },
+        "teams": {
+          "home": {
+            "id": 546,
+            "name": "Getafe",
+            "logo": "https://media.api-sports.io/football/teams/546.png",
+            "winner": null
+          },
+          "away": {
+            "id": 538,
+            "name": "Celta Vigo",
+            "logo": "https://media.api-sports.io/football/teams/538.png",
+            "winner": null
+          }
+        },
+        "status": "FT"
+      },
+      "fulltime": {
+        "capturedAt": "2026-09-08T00:08:09.124Z",
+        "elapsed": 90,
+        "status": "FT",
+        "statistics": {
+          "538": {
+            "team": {
+              "id": 538,
+              "name": "Celta Vigo",
+              "logo": "https://media.api-sports.io/football/teams/538.png"
+            },
+            "values": {
+              "Passes accurate": 497,
+              "Shots insidebox": 8,
+              "Shots outsidebox": 8,
+              "Blocked Shots": 5,
+              "Free Kicks": 8,
+              "Shots on Goal": 3,
+              "Goalkeeper Saves": 1,
+              "Shots off Goal": 8,
+              "Total passes": 588,
+              "Red Cards": 0,
+              "Total Shots": 16,
+              "Yellow Cards": 2,
+              "Corner Kicks": 5,
+              "Offsides": 3,
+              "Fouls": 9,
+              "Ball Possession": "70%"
+            }
+          },
+          "546": {
+            "team": {
+              "id": 546,
+              "name": "Getafe",
+              "logo": "https://media.api-sports.io/football/teams/546.png"
+            },
+            "values": {
+              "Passes accurate": 170,
+              "Shots insidebox": 6,
+              "Shots outsidebox": 4,
+              "Blocked Shots": 2,
+              "Free Kicks": 8,
+              "Shots on Goal": 2,
+              "Goalkeeper Saves": 2,
+              "Shots off Goal": 6,
+              "Total passes": 253,
+              "Red Cards": 1,
+              "Total Shots": 10,
+              "Yellow Cards": 2,
+              "Corner Kicks": 3,
+              "Offsides": 0,
+              "Fouls": 8,
+              "Ball Possession": "30%"
+            }
+          }
+        }
+      }
+    },
+    "1570369": {
+      "fixture": {
+        "id": 1570369,
+        "date": "2026-09-06T13:30:00-03:00",
+        "league": {
+          "id": 140,
+          "name": "La Liga",
+          "country": "Spain",
+          "logo": "https://media.api-sports.io/football/leagues/140.png",
+          "flag": "https://media.api-sports.io/flags/es.svg",
+          "season": 2026,
+          "round": "Regular Season - 4",
+          "standings": true
+        },
+        "teams": {
+          "home": {
+            "id": 535,
+            "name": "Malaga",
+            "logo": "https://media.api-sports.io/football/teams/535.png",
+            "winner": null
+          },
+          "away": {
+            "id": 539,
+            "name": "Levante",
+            "logo": "https://media.api-sports.io/football/teams/539.png",
+            "winner": null
+          }
+        },
+        "status": "FT"
+      },
+      "fulltime": {
+        "capturedAt": "2026-09-06T22:48:34.089Z",
+        "elapsed": 90,
+        "status": "FT",
+        "statistics": {
+          "535": {
+            "team": {
+              "id": 535,
+              "name": "Malaga",
+              "logo": "https://media.api-sports.io/football/teams/535.png"
+            },
+            "values": {
+              "Passes accurate": 507,
+              "Shots insidebox": 7,
+              "Shots outsidebox": 3,
+              "Blocked Shots": 2,
+              "Free Kicks": 10,
+              "Shots on Goal": 3,
+              "Goalkeeper Saves": 3,
+              "Shots off Goal": 5,
+              "Offsides": 3,
+              "Total passes": 578,
+              "Total Shots": 10,
+              "Yellow Cards": 4,
+              "Corner Kicks": 6,
+              "Fouls": 15,
+              "Red Cards": 0,
+              "Ball Possession": "63%"
+            }
+          },
+          "539": {
+            "team": {
+              "id": 539,
+              "name": "Levante",
+              "logo": "https://media.api-sports.io/football/teams/539.png"
+            },
+            "values": {
+              "Passes accurate": 267,
+              "Shots insidebox": 5,
+              "Shots outsidebox": 6,
+              "Blocked Shots": 3,
+              "Free Kicks": 15,
+              "Shots on Goal": 3,
+              "Goalkeeper Saves": 3,
+              "Shots off Goal": 5,
+              "Offsides": 0,
+              "Total passes": 337,
+              "Total Shots": 11,
+              "Yellow Cards": 2,
+              "Corner Kicks": 4,
+              "Fouls": 11,
+              "Red Cards": 0,
+              "Ball Possession": "37%"
+            }
+          }
+        }
+      }
+    },
+    "1570371": {
+      "fixture": {
+        "id": 1570371,
+        "date": "2026-09-06T11:15:00-03:00",
+        "league": {
+          "id": 140,
+          "name": "La Liga",
+          "country": "Spain",
+          "logo": "https://media.api-sports.io/football/leagues/140.png",
+          "flag": "https://media.api-sports.io/flags/es.svg",
+          "season": 2026,
+          "round": "Regular Season - 4",
+          "standings": true
+        },
+        "teams": {
+          "home": {
+            "id": 532,
+            "name": "Valencia",
+            "logo": "https://media.api-sports.io/football/teams/532.png",
+            "winner": false
+          },
+          "away": {
+            "id": 529,
+            "name": "Barcelona",
+            "logo": "https://media.api-sports.io/football/teams/529.png",
+            "winner": true
+          }
+        },
+        "status": "FT"
+      },
+      "fulltime": {
+        "capturedAt": "2026-09-06T22:48:30.140Z",
+        "elapsed": 90,
+        "status": "FT",
+        "statistics": {
+          "529": {
+            "team": {
+              "id": 529,
+              "name": "Barcelona",
+              "logo": "https://media.api-sports.io/football/teams/529.png"
+            },
+            "values": {
+              "Passes accurate": 725,
+              "Shots insidebox": 19,
+              "Free Kicks": 6,
+              "Shots on Goal": 10,
+              "Goalkeeper Saves": 2,
+              "Shots off Goal": 10,
+              "Offsides": 4,
+              "Total passes": 790,
+              "Total Shots": 25,
+              "Yellow Cards": 3,
+              "Corner Kicks": 4,
+              "Shots outsidebox": 6,
+              "Blocked Shots": 5,
+              "Fouls": 6,
+              "Red Cards": 0,
+              "Ball Possession": "74%"
+            }
+          },
+          "532": {
+            "team": {
+              "id": 532,
+              "name": "Valencia",
+              "logo": "https://media.api-sports.io/football/teams/532.png"
+            },
+            "values": {
+              "Passes accurate": 204,
+              "Shots insidebox": 3,
+              "Free Kicks": 6,
+              "Shots on Goal": 2,
+              "Goalkeeper Saves": 5,
+              "Shots off Goal": 1,
+              "Offsides": 2,
+              "Total passes": 279,
+              "Total Shots": 3,
+              "Yellow Cards": 1,
+              "Corner Kicks": 1,
+              "Shots outsidebox": 0,
+              "Blocked Shots": 0,
+              "Fouls": 7,
+              "Red Cards": 0,
+              "Ball Possession": "26%"
+            }
+          }
+        }
+      }
+    },
+    "1570373": {
+      "fixture": {
+        "id": 1570373,
+        "date": "2026-09-12T13:30:00-03:00",
+        "league": {
+          "id": 140,
+          "name": "La Liga",
+          "country": "Spain",
+          "logo": "https://media.api-sports.io/football/leagues/140.png",
+          "flag": "https://media.api-sports.io/flags/es.svg",
+          "season": 2026,
+          "round": "Regular Season - 5",
+          "standings": true
+        },
+        "teams": {
+          "home": {
+            "id": 531,
+            "name": "Athletic Club",
+            "logo": "https://media.api-sports.io/football/teams/531.png",
+            "winner": null
+          },
+          "away": {
+            "id": 797,
+            "name": "Elche",
+            "logo": "https://media.api-sports.io/football/teams/797.png",
+            "winner": null
+          }
+        },
+        "status": "FT"
+      },
+      "fulltime": {
+        "capturedAt": "2026-09-12T18:52:26.937Z",
+        "elapsed": 90,
+        "status": "FT",
+        "statistics": {
+          "531": {
+            "team": {
+              "id": 531,
+              "name": "Athletic Club",
+              "logo": "https://media.api-sports.io/football/teams/531.png"
+            },
+            "values": {
+              "Passes accurate": 542,
+              "Shots insidebox": 14,
+              "Shots outsidebox": 5,
+              "Blocked Shots": 3,
+              "Free Kicks": 12,
+              "Shots on Goal": 3,
+              "Shots off Goal": 13,
+              "Offsides": 4,
+              "Total passes": 613,
+              "Total Shots": 19,
+              "Yellow Cards": 3,
+              "Corner Kicks": 7,
+              "Goalkeeper Saves": 0,
+              "Fouls": 11,
+              "Red Cards": 0,
+              "Ball Possession": "66%"
+            }
+          },
+          "797": {
+            "team": {
+              "id": 797,
+              "name": "Elche",
+              "logo": "https://media.api-sports.io/football/teams/797.png"
+            },
+            "values": {
+              "Passes accurate": 247,
+              "Shots insidebox": 1,
+              "Shots outsidebox": 2,
+              "Blocked Shots": 0,
+              "Free Kicks": 11,
+              "Shots on Goal": 1,
+              "Shots off Goal": 2,
+              "Offsides": 2,
+              "Total passes": 318,
+              "Total Shots": 3,
+              "Yellow Cards": 3,
+              "Corner Kicks": 1,
+              "Goalkeeper Saves": 2,
+              "Fouls": 12,
+              "Red Cards": 0,
+              "Ball Possession": "34%"
+            }
+          }
+        }
+      }
+    },
+    "1570377": {
+      "fixture": {
+        "id": 1570377,
+        "date": "2026-09-12T11:15:00-03:00",
+        "league": {
+          "id": 140,
+          "name": "La Liga",
+          "country": "Spain",
+          "logo": "https://media.api-sports.io/football/leagues/140.png",
+          "flag": "https://media.api-sports.io/flags/es.svg",
+          "season": 2026,
+          "round": "Regular Season - 5",
+          "standings": true
+        },
+        "teams": {
+          "home": {
+            "id": 727,
+            "name": "Osasuna",
+            "logo": "https://media.api-sports.io/football/teams/727.png",
+            "winner": false
+          },
+          "away": {
+            "id": 540,
+            "name": "Espanyol",
+            "logo": "https://media.api-sports.io/football/teams/540.png",
+            "winner": true
+          }
+        },
+        "status": "FT"
+      },
+      "fulltime": {
+        "capturedAt": "2026-09-12T18:52:24.285Z",
+        "elapsed": 90,
+        "status": "FT",
+        "statistics": {
+          "540": {
+            "team": {
+              "id": 540,
+              "name": "Espanyol",
+              "logo": "https://media.api-sports.io/football/teams/540.png"
+            },
+            "values": {
+              "Passes accurate": 255,
+              "Shots insidebox": 3,
+              "Shots outsidebox": 3,
+              "Blocked Shots": 2,
+              "Free Kicks": 9,
+              "Shots on Goal": 3,
+              "Goalkeeper Saves": 4,
+              "Shots off Goal": 1,
+              "Total passes": 324,
+              "Total Shots": 6,
+              "Yellow Cards": 3,
+              "Corner Kicks": 4,
+              "Fouls": 24,
+              "Red Cards": 0,
+              "Ball Possession": "39%"
+            }
+          },
+          "727": {
+            "team": {
+              "id": 727,
+              "name": "Osasuna",
+              "logo": "https://media.api-sports.io/football/teams/727.png"
+            },
+            "values": {
+              "Passes accurate": 411,
+              "Shots insidebox": 5,
+              "Shots outsidebox": 6,
+              "Blocked Shots": 2,
+              "Free Kicks": 22,
+              "Shots on Goal": 4,
+              "Goalkeeper Saves": 1,
+              "Shots off Goal": 5,
+              "Total passes": 492,
+              "Total Shots": 11,
+              "Yellow Cards": 2,
+              "Corner Kicks": 3,
+              "Fouls": 10,
+              "Red Cards": 0,
+              "Ball Possession": "61%"
+            }
+          }
+        }
+      }
+    },
+    "1570378": {
+      "fixture": {
+        "id": 1570378,
+        "date": "2026-09-12T09:00:00-03:00",
+        "league": {
+          "id": 140,
+          "name": "La Liga",
+          "country": "Spain",
+          "logo": "https://media.api-sports.io/football/leagues/140.png",
+          "flag": "https://media.api-sports.io/flags/es.svg",
+          "season": 2026,
+          "round": "Regular Season - 5",
+          "standings": true
+        },
+        "teams": {
+          "home": {
+            "id": 4665,
+            "name": "Racing Santander",
+            "logo": "https://media.api-sports.io/football/teams/4665.png",
+            "winner": true
+          },
+          "away": {
+            "id": 542,
+            "name": "Alaves",
+            "logo": "https://media.api-sports.io/football/teams/542.png",
+            "winner": false
+          }
+        },
+        "status": "FT"
+      },
+      "fulltime": {
+        "capturedAt": "2026-09-12T18:52:15.966Z",
+        "elapsed": 90,
+        "status": "FT",
+        "statistics": {
+          "542": {
+            "team": {
+              "id": 542,
+              "name": "Alaves",
+              "logo": "https://media.api-sports.io/football/teams/542.png"
+            },
+            "values": {
+              "Passes accurate": 252,
+              "Shots insidebox": 10,
+              "Shots outsidebox": 6,
+              "Blocked Shots": 5,
+              "Free Kicks": 15,
+              "Shots on Goal": 8,
+              "Goalkeeper Saves": 2,
+              "Shots off Goal": 3,
+              "Offsides": 9,
+              "Total passes": 334,
+              "Red Cards": 0,
+              "Total Shots": 16,
+              "Yellow Cards": 3,
+              "Corner Kicks": 6,
+              "Fouls": 17,
+              "Ball Possession": "43%"
+            }
+          },
+          "4665": {
+            "team": {
+              "id": 4665,
+              "name": "Racing Santander",
+              "logo": "https://media.api-sports.io/football/teams/4665.png"
+            },
+            "values": {
+              "Passes accurate": 356,
+              "Shots insidebox": 9,
+              "Shots outsidebox": 2,
+              "Blocked Shots": 3,
+              "Free Kicks": 17,
+              "Shots on Goal": 4,
+              "Goalkeeper Saves": 7,
+              "Shots off Goal": 4,
+              "Offsides": 2,
+              "Total passes": 455,
+              "Red Cards": 1,
+              "Total Shots": 11,
+              "Yellow Cards": 2,
+              "Corner Kicks": 4,
+              "Fouls": 16,
+              "Ball Possession": "57%"
+            }
+          }
+        }
+      }
+    },
+    "1570379": {
+      "fixture": {
+        "id": 1570379,
+        "date": "2026-09-12T16:00:00-03:00",
+        "league": {
+          "id": 140,
+          "name": "La Liga",
+          "country": "Spain",
+          "logo": "https://media.api-sports.io/football/leagues/140.png",
+          "flag": "https://media.api-sports.io/flags/es.svg",
+          "season": 2026,
+          "round": "Regular Season - 5",
+          "standings": true
+        },
+        "teams": {
+          "home": {
+            "id": 541,
+            "name": "Real Madrid",
+            "logo": "https://media.api-sports.io/football/teams/541.png",
+            "winner": true
+          },
+          "away": {
+            "id": 728,
+            "name": "Rayo Vallecano",
+            "logo": "https://media.api-sports.io/football/teams/728.png",
+            "winner": false
+          }
+        },
+        "status": "FT"
+      },
+      "fulltime": {
+        "capturedAt": "2026-09-12T21:29:31.600Z",
+        "elapsed": 90,
+        "status": "FT",
+        "statistics": {
+          "541": {
+            "team": {
+              "id": 541,
+              "name": "Real Madrid",
+              "logo": "https://media.api-sports.io/football/teams/541.png"
+            },
+            "values": {
+              "Passes accurate": 494,
+              "Shots insidebox": 16,
+              "Shots outsidebox": 8,
+              "Blocked Shots": 5,
+              "Free Kicks": 12,
+              "Shots on Goal": 11,
+              "Goalkeeper Saves": 6,
+              "Shots off Goal": 8,
+              "Offsides": 1,
+              "Total passes": 543,
+              "Total Shots": 24,
+              "Corner Kicks": 11,
+              "Yellow Cards": 0,
+              "Fouls": 9,
+              "Red Cards": 0,
+              "Ball Possession": "56%"
+            }
+          },
+          "728": {
+            "team": {
+              "id": 728,
+              "name": "Rayo Vallecano",
+              "logo": "https://media.api-sports.io/football/teams/728.png"
+            },
+            "values": {
+              "Passes accurate": 358,
+              "Shots insidebox": 8,
+              "Shots outsidebox": 10,
+              "Blocked Shots": 5,
+              "Free Kicks": 8,
+              "Shots on Goal": 7,
+              "Goalkeeper Saves": 7,
+              "Shots off Goal": 6,
+              "Offsides": 0,
+              "Total passes": 415,
+              "Total Shots": 18,
+              "Corner Kicks": 5,
+              "Yellow Cards": 1,
+              "Fouls": 13,
+              "Red Cards": 0,
+              "Ball Possession": "44%"
+            }
+          }
+        }
+      }
+    },
+    "1570384": {
+      "fixture": {
+        "id": 1570384,
+        "date": "2026-09-16T14:00:00-03:00",
+        "league": {
+          "id": 140,
+          "name": "La Liga",
+          "country": "Spain",
+          "logo": "https://media.api-sports.io/football/leagues/140.png",
+          "flag": "https://media.api-sports.io/flags/es.svg",
+          "season": 2026,
+          "round": "Regular Season - 6",
+          "standings": true
+        },
+        "teams": {
+          "home": {
+            "id": 530,
+            "name": "Atletico Madrid",
+            "logo": "https://media.api-sports.io/football/teams/530.png",
+            "winner": true
+          },
+          "away": {
+            "id": 727,
+            "name": "Osasuna",
+            "logo": "https://media.api-sports.io/football/teams/727.png",
+            "winner": false
+          }
+        },
+        "status": "HT"
+      },
+      "halftime": {
+        "capturedAt": "2026-09-16T17:51:00.261Z",
+        "elapsed": 45,
+        "status": "HT",
+        "statistics": {
+          "530": {
+            "team": {
+              "id": 530,
+              "name": "Atletico Madrid",
+              "logo": "https://media.api-sports.io/football/teams/530.png"
+            },
+            "values": {
+              "Passes accurate": 335,
+              "Shots insidebox": 13,
+              "Shots outsidebox": 3,
+              "Blocked Shots": 5,
+              "Free Kicks": 5,
+              "Shots on Goal": 5,
+              "Goalkeeper Saves": 1,
+              "Shots off Goal": 6,
+              "Total passes": 374,
+              "Total Shots": 16,
+              "Corner Kicks": 2,
+              "Fouls": 1,
+              "Yellow Cards": 0,
+              "Red Cards": 0,
+              "Ball Possession": "70%"
+            }
+          },
+          "727": {
+            "team": {
+              "id": 727,
+              "name": "Osasuna",
+              "logo": "https://media.api-sports.io/football/teams/727.png"
+            },
+            "values": {
+              "Passes accurate": 115,
+              "Shots insidebox": 2,
+              "Shots outsidebox": 0,
+              "Blocked Shots": 1,
+              "Free Kicks": 0,
+              "Shots on Goal": 1,
+              "Goalkeeper Saves": 4,
+              "Shots off Goal": 0,
+              "Total passes": 160,
+              "Total Shots": 2,
+              "Corner Kicks": 0,
+              "Fouls": 5,
+              "Yellow Cards": 0,
+              "Red Cards": 0,
+              "Ball Possession": "30%"
+            }
+          }
+        }
+      }
+    },
+    "1570387": {
+      "fixture": {
+        "id": 1570387,
+        "date": "2026-09-16T14:00:00-03:00",
+        "league": {
+          "id": 140,
+          "name": "La Liga",
+          "country": "Spain",
+          "logo": "https://media.api-sports.io/football/leagues/140.png",
+          "flag": "https://media.api-sports.io/flags/es.svg",
+          "season": 2026,
+          "round": "Regular Season - 6",
+          "standings": true
+        },
+        "teams": {
+          "home": {
+            "id": 544,
+            "name": "Deportivo La Coruna",
+            "logo": "https://media.api-sports.io/football/teams/544.png",
+            "winner": null
+          },
+          "away": {
+            "id": 536,
+            "name": "Sevilla",
+            "logo": "https://media.api-sports.io/football/teams/536.png",
+            "winner": null
+          }
+        },
+        "status": "HT"
+      },
+      "halftime": {
+        "capturedAt": "2026-09-16T17:51:00.916Z",
+        "elapsed": 45,
+        "status": "HT",
+        "statistics": {
+          "536": {
+            "team": {
+              "id": 536,
+              "name": "Sevilla",
+              "logo": "https://media.api-sports.io/football/teams/536.png"
+            },
+            "values": {
+              "Passes accurate": 143,
+              "Shots outsidebox": 3,
+              "Free Kicks": 6,
+              "Shots on Goal": 2,
+              "Goalkeeper Saves": 1,
+              "Total passes": 180,
+              "Total Shots": 4,
+              "Corner Kicks": 3,
+              "Shots insidebox": 1,
+              "Blocked Shots": 1,
+              "Shots off Goal": 1,
+              "Fouls": 7,
+              "Yellow Cards": 0,
+              "Red Cards": 0,
+              "Ball Possession": "42%"
+            }
+          },
+          "544": {
+            "team": {
+              "id": 544,
+              "name": "Deportivo La Coruna",
+              "logo": "https://media.api-sports.io/football/teams/544.png"
+            },
+            "values": {
+              "Passes accurate": 224,
+              "Shots outsidebox": 1,
+              "Free Kicks": 7,
+              "Shots on Goal": 1,
+              "Goalkeeper Saves": 2,
+              "Total passes": 258,
+              "Total Shots": 1,
+              "Corner Kicks": 2,
+              "Shots insidebox": 0,
+              "Blocked Shots": 0,
+              "Shots off Goal": 0,
+              "Fouls": 6,
+              "Yellow Cards": 0,
+              "Red Cards": 0,
+              "Ball Possession": "58%"
+            }
+          }
+        }
+      }
+    },
     "1575141": {
       "fixture": {
         "id": 1575141,
@@ -12158,6 +16409,710 @@
               "Fouls": 11,
               "Red Cards": 0,
               "Ball Possession": "48%"
+            }
+          }
+        }
+      }
+    },
+    "1575152": {
+      "fixture": {
+        "id": 1575152,
+        "date": "2026-09-06T12:30:00-03:00",
+        "league": {
+          "id": 78,
+          "name": "Bundesliga",
+          "country": "Germany",
+          "logo": "https://media.api-sports.io/football/leagues/78.png",
+          "flag": "https://media.api-sports.io/flags/de.svg",
+          "season": 2026,
+          "round": "Regular Season - 2",
+          "standings": true
+        },
+        "teams": {
+          "home": {
+            "id": 169,
+            "name": "Eintracht Frankfurt",
+            "logo": "https://media.api-sports.io/football/teams/169.png",
+            "winner": false
+          },
+          "away": {
+            "id": 170,
+            "name": "FC Augsburg",
+            "logo": "https://media.api-sports.io/football/teams/170.png",
+            "winner": true
+          }
+        },
+        "status": "FT"
+      },
+      "fulltime": {
+        "capturedAt": "2026-09-06T22:48:32.154Z",
+        "elapsed": 90,
+        "status": "FT",
+        "statistics": {
+          "169": {
+            "team": {
+              "id": 169,
+              "name": "Eintracht Frankfurt",
+              "logo": "https://media.api-sports.io/football/teams/169.png"
+            },
+            "values": {
+              "Passes accurate": 468,
+              "Shots insidebox": 17,
+              "Shots outsidebox": 5,
+              "Blocked Shots": 6,
+              "Free Kicks": 12,
+              "Shots on Goal": 8,
+              "Goalkeeper Saves": 4,
+              "Shots off Goal": 8,
+              "Offsides": 3,
+              "Total passes": 552,
+              "Total Shots": 22,
+              "Yellow Cards": 1,
+              "Corner Kicks": 9,
+              "Fouls": 10,
+              "Red Cards": 0,
+              "Ball Possession": "60%"
+            }
+          },
+          "170": {
+            "team": {
+              "id": 170,
+              "name": "FC Augsburg",
+              "logo": "https://media.api-sports.io/football/teams/170.png"
+            },
+            "values": {
+              "Passes accurate": 275,
+              "Shots insidebox": 9,
+              "Shots outsidebox": 8,
+              "Blocked Shots": 5,
+              "Free Kicks": 10,
+              "Shots on Goal": 7,
+              "Goalkeeper Saves": 7,
+              "Shots off Goal": 5,
+              "Offsides": 0,
+              "Total passes": 360,
+              "Total Shots": 17,
+              "Yellow Cards": 1,
+              "Corner Kicks": 4,
+              "Fouls": 13,
+              "Red Cards": 0,
+              "Ball Possession": "40%"
+            }
+          }
+        }
+      }
+    },
+    "1575154": {
+      "fixture": {
+        "id": 1575154,
+        "date": "2026-09-06T10:30:00-03:00",
+        "league": {
+          "id": 78,
+          "name": "Bundesliga",
+          "country": "Germany",
+          "logo": "https://media.api-sports.io/football/leagues/78.png",
+          "flag": "https://media.api-sports.io/flags/de.svg",
+          "season": 2026,
+          "round": "Regular Season - 2",
+          "standings": true
+        },
+        "teams": {
+          "home": {
+            "id": 175,
+            "name": "Hamburger SV",
+            "logo": "https://media.api-sports.io/football/teams/175.png",
+            "winner": false
+          },
+          "away": {
+            "id": 164,
+            "name": "FSV Mainz 05",
+            "logo": "https://media.api-sports.io/football/teams/164.png",
+            "winner": true
+          }
+        },
+        "status": "FT"
+      },
+      "fulltime": {
+        "capturedAt": "2026-09-06T22:48:26.198Z",
+        "elapsed": 90,
+        "status": "FT",
+        "statistics": {
+          "164": {
+            "team": {
+              "id": 164,
+              "name": "FSV Mainz 05",
+              "logo": "https://media.api-sports.io/football/teams/164.png"
+            },
+            "values": {
+              "Passes accurate": 269,
+              "Shots insidebox": 14,
+              "Shots outsidebox": 3,
+              "Blocked Shots": 2,
+              "Free Kicks": 13,
+              "Shots on Goal": 8,
+              "Goalkeeper Saves": 1,
+              "Shots off Goal": 7,
+              "Offsides": 1,
+              "Total passes": 350,
+              "Total Shots": 17,
+              "Yellow Cards": 3,
+              "Corner Kicks": 5,
+              "Fouls": 19,
+              "Red Cards": 0,
+              "Ball Possession": "46%"
+            }
+          },
+          "175": {
+            "team": {
+              "id": 175,
+              "name": "Hamburger SV",
+              "logo": "https://media.api-sports.io/football/teams/175.png"
+            },
+            "values": {
+              "Passes accurate": 347,
+              "Shots insidebox": 3,
+              "Shots outsidebox": 5,
+              "Blocked Shots": 5,
+              "Free Kicks": 19,
+              "Shots on Goal": 1,
+              "Goalkeeper Saves": 3,
+              "Shots off Goal": 2,
+              "Offsides": 2,
+              "Total passes": 421,
+              "Total Shots": 8,
+              "Yellow Cards": 1,
+              "Corner Kicks": 4,
+              "Fouls": 14,
+              "Red Cards": 0,
+              "Ball Possession": "54%"
+            }
+          }
+        }
+      }
+    },
+    "1575158": {
+      "fixture": {
+        "id": 1575158,
+        "date": "2026-09-12T10:30:00-03:00",
+        "league": {
+          "id": 78,
+          "name": "Bundesliga",
+          "country": "Germany",
+          "logo": "https://media.api-sports.io/football/leagues/78.png",
+          "flag": "https://media.api-sports.io/flags/de.svg",
+          "season": 2026,
+          "round": "Regular Season - 3",
+          "standings": true
+        },
+        "teams": {
+          "home": {
+            "id": 165,
+            "name": "Borussia Dortmund",
+            "logo": "https://media.api-sports.io/football/teams/165.png",
+            "winner": true
+          },
+          "away": {
+            "id": 185,
+            "name": "SC Paderborn 07",
+            "logo": "https://media.api-sports.io/football/teams/185.png",
+            "winner": false
+          }
+        },
+        "status": "FT"
+      },
+      "fulltime": {
+        "capturedAt": "2026-09-12T18:52:17.343Z",
+        "elapsed": 90,
+        "status": "FT",
+        "statistics": {
+          "165": {
+            "team": {
+              "id": 165,
+              "name": "Borussia Dortmund",
+              "logo": "https://media.api-sports.io/football/teams/165.png"
+            },
+            "values": {
+              "Passes accurate": 463,
+              "Shots insidebox": 10,
+              "Shots outsidebox": 4,
+              "Blocked Shots": 3,
+              "Free Kicks": 6,
+              "Shots on Goal": 8,
+              "Shots off Goal": 3,
+              "Offsides": 3,
+              "Total passes": 553,
+              "Total Shots": 14,
+              "Yellow Cards": 1,
+              "Corner Kicks": 7,
+              "Goalkeeper Saves": 0,
+              "Fouls": 11,
+              "Red Cards": 0,
+              "Ball Possession": "56%"
+            }
+          },
+          "185": {
+            "team": {
+              "id": 185,
+              "name": "SC Paderborn 07",
+              "logo": "https://media.api-sports.io/football/teams/185.png"
+            },
+            "values": {
+              "Passes accurate": 378,
+              "Shots insidebox": 5,
+              "Shots outsidebox": 5,
+              "Blocked Shots": 2,
+              "Free Kicks": 11,
+              "Shots on Goal": 0,
+              "Shots off Goal": 8,
+              "Offsides": 2,
+              "Total passes": 460,
+              "Total Shots": 10,
+              "Yellow Cards": 1,
+              "Corner Kicks": 3,
+              "Goalkeeper Saves": 5,
+              "Fouls": 7,
+              "Red Cards": 0,
+              "Ball Possession": "44%"
+            }
+          }
+        }
+      }
+    },
+    "1575160": {
+      "fixture": {
+        "id": 1575160,
+        "date": "2026-09-12T10:30:00-03:00",
+        "league": {
+          "id": 78,
+          "name": "Bundesliga",
+          "country": "Germany",
+          "logo": "https://media.api-sports.io/football/leagues/78.png",
+          "flag": "https://media.api-sports.io/flags/de.svg",
+          "season": 2026,
+          "round": "Regular Season - 3",
+          "standings": true
+        },
+        "teams": {
+          "home": {
+            "id": 167,
+            "name": "1899 Hoffenheim",
+            "logo": "https://media.api-sports.io/football/teams/167.png",
+            "winner": true
+          },
+          "away": {
+            "id": 172,
+            "name": "VfB Stuttgart",
+            "logo": "https://media.api-sports.io/football/teams/172.png",
+            "winner": false
+          }
+        },
+        "status": "FT"
+      },
+      "fulltime": {
+        "capturedAt": "2026-09-12T18:52:17.969Z",
+        "elapsed": 90,
+        "status": "FT",
+        "statistics": {
+          "167": {
+            "team": {
+              "id": 167,
+              "name": "1899 Hoffenheim",
+              "logo": "https://media.api-sports.io/football/teams/167.png"
+            },
+            "values": {
+              "Passes accurate": 276,
+              "Shots insidebox": 12,
+              "Shots outsidebox": 8,
+              "Blocked Shots": 5,
+              "Free Kicks": 8,
+              "Shots on Goal": 8,
+              "Goalkeeper Saves": 4,
+              "Shots off Goal": 7,
+              "Offsides": 2,
+              "Total passes": 380,
+              "Total Shots": 20,
+              "Yellow Cards": 1,
+              "Corner Kicks": 5,
+              "Fouls": 15,
+              "Red Cards": 0,
+              "Ball Possession": "43%"
+            }
+          },
+          "172": {
+            "team": {
+              "id": 172,
+              "name": "VfB Stuttgart",
+              "logo": "https://media.api-sports.io/football/teams/172.png"
+            },
+            "values": {
+              "Passes accurate": 395,
+              "Shots insidebox": 13,
+              "Shots outsidebox": 3,
+              "Blocked Shots": 4,
+              "Free Kicks": 13,
+              "Shots on Goal": 5,
+              "Goalkeeper Saves": 6,
+              "Shots off Goal": 7,
+              "Offsides": 1,
+              "Total passes": 509,
+              "Total Shots": 16,
+              "Yellow Cards": 0,
+              "Corner Kicks": 7,
+              "Fouls": 8,
+              "Red Cards": 0,
+              "Ball Possession": "57%"
+            }
+          }
+        }
+      }
+    },
+    "1575161": {
+      "fixture": {
+        "id": 1575161,
+        "date": "2026-09-12T10:30:00-03:00",
+        "league": {
+          "id": 78,
+          "name": "Bundesliga",
+          "country": "Germany",
+          "logo": "https://media.api-sports.io/football/leagues/78.png",
+          "flag": "https://media.api-sports.io/flags/de.svg",
+          "season": 2026,
+          "round": "Regular Season - 3",
+          "standings": true
+        },
+        "teams": {
+          "home": {
+            "id": 160,
+            "name": "SC Freiburg",
+            "logo": "https://media.api-sports.io/football/teams/160.png",
+            "winner": true
+          },
+          "away": {
+            "id": 163,
+            "name": "Borussia Mönchengladbach",
+            "logo": "https://media.api-sports.io/football/teams/163.png",
+            "winner": false
+          }
+        },
+        "status": "FT"
+      },
+      "fulltime": {
+        "capturedAt": "2026-09-12T18:52:18.664Z",
+        "elapsed": 90,
+        "status": "FT",
+        "statistics": {
+          "160": {
+            "team": {
+              "id": 160,
+              "name": "SC Freiburg",
+              "logo": "https://media.api-sports.io/football/teams/160.png"
+            },
+            "values": {
+              "Passes accurate": 490,
+              "Shots insidebox": 12,
+              "Shots outsidebox": 7,
+              "Blocked Shots": 5,
+              "Free Kicks": 16,
+              "Shots on Goal": 9,
+              "Shots off Goal": 5,
+              "Offsides": 1,
+              "Total passes": 544,
+              "Total Shots": 19,
+              "Yellow Cards": 1,
+              "Corner Kicks": 6,
+              "Goalkeeper Saves": 0,
+              "Red Cards": 0,
+              "Fouls": 7,
+              "Ball Possession": "60%"
+            }
+          },
+          "163": {
+            "team": {
+              "id": 163,
+              "name": "Borussia Mönchengladbach",
+              "logo": "https://media.api-sports.io/football/teams/163.png"
+            },
+            "values": {
+              "Passes accurate": 270,
+              "Shots insidebox": 4,
+              "Shots outsidebox": 1,
+              "Blocked Shots": 3,
+              "Free Kicks": 7,
+              "Shots on Goal": 0,
+              "Shots off Goal": 2,
+              "Offsides": 1,
+              "Total passes": 338,
+              "Total Shots": 5,
+              "Yellow Cards": 2,
+              "Corner Kicks": 2,
+              "Goalkeeper Saves": 4,
+              "Red Cards": 1,
+              "Fouls": 16,
+              "Ball Possession": "40%"
+            }
+          }
+        }
+      }
+    },
+    "1575162": {
+      "fixture": {
+        "id": 1575162,
+        "date": "2026-09-12T10:30:00-03:00",
+        "league": {
+          "id": 78,
+          "name": "Bundesliga",
+          "country": "Germany",
+          "logo": "https://media.api-sports.io/football/leagues/78.png",
+          "flag": "https://media.api-sports.io/flags/de.svg",
+          "season": 2026,
+          "round": "Regular Season - 3",
+          "standings": true
+        },
+        "teams": {
+          "home": {
+            "id": 170,
+            "name": "FC Augsburg",
+            "logo": "https://media.api-sports.io/football/teams/170.png",
+            "winner": null
+          },
+          "away": {
+            "id": 168,
+            "name": "Bayer Leverkusen",
+            "logo": "https://media.api-sports.io/football/teams/168.png",
+            "winner": null
+          }
+        },
+        "status": "FT"
+      },
+      "fulltime": {
+        "capturedAt": "2026-09-12T18:52:19.390Z",
+        "elapsed": 90,
+        "status": "FT",
+        "statistics": {
+          "168": {
+            "team": {
+              "id": 168,
+              "name": "Bayer Leverkusen",
+              "logo": "https://media.api-sports.io/football/teams/168.png"
+            },
+            "values": {
+              "Passes accurate": 526,
+              "Shots insidebox": 21,
+              "Shots outsidebox": 9,
+              "Blocked Shots": 12,
+              "Free Kicks": 6,
+              "Shots on Goal": 5,
+              "Goalkeeper Saves": 3,
+              "Shots off Goal": 13,
+              "Total passes": 595,
+              "Total Shots": 30,
+              "Yellow Cards": 1,
+              "Corner Kicks": 14,
+              "Offsides": 1,
+              "Fouls": 12,
+              "Red Cards": 0,
+              "Ball Possession": "63%"
+            }
+          },
+          "170": {
+            "team": {
+              "id": 170,
+              "name": "FC Augsburg",
+              "logo": "https://media.api-sports.io/football/teams/170.png"
+            },
+            "values": {
+              "Passes accurate": 277,
+              "Shots insidebox": 5,
+              "Shots outsidebox": 3,
+              "Blocked Shots": 1,
+              "Free Kicks": 12,
+              "Shots on Goal": 5,
+              "Goalkeeper Saves": 3,
+              "Shots off Goal": 2,
+              "Total passes": 349,
+              "Total Shots": 8,
+              "Yellow Cards": 1,
+              "Corner Kicks": 2,
+              "Offsides": 0,
+              "Fouls": 6,
+              "Red Cards": 0,
+              "Ball Possession": "37%"
+            }
+          }
+        }
+      }
+    },
+    "1575163": {
+      "fixture": {
+        "id": 1575163,
+        "date": "2026-09-12T10:30:00-03:00",
+        "league": {
+          "id": 78,
+          "name": "Bundesliga",
+          "country": "Germany",
+          "logo": "https://media.api-sports.io/football/leagues/78.png",
+          "flag": "https://media.api-sports.io/flags/de.svg",
+          "season": 2026,
+          "round": "Regular Season - 3",
+          "standings": true
+        },
+        "teams": {
+          "home": {
+            "id": 164,
+            "name": "FSV Mainz 05",
+            "logo": "https://media.api-sports.io/football/teams/164.png",
+            "winner": false
+          },
+          "away": {
+            "id": 169,
+            "name": "Eintracht Frankfurt",
+            "logo": "https://media.api-sports.io/football/teams/169.png",
+            "winner": true
+          }
+        },
+        "status": "FT"
+      },
+      "fulltime": {
+        "capturedAt": "2026-09-12T18:52:20.154Z",
+        "elapsed": 90,
+        "status": "FT",
+        "statistics": {
+          "164": {
+            "team": {
+              "id": 164,
+              "name": "FSV Mainz 05",
+              "logo": "https://media.api-sports.io/football/teams/164.png"
+            },
+            "values": {
+              "Passes accurate": 385,
+              "Shots insidebox": 11,
+              "Shots outsidebox": 7,
+              "Blocked Shots": 7,
+              "Free Kicks": 8,
+              "Shots on Goal": 5,
+              "Goalkeeper Saves": 2,
+              "Shots off Goal": 6,
+              "Offsides": 1,
+              "Total passes": 477,
+              "Total Shots": 18,
+              "Corner Kicks": 4,
+              "Yellow Cards": 0,
+              "Fouls": 11,
+              "Red Cards": 0,
+              "Ball Possession": "55%"
+            }
+          },
+          "169": {
+            "team": {
+              "id": 169,
+              "name": "Eintracht Frankfurt",
+              "logo": "https://media.api-sports.io/football/teams/169.png"
+            },
+            "values": {
+              "Passes accurate": 327,
+              "Shots insidebox": 9,
+              "Shots outsidebox": 2,
+              "Blocked Shots": 2,
+              "Free Kicks": 10,
+              "Shots on Goal": 5,
+              "Goalkeeper Saves": 4,
+              "Shots off Goal": 4,
+              "Offsides": 3,
+              "Total passes": 404,
+              "Total Shots": 11,
+              "Corner Kicks": 5,
+              "Yellow Cards": 2,
+              "Fouls": 9,
+              "Red Cards": 0,
+              "Ball Possession": "45%"
+            }
+          }
+        }
+      }
+    },
+    "1575165": {
+      "fixture": {
+        "id": 1575165,
+        "date": "2026-09-12T13:30:00-03:00",
+        "league": {
+          "id": 78,
+          "name": "Bundesliga",
+          "country": "Germany",
+          "logo": "https://media.api-sports.io/football/leagues/78.png",
+          "flag": "https://media.api-sports.io/flags/de.svg",
+          "season": 2026,
+          "round": "Regular Season - 3",
+          "standings": true
+        },
+        "teams": {
+          "home": {
+            "id": 192,
+            "name": "1. FC Köln",
+            "logo": "https://media.api-sports.io/football/teams/192.png",
+            "winner": null
+          },
+          "away": {
+            "id": 162,
+            "name": "Werder Bremen",
+            "logo": "https://media.api-sports.io/football/teams/162.png",
+            "winner": null
+          }
+        },
+        "status": "FT"
+      },
+      "fulltime": {
+        "capturedAt": "2026-09-12T18:52:27.601Z",
+        "elapsed": 90,
+        "status": "FT",
+        "statistics": {
+          "162": {
+            "team": {
+              "id": 162,
+              "name": "Werder Bremen",
+              "logo": "https://media.api-sports.io/football/teams/162.png"
+            },
+            "values": {
+              "Passes accurate": 461,
+              "Shots insidebox": 11,
+              "Shots outsidebox": 3,
+              "Blocked Shots": 3,
+              "Free Kicks": 11,
+              "Shots on Goal": 5,
+              "Goalkeeper Saves": 5,
+              "Shots off Goal": 6,
+              "Offsides": 1,
+              "Total passes": 529,
+              "Total Shots": 14,
+              "Yellow Cards": 1,
+              "Corner Kicks": 5,
+              "Fouls": 12,
+              "Red Cards": 0,
+              "Ball Possession": "53%"
+            }
+          },
+          "192": {
+            "team": {
+              "id": 192,
+              "name": "1. FC Köln",
+              "logo": "https://media.api-sports.io/football/teams/192.png"
+            },
+            "values": {
+              "Passes accurate": 392,
+              "Shots insidebox": 9,
+              "Shots outsidebox": 6,
+              "Blocked Shots": 6,
+              "Free Kicks": 11,
+              "Shots on Goal": 6,
+              "Goalkeeper Saves": 4,
+              "Shots off Goal": 3,
+              "Offsides": 1,
+              "Total passes": 463,
+              "Total Shots": 15,
+              "Yellow Cards": 2,
+              "Corner Kicks": 8,
+              "Fouls": 11,
+              "Red Cards": 0,
+              "Ball Possession": "47%"
             }
           }
         }
@@ -24917,6 +29872,1506 @@
               "Offsides": 1,
               "Fouls": 13,
               "Red Cards": 0
+            }
+          }
+        }
+      }
+    },
+    "1630777": {
+      "fixture": {
+        "id": 1630777,
+        "date": "2026-09-08T19:00:00-03:00",
+        "league": {
+          "id": 13,
+          "name": "CONMEBOL Libertadores",
+          "country": "World",
+          "logo": "https://media.api-sports.io/football/leagues/13.png",
+          "flag": null,
+          "season": 2026,
+          "round": "Quarter-finals",
+          "standings": true
+        },
+        "teams": {
+          "home": {
+            "id": 124,
+            "name": "Fluminense",
+            "logo": "https://media.api-sports.io/football/teams/124.png",
+            "winner": true
+          },
+          "away": {
+            "id": 1064,
+            "name": "Platense",
+            "logo": "https://media.api-sports.io/football/teams/1064.png",
+            "winner": false
+          }
+        },
+        "status": "HT"
+      },
+      "halftime": {
+        "capturedAt": "2026-09-08T22:53:26.681Z",
+        "elapsed": 45,
+        "status": "HT",
+        "statistics": {
+          "124": {
+            "team": {
+              "id": 124,
+              "name": "Fluminense",
+              "logo": "https://media.api-sports.io/football/teams/124.png"
+            },
+            "values": {
+              "Passes accurate": 281,
+              "Shots insidebox": 2,
+              "Shots outsidebox": 1,
+              "Free Kicks": 7,
+              "Shots on Goal": 2,
+              "Goalkeeper Saves": 1,
+              "Shots off Goal": 1,
+              "Offsides": 1,
+              "Total passes": 316,
+              "Total Shots": 3,
+              "Corner Kicks": 1,
+              "Blocked Shots": 0,
+              "Fouls": 3,
+              "Red Cards": 0,
+              "Yellow Cards": 0,
+              "Ball Possession": "61%"
+            }
+          },
+          "1064": {
+            "team": {
+              "id": 1064,
+              "name": "Platense",
+              "logo": "https://media.api-sports.io/football/teams/1064.png"
+            },
+            "values": {
+              "Passes accurate": 137,
+              "Shots insidebox": 1,
+              "Shots outsidebox": 4,
+              "Free Kicks": 3,
+              "Shots on Goal": 1,
+              "Goalkeeper Saves": 0,
+              "Shots off Goal": 1,
+              "Offsides": 0,
+              "Total passes": 190,
+              "Total Shots": 5,
+              "Corner Kicks": 2,
+              "Blocked Shots": 3,
+              "Fouls": 7,
+              "Red Cards": 0,
+              "Yellow Cards": 0,
+              "Ball Possession": "39%"
+            }
+          }
+        }
+      }
+    },
+    "1635556": {
+      "fixture": {
+        "id": 1635556,
+        "date": "2026-09-08T15:45:00-03:00",
+        "league": {
+          "id": 48,
+          "name": "League Cup",
+          "country": "England",
+          "logo": "https://media.api-sports.io/football/leagues/48.png",
+          "flag": "https://media.api-sports.io/flags/gb-eng.svg",
+          "season": 2026,
+          "round": "Round of 32",
+          "standings": false
+        },
+        "teams": {
+          "home": {
+            "id": 35,
+            "name": "Bournemouth",
+            "logo": "https://media.api-sports.io/football/teams/35.png",
+            "winner": true
+          },
+          "away": {
+            "id": 1379,
+            "name": "Lincoln",
+            "logo": "https://media.api-sports.io/football/teams/1379.png",
+            "winner": false
+          }
+        },
+        "status": "FT"
+      },
+      "fulltime": {
+        "capturedAt": "2026-09-08T22:44:08.711Z",
+        "elapsed": 90,
+        "status": "FT",
+        "statistics": {
+          "35": {
+            "team": {
+              "id": 35,
+              "name": "Bournemouth",
+              "logo": "https://media.api-sports.io/football/teams/35.png"
+            },
+            "values": {
+              "Passes accurate": 521,
+              "Shots insidebox": 21,
+              "Shots outsidebox": 15,
+              "Blocked Shots": 13,
+              "Free Kicks": 8,
+              "Shots on Goal": 8,
+              "Goalkeeper Saves": 1,
+              "Shots off Goal": 15,
+              "Offsides": 1,
+              "Total passes": 586,
+              "Total Shots": 36,
+              "Yellow Cards": 2,
+              "Corner Kicks": 10,
+              "Fouls": 11,
+              "Red Cards": 0,
+              "Ball Possession": "60%"
+            }
+          },
+          "1379": {
+            "team": {
+              "id": 1379,
+              "name": "Lincoln",
+              "logo": "https://media.api-sports.io/football/teams/1379.png"
+            },
+            "values": {
+              "Passes accurate": 207,
+              "Shots insidebox": 2,
+              "Shots outsidebox": 0,
+              "Blocked Shots": 0,
+              "Free Kicks": 11,
+              "Shots on Goal": 1,
+              "Goalkeeper Saves": 4,
+              "Shots off Goal": 1,
+              "Offsides": 0,
+              "Total passes": 283,
+              "Total Shots": 2,
+              "Yellow Cards": 3,
+              "Corner Kicks": 0,
+              "Fouls": 8,
+              "Red Cards": 0,
+              "Ball Possession": "40%"
+            }
+          }
+        }
+      }
+    },
+    "1635558": {
+      "fixture": {
+        "id": 1635558,
+        "date": "2026-09-08T15:45:00-03:00",
+        "league": {
+          "id": 48,
+          "name": "League Cup",
+          "country": "England",
+          "logo": "https://media.api-sports.io/football/leagues/48.png",
+          "flag": "https://media.api-sports.io/flags/gb-eng.svg",
+          "season": 2026,
+          "round": "Round of 32",
+          "standings": false
+        },
+        "teams": {
+          "home": {
+            "id": 52,
+            "name": "Crystal Palace",
+            "logo": "https://media.api-sports.io/football/teams/52.png",
+            "winner": true
+          },
+          "away": {
+            "id": 70,
+            "name": "Middlesbrough",
+            "logo": "https://media.api-sports.io/football/teams/70.png",
+            "winner": false
+          }
+        },
+        "status": "FT"
+      },
+      "fulltime": {
+        "capturedAt": "2026-09-08T22:44:09.383Z",
+        "elapsed": 90,
+        "status": "FT",
+        "statistics": {
+          "52": {
+            "team": {
+              "id": 52,
+              "name": "Crystal Palace",
+              "logo": "https://media.api-sports.io/football/teams/52.png"
+            },
+            "values": {
+              "Passes accurate": 343,
+              "Shots insidebox": 4,
+              "Shots outsidebox": 4,
+              "Blocked Shots": 2,
+              "Free Kicks": 10,
+              "Shots on Goal": 5,
+              "Goalkeeper Saves": 4,
+              "Shots off Goal": 1,
+              "Offsides": 2,
+              "Total passes": 415,
+              "Total Shots": 8,
+              "Corner Kicks": 1,
+              "Yellow Cards": 0,
+              "Fouls": 10,
+              "Red Cards": 0,
+              "Ball Possession": "63%"
+            }
+          },
+          "70": {
+            "team": {
+              "id": 70,
+              "name": "Middlesbrough",
+              "logo": "https://media.api-sports.io/football/teams/70.png"
+            },
+            "values": {
+              "Passes accurate": 539,
+              "Shots insidebox": 9,
+              "Shots outsidebox": 7,
+              "Blocked Shots": 6,
+              "Free Kicks": 10,
+              "Shots on Goal": 4,
+              "Goalkeeper Saves": 2,
+              "Shots off Goal": 6,
+              "Offsides": 3,
+              "Total passes": 600,
+              "Total Shots": 16,
+              "Corner Kicks": 6,
+              "Yellow Cards": 2,
+              "Fouls": 11,
+              "Red Cards": 0,
+              "Ball Possession": "37%"
+            }
+          }
+        }
+      }
+    },
+    "1635562": {
+      "fixture": {
+        "id": 1635562,
+        "date": "2026-09-08T15:45:00-03:00",
+        "league": {
+          "id": 48,
+          "name": "League Cup",
+          "country": "England",
+          "logo": "https://media.api-sports.io/football/leagues/48.png",
+          "flag": "https://media.api-sports.io/flags/gb-eng.svg",
+          "season": 2026,
+          "round": "Round of 32",
+          "standings": false
+        },
+        "teams": {
+          "home": {
+            "id": 1373,
+            "name": "Leyton Orient",
+            "logo": "https://media.api-sports.io/football/teams/1373.png",
+            "winner": false
+          },
+          "away": {
+            "id": 1343,
+            "name": "Bradford",
+            "logo": "https://media.api-sports.io/football/teams/1343.png",
+            "winner": true
+          }
+        },
+        "status": "FT"
+      },
+      "fulltime": {
+        "capturedAt": "2026-09-08T22:44:10.043Z",
+        "elapsed": 90,
+        "status": "FT",
+        "statistics": {
+          "1343": {
+            "team": {
+              "id": 1343,
+              "name": "Bradford",
+              "logo": "https://media.api-sports.io/football/teams/1343.png"
+            },
+            "values": {
+              "Passes accurate": 228,
+              "Shots insidebox": 14,
+              "Shots outsidebox": 3,
+              "Blocked Shots": 5,
+              "Free Kicks": 8,
+              "Shots on Goal": 9,
+              "Goalkeeper Saves": 4,
+              "Shots off Goal": 3,
+              "Offsides": 1,
+              "Total passes": 338,
+              "Total Shots": 17,
+              "Yellow Cards": 1,
+              "Corner Kicks": 12,
+              "Fouls": 10,
+              "Red Cards": 0,
+              "Ball Possession": "57%"
+            }
+          },
+          "1373": {
+            "team": {
+              "id": 1373,
+              "name": "Leyton Orient",
+              "logo": "https://media.api-sports.io/football/teams/1373.png"
+            },
+            "values": {
+              "Passes accurate": 261,
+              "Shots insidebox": 9,
+              "Shots outsidebox": 7,
+              "Blocked Shots": 6,
+              "Free Kicks": 9,
+              "Shots on Goal": 4,
+              "Goalkeeper Saves": 5,
+              "Shots off Goal": 6,
+              "Offsides": 3,
+              "Total passes": 370,
+              "Total Shots": 16,
+              "Yellow Cards": 3,
+              "Corner Kicks": 8,
+              "Fouls": 9,
+              "Red Cards": 0,
+              "Ball Possession": "43%"
+            }
+          }
+        }
+      }
+    },
+    "1635566": {
+      "fixture": {
+        "id": 1635566,
+        "date": "2026-09-08T16:00:00-03:00",
+        "league": {
+          "id": 48,
+          "name": "League Cup",
+          "country": "England",
+          "logo": "https://media.api-sports.io/football/leagues/48.png",
+          "flag": "https://media.api-sports.io/flags/gb-eng.svg",
+          "season": 2026,
+          "round": "Round of 32",
+          "standings": false
+        },
+        "teams": {
+          "home": {
+            "id": 58,
+            "name": "Millwall",
+            "logo": "https://media.api-sports.io/football/teams/58.png",
+            "winner": false
+          },
+          "away": {
+            "id": 34,
+            "name": "Newcastle",
+            "logo": "https://media.api-sports.io/football/teams/34.png",
+            "winner": true
+          }
+        },
+        "status": "FT"
+      },
+      "fulltime": {
+        "capturedAt": "2026-09-08T22:44:27.300Z",
+        "elapsed": 90,
+        "status": "FT",
+        "statistics": {
+          "34": {
+            "team": {
+              "id": 34,
+              "name": "Newcastle",
+              "logo": "https://media.api-sports.io/football/teams/34.png"
+            },
+            "values": {
+              "Passes accurate": 393,
+              "Shots insidebox": 17,
+              "Shots outsidebox": 8,
+              "Blocked Shots": 10,
+              "Free Kicks": 15,
+              "Shots on Goal": 6,
+              "Goalkeeper Saves": 3,
+              "Shots off Goal": 9,
+              "Offsides": 0,
+              "Total passes": 463,
+              "Total Shots": 25,
+              "Yellow Cards": 1,
+              "Corner Kicks": 15,
+              "Fouls": 12,
+              "Red Cards": 0,
+              "Ball Possession": "63%"
+            }
+          },
+          "58": {
+            "team": {
+              "id": 58,
+              "name": "Millwall",
+              "logo": "https://media.api-sports.io/football/teams/58.png"
+            },
+            "values": {
+              "Passes accurate": 204,
+              "Shots insidebox": 8,
+              "Shots outsidebox": 1,
+              "Blocked Shots": 2,
+              "Free Kicks": 12,
+              "Shots on Goal": 2,
+              "Goalkeeper Saves": 5,
+              "Shots off Goal": 5,
+              "Offsides": 2,
+              "Total passes": 276,
+              "Total Shots": 9,
+              "Yellow Cards": 2,
+              "Corner Kicks": 1,
+              "Fouls": 15,
+              "Red Cards": 0,
+              "Ball Possession": "37%"
+            }
+          }
+        }
+      }
+    },
+    "1635569": {
+      "fixture": {
+        "id": 1635569,
+        "date": "2026-09-08T15:45:00-03:00",
+        "league": {
+          "id": 48,
+          "name": "League Cup",
+          "country": "England",
+          "logo": "https://media.api-sports.io/football/leagues/48.png",
+          "flag": "https://media.api-sports.io/flags/gb-eng.svg",
+          "season": 2026,
+          "round": "Round of 32",
+          "standings": false
+        },
+        "teams": {
+          "home": {
+            "id": 746,
+            "name": "Sunderland",
+            "logo": "https://media.api-sports.io/football/teams/746.png",
+            "winner": true
+          },
+          "away": {
+            "id": 64,
+            "name": "Hull City",
+            "logo": "https://media.api-sports.io/football/teams/64.png",
+            "winner": false
+          }
+        },
+        "status": "FT"
+      },
+      "fulltime": {
+        "capturedAt": "2026-09-08T22:44:10.664Z",
+        "elapsed": 90,
+        "status": "FT",
+        "statistics": {
+          "64": {
+            "team": {
+              "id": 64,
+              "name": "Hull City",
+              "logo": "https://media.api-sports.io/football/teams/64.png"
+            },
+            "values": {
+              "Passes accurate": 328,
+              "Shots insidebox": 1,
+              "Shots outsidebox": 6,
+              "Blocked Shots": 3,
+              "Free Kicks": 8,
+              "Shots on Goal": 1,
+              "Goalkeeper Saves": 3,
+              "Shots off Goal": 3,
+              "Offsides": 1,
+              "Total passes": 399,
+              "Total Shots": 7,
+              "Yellow Cards": 3,
+              "Corner Kicks": 12,
+              "Fouls": 17,
+              "Red Cards": 0,
+              "Ball Possession": "45%"
+            }
+          },
+          "746": {
+            "team": {
+              "id": 746,
+              "name": "Sunderland",
+              "logo": "https://media.api-sports.io/football/teams/746.png"
+            },
+            "values": {
+              "Passes accurate": 366,
+              "Shots insidebox": 9,
+              "Shots outsidebox": 5,
+              "Blocked Shots": 2,
+              "Free Kicks": 16,
+              "Shots on Goal": 4,
+              "Goalkeeper Saves": 1,
+              "Shots off Goal": 8,
+              "Offsides": 5,
+              "Total passes": 419,
+              "Total Shots": 14,
+              "Yellow Cards": 1,
+              "Corner Kicks": 7,
+              "Fouls": 8,
+              "Red Cards": 0,
+              "Ball Possession": "55%"
+            }
+          }
+        }
+      }
+    },
+    "1635576": {
+      "fixture": {
+        "id": 1635576,
+        "date": "2026-09-08T19:00:00-03:00",
+        "league": {
+          "id": 11,
+          "name": "CONMEBOL Sudamericana",
+          "country": "World",
+          "logo": "https://media.api-sports.io/football/leagues/11.png",
+          "flag": null,
+          "season": 2026,
+          "round": "Quarter-finals",
+          "standings": true
+        },
+        "teams": {
+          "home": {
+            "id": 1139,
+            "name": "Santa Fe",
+            "logo": "https://media.api-sports.io/football/teams/1139.png",
+            "winner": null
+          },
+          "away": {
+            "id": 133,
+            "name": "Vasco DA Gama",
+            "logo": "https://media.api-sports.io/football/teams/133.png",
+            "winner": null
+          }
+        },
+        "status": "HT"
+      },
+      "halftime": {
+        "capturedAt": "2026-09-08T22:53:27.347Z",
+        "elapsed": 45,
+        "status": "HT",
+        "statistics": {
+          "133": {
+            "team": {
+              "id": 133,
+              "name": "Vasco DA Gama",
+              "logo": "https://media.api-sports.io/football/teams/133.png"
+            },
+            "values": {
+              "Passes accurate": 149,
+              "Shots insidebox": 3,
+              "Shots outsidebox": 6,
+              "Blocked Shots": 3,
+              "Free Kicks": 1,
+              "Goalkeeper Saves": 0,
+              "Shots off Goal": 4,
+              "Offsides": 0,
+              "Total passes": 178,
+              "Total Shots": 9,
+              "Corner Kicks": 5,
+              "Shots on Goal": 2,
+              "Yellow Cards": 1,
+              "Fouls": 4,
+              "Red Cards": 0,
+              "Ball Possession": "64%"
+            }
+          },
+          "1139": {
+            "team": {
+              "id": 1139,
+              "name": "Santa Fe",
+              "logo": "https://media.api-sports.io/football/teams/1139.png"
+            },
+            "values": {
+              "Passes accurate": 147,
+              "Shots insidebox": 2,
+              "Shots outsidebox": 1,
+              "Blocked Shots": 1,
+              "Free Kicks": 4,
+              "Goalkeeper Saves": 2,
+              "Shots off Goal": 2,
+              "Offsides": 1,
+              "Total passes": 188,
+              "Total Shots": 3,
+              "Corner Kicks": 1,
+              "Shots on Goal": 0,
+              "Yellow Cards": 0,
+              "Fouls": 1,
+              "Red Cards": 0,
+              "Ball Possession": "36%"
+            }
+          }
+        }
+      }
+    },
+    "1635609": {
+      "fixture": {
+        "id": 1635609,
+        "date": "2026-09-08T13:45:00-03:00",
+        "league": {
+          "id": 2,
+          "name": "UEFA Champions League",
+          "country": "World",
+          "logo": "https://media.api-sports.io/football/leagues/2.png",
+          "flag": null,
+          "season": 2026,
+          "round": "League Stage - 1",
+          "standings": true
+        },
+        "teams": {
+          "home": {
+            "id": 575,
+            "name": "AEK Athens FC",
+            "logo": "https://media.api-sports.io/football/teams/575.png",
+            "winner": true
+          },
+          "away": {
+            "id": 1026,
+            "name": "Lask Linz",
+            "logo": "https://media.api-sports.io/football/teams/1026.png",
+            "winner": false
+          }
+        },
+        "status": "FT"
+      },
+      "fulltime": {
+        "capturedAt": "2026-09-08T22:44:06.748Z",
+        "elapsed": 90,
+        "status": "FT",
+        "statistics": {
+          "575": {
+            "team": {
+              "id": 575,
+              "name": "AEK Athens FC",
+              "logo": "https://media.api-sports.io/football/teams/575.png"
+            },
+            "values": {
+              "Passes accurate": 341,
+              "Shots insidebox": 10,
+              "Shots outsidebox": 8,
+              "Blocked Shots": 9,
+              "Free Kicks": 14,
+              "Shots on Goal": 4,
+              "Goalkeeper Saves": 3,
+              "Shots off Goal": 5,
+              "Offsides": 2,
+              "Total passes": 405,
+              "Total Shots": 18,
+              "Yellow Cards": 1,
+              "Corner Kicks": 7,
+              "Fouls": 7,
+              "Red Cards": 0,
+              "Ball Possession": "49%"
+            }
+          },
+          "1026": {
+            "team": {
+              "id": 1026,
+              "name": "Lask Linz",
+              "logo": "https://media.api-sports.io/football/teams/1026.png"
+            },
+            "values": {
+              "Passes accurate": 345,
+              "Shots insidebox": 5,
+              "Shots outsidebox": 6,
+              "Blocked Shots": 2,
+              "Free Kicks": 6,
+              "Shots on Goal": 3,
+              "Goalkeeper Saves": 2,
+              "Shots off Goal": 6,
+              "Offsides": 0,
+              "Total passes": 426,
+              "Total Shots": 11,
+              "Yellow Cards": 2,
+              "Corner Kicks": 3,
+              "Fouls": 15,
+              "Red Cards": 0,
+              "Ball Possession": "51%"
+            }
+          }
+        }
+      }
+    },
+    "1635643": {
+      "fixture": {
+        "id": 1635643,
+        "date": "2026-09-08T13:45:00-03:00",
+        "league": {
+          "id": 2,
+          "name": "UEFA Champions League",
+          "country": "World",
+          "logo": "https://media.api-sports.io/football/leagues/2.png",
+          "flag": null,
+          "season": 2026,
+          "round": "League Stage - 1",
+          "standings": true
+        },
+        "teams": {
+          "home": {
+            "id": 569,
+            "name": "Club Brugge KV",
+            "logo": "https://media.api-sports.io/football/teams/569.png",
+            "winner": false
+          },
+          "away": {
+            "id": 66,
+            "name": "Aston Villa",
+            "logo": "https://media.api-sports.io/football/teams/66.png",
+            "winner": true
+          }
+        },
+        "status": "FT"
+      },
+      "fulltime": {
+        "capturedAt": "2026-09-08T22:44:07.394Z",
+        "elapsed": 90,
+        "status": "FT",
+        "statistics": {
+          "66": {
+            "team": {
+              "id": 66,
+              "name": "Aston Villa",
+              "logo": "https://media.api-sports.io/football/teams/66.png"
+            },
+            "values": {
+              "Passes accurate": 280,
+              "Shots insidebox": 15,
+              "Shots outsidebox": 6,
+              "Blocked Shots": 7,
+              "Free Kicks": 15,
+              "Shots on Goal": 9,
+              "Goalkeeper Saves": 5,
+              "Shots off Goal": 5,
+              "Offsides": 2,
+              "Total passes": 337,
+              "Total Shots": 21,
+              "Yellow Cards": 3,
+              "Corner Kicks": 5,
+              "Fouls": 14,
+              "Red Cards": 0,
+              "Ball Possession": "36%"
+            }
+          },
+          "569": {
+            "team": {
+              "id": 569,
+              "name": "Club Brugge KV",
+              "logo": "https://media.api-sports.io/football/teams/569.png"
+            },
+            "values": {
+              "Passes accurate": 532,
+              "Shots insidebox": 10,
+              "Shots outsidebox": 4,
+              "Blocked Shots": 3,
+              "Free Kicks": 12,
+              "Shots on Goal": 7,
+              "Goalkeeper Saves": 5,
+              "Shots off Goal": 4,
+              "Offsides": 1,
+              "Total passes": 602,
+              "Total Shots": 14,
+              "Yellow Cards": 3,
+              "Corner Kicks": 4,
+              "Fouls": 17,
+              "Red Cards": 0,
+              "Ball Possession": "64%"
+            }
+          }
+        }
+      }
+    },
+    "1635652": {
+      "fixture": {
+        "id": 1635652,
+        "date": "2026-09-08T16:00:00-03:00",
+        "league": {
+          "id": 2,
+          "name": "UEFA Champions League",
+          "country": "World",
+          "logo": "https://media.api-sports.io/football/leagues/2.png",
+          "flag": null,
+          "season": 2026,
+          "round": "League Stage - 1",
+          "standings": true
+        },
+        "teams": {
+          "home": {
+            "id": 165,
+            "name": "Borussia Dortmund",
+            "logo": "https://media.api-sports.io/football/teams/165.png",
+            "winner": true
+          },
+          "away": {
+            "id": 533,
+            "name": "Villarreal",
+            "logo": "https://media.api-sports.io/football/teams/533.png",
+            "winner": false
+          }
+        },
+        "status": "FT"
+      },
+      "fulltime": {
+        "capturedAt": "2026-09-08T22:44:27.959Z",
+        "elapsed": 90,
+        "status": "FT",
+        "statistics": {
+          "165": {
+            "team": {
+              "id": 165,
+              "name": "Borussia Dortmund",
+              "logo": "https://media.api-sports.io/football/teams/165.png"
+            },
+            "values": {
+              "Passes accurate": 461,
+              "Shots insidebox": 12,
+              "Shots outsidebox": 6,
+              "Blocked Shots": 7,
+              "Free Kicks": 10,
+              "Shots on Goal": 6,
+              "Goalkeeper Saves": 5,
+              "Shots off Goal": 5,
+              "Offsides": 1,
+              "Total passes": 514,
+              "Total Shots": 18,
+              "Yellow Cards": 1,
+              "Corner Kicks": 9,
+              "Fouls": 15,
+              "Red Cards": 0,
+              "Ball Possession": "52%"
+            }
+          },
+          "533": {
+            "team": {
+              "id": 533,
+              "name": "Villarreal",
+              "logo": "https://media.api-sports.io/football/teams/533.png"
+            },
+            "values": {
+              "Passes accurate": 413,
+              "Shots insidebox": 9,
+              "Shots outsidebox": 4,
+              "Blocked Shots": 3,
+              "Free Kicks": 14,
+              "Shots on Goal": 6,
+              "Goalkeeper Saves": 4,
+              "Shots off Goal": 4,
+              "Offsides": 3,
+              "Total passes": 481,
+              "Total Shots": 13,
+              "Yellow Cards": 3,
+              "Corner Kicks": 7,
+              "Fouls": 10,
+              "Red Cards": 0,
+              "Ball Possession": "48%"
+            }
+          }
+        }
+      }
+    },
+    "1635654": {
+      "fixture": {
+        "id": 1635654,
+        "date": "2026-09-08T16:00:00-03:00",
+        "league": {
+          "id": 2,
+          "name": "UEFA Champions League",
+          "country": "World",
+          "logo": "https://media.api-sports.io/football/leagues/2.png",
+          "flag": null,
+          "season": 2026,
+          "round": "League Stage - 1",
+          "standings": true
+        },
+        "teams": {
+          "home": {
+            "id": 212,
+            "name": "FC Porto",
+            "logo": "https://media.api-sports.io/football/teams/212.png",
+            "winner": false
+          },
+          "away": {
+            "id": 50,
+            "name": "Manchester City",
+            "logo": "https://media.api-sports.io/football/teams/50.png",
+            "winner": true
+          }
+        },
+        "status": "FT"
+      },
+      "fulltime": {
+        "capturedAt": "2026-09-08T22:44:28.595Z",
+        "elapsed": 90,
+        "status": "FT",
+        "statistics": {
+          "50": {
+            "team": {
+              "id": 50,
+              "name": "Manchester City",
+              "logo": "https://media.api-sports.io/football/teams/50.png"
+            },
+            "values": {
+              "Passes accurate": 589,
+              "Shots insidebox": 13,
+              "Shots outsidebox": 7,
+              "Blocked Shots": 4,
+              "Free Kicks": 10,
+              "Goalkeeper Saves": 0,
+              "Shots off Goal": 6,
+              "Offsides": 1,
+              "Total passes": 639,
+              "Total Shots": 20,
+              "Yellow Cards": 3,
+              "Corner Kicks": 5,
+              "Shots on Goal": 10,
+              "Fouls": 17,
+              "Red Cards": 0,
+              "Ball Possession": "64%"
+            }
+          },
+          "212": {
+            "team": {
+              "id": 212,
+              "name": "FC Porto",
+              "logo": "https://media.api-sports.io/football/teams/212.png"
+            },
+            "values": {
+              "Passes accurate": 286,
+              "Shots insidebox": 3,
+              "Shots outsidebox": 2,
+              "Blocked Shots": 1,
+              "Free Kicks": 17,
+              "Goalkeeper Saves": 8,
+              "Shots off Goal": 4,
+              "Offsides": 7,
+              "Total passes": 353,
+              "Total Shots": 5,
+              "Yellow Cards": 1,
+              "Corner Kicks": 2,
+              "Shots on Goal": 0,
+              "Fouls": 10,
+              "Red Cards": 0,
+              "Ball Possession": "36%"
+            }
+          }
+        }
+      }
+    },
+    "1635659": {
+      "fixture": {
+        "id": 1635659,
+        "date": "2026-09-10T13:45:00-03:00",
+        "league": {
+          "id": 2,
+          "name": "UEFA Champions League",
+          "country": "World",
+          "logo": "https://media.api-sports.io/football/leagues/2.png",
+          "flag": null,
+          "season": 2026,
+          "round": "League Stage - 1",
+          "standings": true
+        },
+        "teams": {
+          "home": {
+            "id": 611,
+            "name": "Fenerbahçe",
+            "logo": "https://media.api-sports.io/football/teams/611.png",
+            "winner": false
+          },
+          "away": {
+            "id": 497,
+            "name": "AS Roma",
+            "logo": "https://media.api-sports.io/football/teams/497.png",
+            "winner": true
+          }
+        },
+        "status": "HT"
+      },
+      "halftime": {
+        "capturedAt": "2026-09-10T17:43:11.632Z",
+        "elapsed": 45,
+        "status": "HT",
+        "statistics": {
+          "497": {
+            "team": {
+              "id": 497,
+              "name": "AS Roma",
+              "logo": "https://media.api-sports.io/football/teams/497.png"
+            },
+            "values": {
+              "Passes accurate": 260,
+              "Shots insidebox": 1,
+              "Shots outsidebox": 2,
+              "Blocked Shots": 0,
+              "Free Kicks": 5,
+              "Shots on Goal": 2,
+              "Goalkeeper Saves": 2,
+              "Shots off Goal": 1,
+              "Total passes": 292,
+              "Total Shots": 3,
+              "Corner Kicks": 1,
+              "Fouls": 12,
+              "Red Cards": 0,
+              "Yellow Cards": 0,
+              "Ball Possession": "54%"
+            }
+          },
+          "611": {
+            "team": {
+              "id": 611,
+              "name": "Fenerbahçe",
+              "logo": "https://media.api-sports.io/football/teams/611.png"
+            },
+            "values": {
+              "Passes accurate": 206,
+              "Shots insidebox": 3,
+              "Shots outsidebox": 1,
+              "Blocked Shots": 1,
+              "Free Kicks": 11,
+              "Shots on Goal": 2,
+              "Goalkeeper Saves": 1,
+              "Shots off Goal": 1,
+              "Total passes": 247,
+              "Total Shots": 4,
+              "Corner Kicks": 0,
+              "Fouls": 5,
+              "Red Cards": 0,
+              "Yellow Cards": 0,
+              "Ball Possession": "46%"
+            }
+          }
+        }
+      }
+    },
+    "1635683": {
+      "fixture": {
+        "id": 1635683,
+        "date": "2026-09-08T16:00:00-03:00",
+        "league": {
+          "id": 2,
+          "name": "UEFA Champions League",
+          "country": "World",
+          "logo": "https://media.api-sports.io/football/leagues/2.png",
+          "flag": null,
+          "season": 2026,
+          "round": "League Stage - 1",
+          "standings": true
+        },
+        "teams": {
+          "home": {
+            "id": 79,
+            "name": "Lille",
+            "logo": "https://media.api-sports.io/football/teams/79.png",
+            "winner": false
+          },
+          "away": {
+            "id": 543,
+            "name": "Real Betis",
+            "logo": "https://media.api-sports.io/football/teams/543.png",
+            "winner": true
+          }
+        },
+        "status": "FT"
+      },
+      "fulltime": {
+        "capturedAt": "2026-09-08T22:44:29.261Z",
+        "elapsed": 90,
+        "status": "FT",
+        "statistics": {
+          "79": {
+            "team": {
+              "id": 79,
+              "name": "Lille",
+              "logo": "https://media.api-sports.io/football/teams/79.png"
+            },
+            "values": {
+              "Passes accurate": 392,
+              "Shots insidebox": 4,
+              "Shots outsidebox": 2,
+              "Blocked Shots": 2,
+              "Free Kicks": 12,
+              "Shots on Goal": 2,
+              "Goalkeeper Saves": 2,
+              "Shots off Goal": 2,
+              "Offsides": 4,
+              "Total passes": 447,
+              "Red Cards": 1,
+              "Total Shots": 6,
+              "Yellow Cards": 1,
+              "Corner Kicks": 5,
+              "Fouls": 11,
+              "Ball Possession": "45%"
+            }
+          },
+          "543": {
+            "team": {
+              "id": 543,
+              "name": "Real Betis",
+              "logo": "https://media.api-sports.io/football/teams/543.png"
+            },
+            "values": {
+              "Passes accurate": 495,
+              "Shots insidebox": 10,
+              "Shots outsidebox": 10,
+              "Blocked Shots": 6,
+              "Free Kicks": 11,
+              "Shots on Goal": 5,
+              "Goalkeeper Saves": 0,
+              "Shots off Goal": 9,
+              "Offsides": 0,
+              "Total passes": 565,
+              "Red Cards": 0,
+              "Total Shots": 20,
+              "Yellow Cards": 3,
+              "Corner Kicks": 5,
+              "Fouls": 13,
+              "Ball Possession": "55%"
+            }
+          }
+        }
+      }
+    },
+    "1635708": {
+      "fixture": {
+        "id": 1635708,
+        "date": "2026-09-10T13:45:00-03:00",
+        "league": {
+          "id": 2,
+          "name": "UEFA Champions League",
+          "country": "World",
+          "logo": "https://media.api-sports.io/football/leagues/2.png",
+          "flag": null,
+          "season": 2026,
+          "round": "League Stage - 1",
+          "standings": true
+        },
+        "teams": {
+          "home": {
+            "id": 197,
+            "name": "PSV Eindhoven",
+            "logo": "https://media.api-sports.io/football/teams/197.png",
+            "winner": false
+          },
+          "away": {
+            "id": 550,
+            "name": "Shakhtar Donetsk",
+            "logo": "https://media.api-sports.io/football/teams/550.png",
+            "winner": true
+          }
+        },
+        "status": "HT"
+      },
+      "halftime": {
+        "capturedAt": "2026-09-10T17:43:12.277Z",
+        "elapsed": 45,
+        "status": "HT",
+        "statistics": {
+          "197": {
+            "team": {
+              "id": 197,
+              "name": "PSV Eindhoven",
+              "logo": "https://media.api-sports.io/football/teams/197.png"
+            },
+            "values": {
+              "Passes accurate": 167,
+              "Shots insidebox": 2,
+              "Shots outsidebox": 2,
+              "Blocked Shots": 1,
+              "Free Kicks": 4,
+              "Shots on Goal": 1,
+              "Shots off Goal": 2,
+              "Total passes": 203,
+              "Total Shots": 4,
+              "Corner Kicks": 2,
+              "Goalkeeper Saves": 0,
+              "Yellow Cards": 0,
+              "Fouls": 7,
+              "Red Cards": 0,
+              "Ball Possession": "44%"
+            }
+          },
+          "550": {
+            "team": {
+              "id": 550,
+              "name": "Shakhtar Donetsk",
+              "logo": "https://media.api-sports.io/football/teams/550.png"
+            },
+            "values": {
+              "Passes accurate": 220,
+              "Shots insidebox": 3,
+              "Shots outsidebox": 1,
+              "Blocked Shots": 3,
+              "Free Kicks": 7,
+              "Shots on Goal": 1,
+              "Shots off Goal": 0,
+              "Total passes": 269,
+              "Total Shots": 4,
+              "Corner Kicks": 0,
+              "Goalkeeper Saves": 1,
+              "Yellow Cards": 1,
+              "Fouls": 4,
+              "Red Cards": 0,
+              "Ball Possession": "56%"
+            }
+          }
+        }
+      }
+    },
+    "1635714": {
+      "fixture": {
+        "id": 1635714,
+        "date": "2026-09-08T16:00:00-03:00",
+        "league": {
+          "id": 2,
+          "name": "UEFA Champions League",
+          "country": "World",
+          "logo": "https://media.api-sports.io/football/leagues/2.png",
+          "flag": null,
+          "season": 2026,
+          "round": "League Stage - 1",
+          "standings": true
+        },
+        "teams": {
+          "home": {
+            "id": 541,
+            "name": "Real Madrid",
+            "logo": "https://media.api-sports.io/football/teams/541.png",
+            "winner": true
+          },
+          "away": {
+            "id": 505,
+            "name": "Inter",
+            "logo": "https://media.api-sports.io/football/teams/505.png",
+            "winner": false
+          }
+        },
+        "status": "FT"
+      },
+      "fulltime": {
+        "capturedAt": "2026-09-08T22:44:29.913Z",
+        "elapsed": 90,
+        "status": "FT",
+        "statistics": {
+          "505": {
+            "team": {
+              "id": 505,
+              "name": "Inter",
+              "logo": "https://media.api-sports.io/football/teams/505.png"
+            },
+            "values": {
+              "Passes accurate": 584,
+              "Shots insidebox": 15,
+              "Shots outsidebox": 6,
+              "Blocked Shots": 5,
+              "Free Kicks": 11,
+              "Shots on Goal": 7,
+              "Goalkeeper Saves": 6,
+              "Shots off Goal": 9,
+              "Offsides": 4,
+              "Total passes": 621,
+              "Total Shots": 21,
+              "Yellow Cards": 3,
+              "Corner Kicks": 11,
+              "Fouls": 10,
+              "Red Cards": 0,
+              "Ball Possession": "64%"
+            }
+          },
+          "541": {
+            "team": {
+              "id": 541,
+              "name": "Real Madrid",
+              "logo": "https://media.api-sports.io/football/teams/541.png"
+            },
+            "values": {
+              "Passes accurate": 306,
+              "Shots insidebox": 14,
+              "Shots outsidebox": 2,
+              "Blocked Shots": 3,
+              "Free Kicks": 10,
+              "Shots on Goal": 8,
+              "Goalkeeper Saves": 7,
+              "Shots off Goal": 5,
+              "Offsides": 2,
+              "Total passes": 352,
+              "Total Shots": 16,
+              "Yellow Cards": 1,
+              "Corner Kicks": 4,
+              "Fouls": 12,
+              "Red Cards": 0,
+              "Ball Possession": "36%"
+            }
+          }
+        }
+      }
+    },
+    "1636217": {
+      "fixture": {
+        "id": 1636217,
+        "date": "2026-09-16T13:45:00-03:00",
+        "league": {
+          "id": 3,
+          "name": "UEFA Europa League",
+          "country": "World",
+          "logo": "https://media.api-sports.io/football/leagues/3.png",
+          "flag": null,
+          "season": 2026,
+          "round": "League Stage - 1",
+          "standings": true
+        },
+        "teams": {
+          "home": {
+            "id": 3683,
+            "name": "Ararat-Armenia",
+            "logo": "https://media.api-sports.io/football/teams/3683.png",
+            "winner": false
+          },
+          "away": {
+            "id": 628,
+            "name": "Sparta Praha",
+            "logo": "https://media.api-sports.io/football/teams/628.png",
+            "winner": true
+          }
+        },
+        "status": "HT"
+      },
+      "halftime": {
+        "capturedAt": "2026-09-16T17:34:35.937Z",
+        "elapsed": 45,
+        "status": "HT",
+        "statistics": {
+          "628": {
+            "team": {
+              "id": 628,
+              "name": "Sparta Praha",
+              "logo": "https://media.api-sports.io/football/teams/628.png"
+            },
+            "values": {
+              "Shots on Goal": 3,
+              "Shots off Goal": 6,
+              "Total Shots": 14,
+              "Blocked Shots": 5,
+              "Shots insidebox": 7,
+              "Shots outsidebox": 7,
+              "Fouls": 4,
+              "Corner Kicks": 9,
+              "Offsides": 0,
+              "Ball Possession": "59%",
+              "Yellow Cards": null,
+              "Red Cards": null,
+              "Goalkeeper Saves": 1,
+              "Total passes": 211,
+              "Passes accurate": 194,
+              "Passes %": "92%",
+              "expected_goals": "1.25",
+              "goals_prevented": "0.09"
+            }
+          },
+          "3683": {
+            "team": {
+              "id": 3683,
+              "name": "Ararat-Armenia",
+              "logo": "https://media.api-sports.io/football/teams/3683.png"
+            },
+            "values": {
+              "Shots on Goal": 1,
+              "Shots off Goal": 5,
+              "Total Shots": 9,
+              "Blocked Shots": 3,
+              "Shots insidebox": 6,
+              "Shots outsidebox": 3,
+              "Fouls": 4,
+              "Corner Kicks": 1,
+              "Offsides": 1,
+              "Ball Possession": "41%",
+              "Yellow Cards": null,
+              "Red Cards": null,
+              "Goalkeeper Saves": 1,
+              "Total passes": 161,
+              "Passes accurate": 135,
+              "Passes %": "84%",
+              "expected_goals": "0.56",
+              "goals_prevented": "0.09"
+            }
+          }
+        }
+      }
+    },
+    "1636312": {
+      "fixture": {
+        "id": 1636312,
+        "date": "2026-09-16T13:45:00-03:00",
+        "league": {
+          "id": 3,
+          "name": "UEFA Europa League",
+          "country": "World",
+          "logo": "https://media.api-sports.io/football/leagues/3.png",
+          "flag": null,
+          "season": 2026,
+          "round": "League Stage - 1",
+          "standings": true
+        },
+        "teams": {
+          "home": {
+            "id": 3402,
+            "name": "Omonia Nicosia",
+            "logo": "https://media.api-sports.io/football/teams/3402.png",
+            "winner": null
+          },
+          "away": {
+            "id": 538,
+            "name": "Celta Vigo",
+            "logo": "https://media.api-sports.io/football/teams/538.png",
+            "winner": null
+          }
+        },
+        "status": "HT"
+      },
+      "halftime": {
+        "capturedAt": "2026-09-16T17:34:36.594Z",
+        "elapsed": 45,
+        "status": "HT",
+        "statistics": {
+          "538": {
+            "team": {
+              "id": 538,
+              "name": "Celta Vigo",
+              "logo": "https://media.api-sports.io/football/teams/538.png"
+            },
+            "values": {
+              "Shots on Goal": 2,
+              "Shots off Goal": 1,
+              "Total Shots": 7,
+              "Blocked Shots": 4,
+              "Shots insidebox": 4,
+              "Shots outsidebox": 3,
+              "Fouls": 5,
+              "Corner Kicks": 4,
+              "Offsides": 1,
+              "Ball Possession": "54%",
+              "Yellow Cards": null,
+              "Red Cards": null,
+              "Goalkeeper Saves": 3,
+              "Total passes": 275,
+              "Passes accurate": 254,
+              "Passes %": "92%",
+              "expected_goals": "0.30",
+              "goals_prevented": "0.91"
+            }
+          },
+          "3402": {
+            "team": {
+              "id": 3402,
+              "name": "Omonia Nicosia",
+              "logo": "https://media.api-sports.io/football/teams/3402.png"
+            },
+            "values": {
+              "Shots on Goal": 3,
+              "Shots off Goal": 2,
+              "Total Shots": 5,
+              "Blocked Shots": 0,
+              "Shots insidebox": 1,
+              "Shots outsidebox": 4,
+              "Fouls": 3,
+              "Corner Kicks": 3,
+              "Offsides": 0,
+              "Ball Possession": "46%",
+              "Yellow Cards": null,
+              "Red Cards": null,
+              "Goalkeeper Saves": 2,
+              "Total passes": 232,
+              "Passes accurate": 198,
+              "Passes %": "85%",
+              "expected_goals": "0.11",
+              "goals_prevented": "0.91"
             }
           }
         }

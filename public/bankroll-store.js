@@ -52,6 +52,10 @@
       match: String(input.match || '').trim(),
       market: String(input.market || '').trim(),
       selection: String(input.selection || '').trim(),
+      legs: Array.isArray(input.legs)
+        ? input.legs.map((leg) => ({ match: String(leg?.match || '').trim(), market: String(leg?.market || '').trim(), selection: String(leg?.selection || '').trim() })).filter((leg) => leg.match || leg.market || leg.selection)
+        : Array.isArray(existing?.legs) ? existing.legs : [],
+      source: input.source === 'screenshot' ? 'screenshot' : (existing?.source || 'manual'),
       odd: Math.max(0, number(input.odd)),
       stake: Math.max(0, number(input.stake)),
       result,

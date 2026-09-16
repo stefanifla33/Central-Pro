@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Minha Banca | Central Pro</title><script src="auth-guard.js?v=2"></script>
   <link rel="stylesheet" href="app-shell.css?v=2">
-  <link rel="stylesheet" href="bankroll.css?v=4">
+  <link rel="stylesheet" href="bankroll.css?v=5">
   <link rel="stylesheet" href="design-system.css?v=1">
 </head>
 <body class="bankroll-page">
@@ -108,13 +108,36 @@
   <dialog id="entryDialog" class="modal modal-wide">
     <form id="entryForm" method="dialog">
       <input id="entryId" type="hidden">
-      <div class="modal-head"><div><span class="eyebrow">ENTRADA MANUAL</span><h2 id="entryDialogTitle">Nova entrada</h2></div><button class="icon-button close-dialog" type="button" aria-label="Fechar">×</button></div>
+      <div class="modal-head"><div><span class="eyebrow">NOVA ENTRADA</span><h2 id="entryDialogTitle">Nova entrada</h2></div><button class="icon-button close-dialog" type="button" aria-label="Fechar">×</button></div>
+
+      <section class="slip-reader" id="slipReader">
+        <div class="slip-reader-head">
+          <div><strong>Preencher pelo print da aposta</strong><small>Envie o bilhete de qualquer casa de apostas. A IA identifica as seleções e você confere antes de salvar.</small></div>
+          <button class="btn btn-secondary" id="toggleSlipReaderButton" type="button">Ler print da aposta</button>
+        </div>
+        <div class="slip-reader-body" id="slipReaderBody" hidden>
+          <input id="slipImageInput" type="file" accept="image/png,image/jpeg,image/webp" hidden>
+          <div class="slip-dropzone" id="slipDropzone" tabindex="0" role="button" aria-label="Selecionar print da aposta">
+            <div class="slip-dropzone-copy" id="slipDropzoneCopy"><span class="slip-upload-icon">⇧</span><strong>Escolher print da aposta</strong><small>PNG, JPG ou WEBP · leitura por IA para diferentes casas de apostas</small></div>
+            <img id="slipPreview" alt="Prévia do print da aposta" hidden>
+          </div>
+          <div class="slip-reader-actions">
+            <button class="btn btn-secondary" id="changeSlipImageButton" type="button" hidden>Trocar imagem</button>
+            <button class="btn btn-primary" id="analyzeSlipButton" type="button" disabled>Analisar e preencher</button>
+          </div>
+          <div class="slip-reader-status" id="slipReaderStatus" hidden><span class="slip-status-spinner" aria-hidden="true"></span><div><strong id="slipReaderStatusTitle">Lendo o print…</strong><small id="slipReaderStatusText">Aguarde alguns segundos.</small></div></div>
+          <div class="slip-reader-review" id="slipReaderReview" hidden><strong>Dados preenchidos. Confira antes de salvar.</strong><small id="slipReaderReviewText"></small></div>
+        </div>
+      </section>
+
       <div class="form-grid">
         <label class="field"><span>Data</span><input id="entryDate" type="date" required></label>
         <label class="field"><span>Competição</span><input id="entryCompetition" type="text" required maxlength="80" placeholder="Ex.: Brasileirão"></label>
         <label class="field full"><span>Partida</span><input id="entryMatch" type="text" required maxlength="120" placeholder="Mandante x Visitante"></label>
-        <label class="field"><span>Mercado</span><input id="entryMarket" type="text" required maxlength="80" placeholder="Ex.: Mais de 2.5 gols"></label>
-        <label class="field"><span>Seleção</span><input id="entrySelection" type="text" required maxlength="100" placeholder="Ex.: Over 2.5"></label>
+        <div class="field full entry-legs-field">
+          <div class="entry-legs-heading"><span>Seleções da aposta</span><button class="btn btn-secondary btn-small" id="addEntryLegButton" type="button">+ Adicionar seleção</button></div>
+          <div class="entry-legs" id="entryLegs"></div>
+        </div>
         <label class="field"><span>Odd</span><input id="entryOdd" type="number" min="1.01" step="any" required placeholder="1,85"></label>
         <label class="field"><span>Stake (R$)</span><input id="entryStake" type="number" min="0.01" step="0.01" required placeholder="50,00"><small class="stake-inline" id="stakeInline">Informe a stake para calcular a exposição.</small></label>
         <div class="stake-risk full" id="stakeRisk" hidden>
@@ -139,9 +162,10 @@
   </dialog>
 
   <script src="/vendor/exceljs/exceljs.min.js"></script>
-  <script src="bankroll-store.js"></script>
+  <script src="bankroll-store.js?v=5"></script>
+  <script src="bankroll-slip-reader.js?v=7"></script>
   <script src="bankroll-export.js"></script>
-  <script src="bankroll.js?v=3"></script>
+  <script src="bankroll.js?v=8"></script>
   <script src="app-shell.js?v=2"></script>
 </body>
 </html>

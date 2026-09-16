@@ -22,6 +22,7 @@ const { createPagBankPaymentService } = require("./lib/pagbank-payments");
 const { createInfinitePayPaymentService, infinitePayCallbackBase } = require("./lib/infinitepay-payments");
 const { createMetricSampleCoverage, selectStatisticsItems, mergeMissingMetricValues, createConcurrencyLimiter, createExpiringCache } = require("./lib/metric-sample-coverage");
 const { CP_MAIN_LEAGUES: MAIN_LEAGUES, cpIsScannerEligibleLeagueId } = require("./public/competition-config");
+const { analyzeSlipWithGemini } = require("./lib/bankroll-slip-ai");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -1432,6 +1433,19 @@ app.get("/api/bilhetes/gerador/jogos", async (req, res) => {
     } catch (error) {
         console.error('[BILHETES-GERADOR-JOGOS]', error);
         res.status(error.status || 500).json({ erro: error.status ? error.message : `Não foi possível carregar os jogos: ${error.message}` });
+    }
+});
+
+
+// Leitor de prints da Minha Banca. A chave do Gemini fica somente no servidor.
+app.post("/api/bankroll/read-slip", express.json({ limit: "14mb" }), async (req, res) => {
+    try {
+        const result = await analyzeSlipWithGemini({ image: req.body?.image });
+        res.json(result);
+    } catch (erro) {
+        const status = Number(erro?.statusCode) || 500;
+        if (status >= 500) console.error("[BANKROLL-SLIP-AI]", erro?.message || erro);
+        res.status(status).json({ error: erro?.message || "Não foi possível analisar o print da aposta." });
     }
 });
 
