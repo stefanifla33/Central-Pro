@@ -7,7 +7,7 @@
   <script src="auth-guard.js?v=2"></script>
   <link rel="stylesheet" href="app-shell.css?v=2">
   <link rel="stylesheet" href="design-system.css?v=1">
-  <link rel="stylesheet" href="gerador-bilhetes.css?v=4">
+  <link rel="stylesheet" href="gerador-bilhetes.css?v=5">
 </head>
 <body class="generator-page">
   <button class="menu-button" id="menuButton">☰</button>
@@ -35,7 +35,16 @@
       <section class="generator-panel">
         <div class="generator-grid">
           <label>Data<input id="gDate" type="date"></label>
-          <label>Fonte<select id="gSource" disabled><option value="games" selected>Mercados de jogo</option></select></label>
+          <label>Mercados<select id="gMarketMode">
+            <option value="all" selected>Todos os mercados ativos</option>
+            <option value="first_half_goal">Gol no 1º tempo (+0.5 HT)</option>
+            <option value="goals">Gols (+1.5 / +2.5)</option>
+            <option value="btts">Ambas marcam</option>
+            <option value="result">Resultado (mandante / visitante)</option>
+            <option value="double_chance">Dupla chance</option>
+            <option value="win_half">Vence algum tempo</option>
+            <option value="team_scores">Time marca</option>
+          </select></label>
           <label>Escopo<select id="gScope"><option value="all" selected>Todos os jogos</option><option value="specific">Um jogo específico</option><option value="fixed">Jogo fixo + completar com outros</option></select></label>
           <label class="game-focus-field" hidden>Jogo para dar atenção<select id="gFixture"><option value="">Carregando jogos...</option></select></label>
           <label>Perfil<select id="gProfile"><option value="CONSERVADOR">Conservador</option><option value="MODERADO" selected>Moderado</option><option value="AGRESSIVO">Agressivo</option><option value="LIVRE">Livre</option></select></label>
@@ -56,6 +65,6 @@
     </main>
   </div>
   <script src="app-shell.js?v=3"></script>
-  <script src="gerador-bilhetes.js?v=4"></script>
+  <script src="gerador-bilhetes.js?v=6"></script>
 </body>
 </html>

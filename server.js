@@ -1510,12 +1510,25 @@ app.post("/api/bankroll/read-slip", express.json({ limit: "14mb" }), async (req,
     }
 });
 
+const GENERATOR_MARKET_MODES = Object.freeze({
+    all: { label: 'Todos os mercados ativos', keys: ['over05HT','over15','over25','btts','homeWin','awayWin','homeOrDraw','awayOrDraw','homeWinEitherHalf','awayWinEitherHalf','homeScores','awayScores'] },
+    first_half_goal: { label: 'Gol no 1º tempo (+0.5 HT)', keys: ['over05HT'] },
+    goals: { label: 'Gols (+1.5 / +2.5)', keys: ['over15','over25'] },
+    btts: { label: 'Ambas marcam', keys: ['btts'] },
+    result: { label: 'Resultado (mandante / visitante)', keys: ['homeWin','awayWin'] },
+    double_chance: { label: 'Dupla chance', keys: ['homeOrDraw','awayOrDraw'] },
+    win_half: { label: 'Vence algum tempo', keys: ['homeWinEitherHalf','awayWinEitherHalf'] },
+    team_scores: { label: 'Time marca', keys: ['homeScores','awayScores'] }
+});
+
 app.post("/api/bilhetes/gerador", express.json({ limit: "32kb" }), async (req, res) => {
     try {
         if (!(await authenticateAdmin(req.get("Authorization")))) return res.status(403).json({ erro: "Acesso administrativo necessário." });
         const body = req.body || {};
         const date = /^\d{4}-\d{2}-\d{2}$/.test(String(body.date || '')) ? String(body.date) : new Intl.DateTimeFormat('en-CA', { timeZone: APP_TIMEZONE }).format(new Date());
         const sourceMode = 'games';
+        const marketMode = Object.prototype.hasOwnProperty.call(GENERATOR_MARKET_MODES, body.marketMode) ? body.marketMode : 'all';
+        const marketConfig = GENERATOR_MARKET_MODES[marketMode];
         const scopeMode = ['all','specific','fixed'].includes(body.scopeMode) ? body.scopeMode : 'all';
         const targetFixtureId = scopeMode === 'all' ? null : Number(body.targetFixtureId) || null;
         if (scopeMode !== 'all' && !targetFixtureId) return res.status(400).json({ erro: "Escolha o jogo que você quer destacar." });
@@ -1532,7 +1545,8 @@ app.post("/api/bilhetes/gerador", express.json({ limit: "32kb" }), async (req, r
             date,
             apiUsageDiagnostic,
             focusFixtureId: targetFixtureId,
-            forceFocusFixture: scopeMode === 'specific'
+            forceFocusFixture: scopeMode === 'specific',
+            marketKeys: marketConfig.keys
         });
         gameCandidates = normalizeGeneratorGameCandidates(previewReport);
 
@@ -1570,7 +1584,7 @@ app.post("/api/bilhetes/gerador", express.json({ limit: "32kb" }), async (req, r
         if (pendingOdds) warnings.push(`${pendingOdds} seleção(ões) passaram na análise, mas estão sem odd automática. Confira a odd na casa antes de publicar.`);
         if (result?.diversity?.insufficientUniqueFixtures) warnings.push(`Foram gerados ${result.generated} de ${result.requested} bilhetes. Após os filtros atuais, o gerador recebeu ${result?.diversity?.availableUniqueFixtures ?? result?.diversity?.uniqueFixtures ?? 0} partida(s) diferente(s) utilizável(is); não repetimos jogo para preencher artificialmente.`);
         if (scopeMode === 'specific' && !gameCandidates.length) warnings.push('Este confronto não apresentou nenhum mercado com evidência estatística suficiente no modelo atual. O gerador não vai inventar uma seleção só para preencher o bilhete.');
-        res.json({ ok: true, date, sourceMode, scopeMode, focusGame, ...result, candidates: { games: gameCandidates.length, players: 0 }, warnings, playerDiagnostics: null, diagnostics: previewReport ? { fixturesFound: previewReport.fixturesFound, approvedGameCandidates: gameCandidates.filter(item => Number.isFinite(Number(item.odd))).length, statisticalShortlist: (previewReport.statisticalShortlist || []).length, pendingOdds, oddsExternalCalls: previewReport.oddsExternalCalls, statisticsExternalCalls: previewReport.statisticsExternalCalls, rejectionReasons: previewReport.rejectionReasons || {} } : { fixturesFound: games.length } });
+        res.json({ ok: true, date, sourceMode, marketMode, marketLabel: marketConfig.label, activeMarketKeys: marketConfig.keys, scopeMode, focusGame, ...result, candidates: { games: gameCandidates.length, players: 0 }, warnings, playerDiagnostics: null, diagnostics: previewReport ? { fixturesFound: previewReport.fixturesFound, approvedGameCandidates: gameCandidates.filter(item => Number.isFinite(Number(item.odd))).length, statisticalShortlist: (previewReport.statisticalShortlist || []).length, pendingOdds, oddsExternalCalls: previewReport.oddsExternalCalls, statisticsExternalCalls: previewReport.statisticsExternalCalls, rejectionReasons: previewReport.rejectionReasons || {} } : { fixturesFound: games.length } });
     } catch (error) {
         console.error('[BILHETES-GERADOR]', error);
         res.status(error.status || 500).json({ erro: error.status ? error.message : `Não foi possível gerar sugestões: ${error.message}` });

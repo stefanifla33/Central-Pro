@@ -44,7 +44,7 @@
 
   const payload=()=>{
     const exact=format.value==='free'?null:Number(format.value);
-    return {date:$('gDate').value,sourceMode:'games',scopeMode:scope.value,targetFixtureId:scope.value==='all'?null:Number(fixture.value||0),profile:$('gProfile').value,count:Number($('gCount').value),minLegs:exact||Number($('gMinLegs').value),maxLegs:exact||Number($('gMaxLegs').value),minScore:Number($('gMinScore').value),oddMin:Number($('gOddMin').value),oddMax:Number($('gOddMax').value)};
+    return {date:$('gDate').value,sourceMode:'games',marketMode:$('gMarketMode').value,scopeMode:scope.value,targetFixtureId:scope.value==='all'?null:Number(fixture.value||0),profile:$('gProfile').value,count:Number($('gCount').value),minLegs:exact||Number($('gMinLegs').value),maxLegs:exact||Number($('gMaxLegs').value),minScore:Number($('gMinScore').value),oddMin:Number($('gOddMin').value),oddMax:Number($('gOddMax').value)};
   };
   const localDateTime=value=>{if(!value)return'';const d=new Date(value);if(Number.isNaN(d.getTime()))return'';const parts=new Intl.DateTimeFormat('sv-SE',{timeZone:'America/Sao_Paulo',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}).formatToParts(d);const o=Object.fromEntries(parts.map(x=>[x.type,x.value]));return `${o.year}-${o.month}-${o.day}T${o.hour}:${o.minute}`;};
   const useTicket=ticket=>{
@@ -54,9 +54,10 @@
   };
   const render=body=>{
     const scopeText=body.scopeMode==='specific'?'Jogo específico':body.scopeMode==='fixed'?'Jogo fixo + outros':'Todos os jogos';
+    const marketText=body.marketLabel||'Todos os mercados ativos';
     const diversity=body.diversity||{};
     const diag=body.diagnostics||{};
-    status.hidden=false;status.innerHTML=`<span>${body.generated}/${body.requested} bilhetes gerados</span><span>${body.poolSize} seleções passaram no filtro</span><span>${body.candidates.games} mercados de jogo encontrados</span>${diag.pendingOdds?`<span>${diag.pendingOdds} com odd pendente</span>`:''}${diversity.availableUniqueFixtures!=null?`<span>${diversity.availableUniqueFixtures} partidas diferentes disponíveis</span>`:''}${diversity.uniqueFixtures!=null?`<span>${diversity.uniqueFixtures} jogos diferentes nos bilhetes</span>`:''}<span>${esc(scopeText)}</span><span>Score mínimo aplicado: ${body.minScoreApplied}</span>`;
+    status.hidden=false;status.innerHTML=`<span>${body.generated}/${body.requested} bilhetes gerados</span><span>${body.poolSize} seleções passaram no filtro</span><span>${body.candidates.games} mercados de jogo encontrados</span>${diag.pendingOdds?`<span>${diag.pendingOdds} com odd pendente</span>`:''}${diversity.availableUniqueFixtures!=null?`<span>${diversity.availableUniqueFixtures} partidas diferentes disponíveis</span>`:''}${diversity.uniqueFixtures!=null?`<span>${diversity.uniqueFixtures} jogos diferentes nos bilhetes</span>`:''}<span>${esc(scopeText)}</span><span>Mercados: ${esc(marketText)}</span><span>Score mínimo aplicado: ${body.minScoreApplied}</span>`;
     results.innerHTML='';
     if(body.focusGame)results.insertAdjacentHTML('beforeend',`<div class="focus-note">🎯 Jogo em destaque: <b>${esc(body.focusGame.match)}</b>${body.scopeMode==='specific'?' · as sugestões usam somente este confronto':' · toda sugestão precisa incluir pelo menos uma seleção deste confronto'}</div>`);
     (body.warnings||[]).forEach(w=>results.insertAdjacentHTML('beforeend',`<div class="warning-note">⚠ ${esc(w)}</div>`));
