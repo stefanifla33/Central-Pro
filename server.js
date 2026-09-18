@@ -1994,7 +1994,12 @@ const prematchOdds = createPrematchOddsService({ football, sharedCache: remoteFo
 const { generateBilhetesPreview } = require("./lib/bilhetes-generation");
 app.locals.bilhetesPreviewGenerator = options => generateBilhetesPreview({ ...options, football, oddsService: prematchOdds, sharedCache: remoteFootballCache });
 app.locals.bilhetesGameSnapshot = date => gameSnapshotStorage.get(date);
-app.locals.bilhetesFixturesLoader = date => resolveGames(date, () => football(`/fixtures?date=${date}&timezone=${encodeURIComponent(APP_TIMEZONE)}`, 30_000), gameSnapshotStorage);
+app.locals.bilhetesFixturesLoader = date => resolveGames(
+    date,
+    () => football(`/fixtures?date=${date}&timezone=${encodeURIComponent(APP_TIMEZONE)}`, 30_000),
+    gameSnapshotStorage,
+    { snapshotFreshMs: Math.max(300_000, Number(process.env.BILHETES_FIXTURES_SNAPSHOT_TTL_MS) || 7_200_000) }
+);
 app.locals.bilhetesApiMetrics = metrics;
 app.locals.bilhetesApiUsageDiagnostic = apiUsageDiagnostic;
 

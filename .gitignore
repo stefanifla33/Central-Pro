@@ -12,3 +12,6 @@ outputs/bilhetes-real-preview.json
 
 # Logs
 *.log
+
+# Cache local de partidas do gerador (recriado automaticamente)
+data/game-snapshots.json

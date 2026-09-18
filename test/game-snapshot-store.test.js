@@ -35,14 +35,26 @@ async function run() { try {
     assert.strictEqual(apiResult.source, "api", "E: service saves through an abstract adapter");
     assert.strictEqual(fallback.source, "snapshot", "E: service reads fallback through an abstract adapter");
 
+    let snapshotFirstCalls = 0;
+    const freshDate = "2026-08-30";
+    await abstractStorage.saveApiPayload(freshDate, { response: [fixture(350, freshDate)] }, new Date().toISOString());
+    const snapshotFirst = await resolveGames(freshDate, async () => { snapshotFirstCalls++; return { response: [fixture(351, freshDate)] }; }, abstractStorage, { snapshotFreshMs: 7_200_000 });
+    assert.strictEqual(snapshotFirst.source, "snapshot-cache", "F: fresh snapshot avoids an external fixture request");
+    assert.strictEqual(snapshotFirstCalls, 0, "F: snapshot-first path does not call fetchGames");
+
+    const pruningFile = path.join(directory, "pruning.json");
+    const pruningStorage = createGameSnapshotStorage(createLocalGameSnapshotAdapter(pruningFile, { maxDates: 2 }));
+    for (const day of ["2026-08-27", "2026-08-28", "2026-08-29"]) await pruningStorage.saveApiPayload(day, { response: [fixture(500 + Number(day.slice(-2)), day)] });
+    assert.deepStrictEqual(Object.keys(await pruningStorage.getAll()).sort(), ["2026-08-28", "2026-08-29"], "G: local snapshots keep only the newest configured dates");
+
     const remote = createRemoteGameSnapshotAdapter();
-    await assert.rejects(remote.get(dateA), error => error.code === "GAME_SNAPSHOT_REMOTE_NOT_CONFIGURED", "F: unconfigured remote fails explicitly");
+    await assert.rejects(remote.get(dateA), error => error.code === "GAME_SNAPSHOT_REMOTE_NOT_CONFIGURED", "H: unconfigured remote fails explicitly");
 
     const defaultFile = path.join(directory, "default.json");
     const configured = createConfiguredGameSnapshotStorage({ env: {}, localFile: defaultFile });
     await configured.saveApiPayload(dateA, { response: [fixture(400, dateA)] });
-    assert.strictEqual(fs.existsSync(defaultFile), true, "G: current default selects local storage");
-    console.log("game snapshot storage scenarios A-G: ok");
+    assert.strictEqual(fs.existsSync(defaultFile), true, "I: current default selects local storage");
+    console.log("game snapshot storage scenarios A-I: ok");
 } finally { fs.rmSync(directory, { recursive: true, force: true }); }}
 
 run().catch(error => { console.error(error); process.exitCode = 1; });
