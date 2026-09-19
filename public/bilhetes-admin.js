@@ -64,6 +64,86 @@
     invalidatePreview();
   };
 
+  // Reaproveita o mesmo leitor de print já usado em Minha Banca.
+  const slipToggle=document.querySelector('#toggleManualSlipReader');
+  const slipBody=document.querySelector('#manualSlipReaderBody');
+  const slipInput=document.querySelector('#manualSlipImageInput');
+  const slipDropzone=document.querySelector('#manualSlipDropzone');
+  const slipCopy=document.querySelector('#manualSlipDropzoneCopy');
+  const slipImage=document.querySelector('#manualSlipPreview');
+  const slipChange=document.querySelector('#changeManualSlipImage');
+  const slipAnalyze=document.querySelector('#analyzeManualSlip');
+  const slipStatus=document.querySelector('#manualSlipStatus');
+  let selectedSlipFile=null;
+
+  const setSlipStatus=(message,type='')=>{
+    if(!slipStatus)return;
+    slipStatus.textContent=message||'';
+    slipStatus.className=`manual-slip-status${type?` ${type}`:''}`;
+    slipStatus.hidden=!message;
+  };
+  const chooseSlipFile=file=>{
+    if(!file)return;
+    if(!/^image\/(png|jpeg|webp)$/i.test(file.type)){setSlipStatus('Escolha uma imagem PNG, JPG ou WEBP.','error');return;}
+    if(file.size>10*1024*1024){setSlipStatus('O print é muito grande. Use uma imagem de até 10 MB.','error');return;}
+    selectedSlipFile=file;
+    const url=URL.createObjectURL(file);
+    slipImage.src=url;
+    slipImage.onload=()=>URL.revokeObjectURL(url);
+    slipImage.hidden=false;
+    slipCopy.hidden=true;
+    slipChange.hidden=false;
+    slipAnalyze.disabled=false;
+    setSlipStatus('Print carregado. Clique em “Analisar e preencher”.');
+  };
+  const applySlipToTicket=data=>{
+    const legs=Array.isArray(data?.legs)?data.legs.filter(leg=>leg?.match||leg?.market||leg?.selection):[];
+    if(!legs.length)throw new Error('A IA não encontrou seleções no print. Tente um print mais completo ou nítido.');
+    list.innerHTML='';
+    legs.forEach(leg=>add({
+      displayMatch:leg.match||'',
+      market:leg.market||'',
+      displaySelection:leg.selection||'',
+      odd:Number(leg.odd)>1?Number(leg.odd):'',
+      bookmakerName:data.bookmaker||''
+    }));
+    if(Number(data.odd)>1)form.elements.totalOdd.value=Number(data.odd);
+    invalidatePreview();
+    const missing=[];
+    const incomplete=legs.filter(leg=>!leg.match||!leg.market||!leg.selection).length;
+    if(incomplete)missing.push(`${incomplete} seleção(ões) com algum campo incompleto`);
+    const missingOdds=legs.filter(leg=>!(Number(leg.odd)>1)).length;
+    if(missingOdds)missing.push(`${missingOdds} odd(s) individual(is) não identificada(s)`);
+    if(!(Number(data.odd)>1))missing.push('odd final não identificada');
+    if(data.expectedLegs&&legs.length<data.expectedLegs)missing.push(`o print parece ter ${data.expectedLegs} seleções, mas ${legs.length} foram reconhecidas`);
+    const house=data.bookmaker?` Casa identificada: ${data.bookmaker}.`:'';
+    const warnings=Array.isArray(data.warnings)&&data.warnings.length?` Avisos da leitura: ${data.warnings.join(' · ')}`:'';
+    setSlipStatus(missing.length
+      ? `Preenchi ${legs.length} seleção(ões).${house} Confira: ${missing.join(', ')}.${warnings}`
+      : `Pronto: ${legs.length} seleção(ões) preenchida(s)${data.bookmaker?` · ${data.bookmaker}`:''}${Number(data.odd)>1?` · odd final ${Number(data.odd).toFixed(2)}`:''}. Confira antes de publicar.${warnings}`,'success');
+  };
+
+  if(slipToggle&&slipBody&&slipInput&&slipDropzone&&slipAnalyze){
+    slipToggle.onclick=()=>{slipBody.hidden=!slipBody.hidden;slipToggle.textContent=slipBody.hidden?'Ler print da aposta':'Fechar leitor'};
+    slipDropzone.onclick=()=>slipInput.click();
+    slipDropzone.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();slipInput.click();}};
+    slipInput.onchange=()=>chooseSlipFile(slipInput.files?.[0]);
+    slipChange.onclick=()=>slipInput.click();
+    ['dragenter','dragover'].forEach(name=>slipDropzone.addEventListener(name,e=>{e.preventDefault();slipDropzone.classList.add('is-dragging')}));
+    ['dragleave','drop'].forEach(name=>slipDropzone.addEventListener(name,e=>{e.preventDefault();slipDropzone.classList.remove('is-dragging')}));
+    slipDropzone.addEventListener('drop',e=>chooseSlipFile(e.dataTransfer?.files?.[0]));
+    slipAnalyze.onclick=async()=>{
+      if(!selectedSlipFile||!window.BankrollSlipReader)return;
+      slipAnalyze.disabled=true;
+      setSlipStatus('Enviando o print para a IA…');
+      try{
+        const data=await window.BankrollSlipReader.analyze(selectedSlipFile,progress=>setSlipStatus(progress<70?`Analisando o bilhete… ${progress}%`:`Organizando as seleções… ${progress}%`));
+        applySlipToTicket(data);
+      }catch(err){setSlipStatus(err?.message||'Não foi possível analisar este print.','error')}
+      finally{slipAnalyze.disabled=false}
+    };
+  }
+
   const buildPayload=()=>{
     const selections=[...list.querySelectorAll('.manual-pick-form')].map(row=>Object.fromEntries([...row.querySelectorAll('input')].map(x=>[x.name,x.value])));
     return {
