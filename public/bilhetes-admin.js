@@ -71,7 +71,8 @@
       description:form.elements.description.value,
       profile:form.elements.profile.value,
       reason:form.elements.reason.value,
-      ticketUrl:form.elements.ticketUrl?.value||'',
+      betanoUrl:form.elements.betanoUrl?.value||'',
+      superbetUrl:form.elements.superbetUrl?.value||'',
       totalOdd:form.elements.totalOdd.value,
       selections
     };
@@ -80,7 +81,7 @@
   const renderPreview=payload=>{
     const odd=Number(payload.totalOdd);
     const picks=payload.selections.map(s=>`<div class="preview-pick"><strong>${esc(s.displayMatch)}</strong><span>${esc(s.market)} · ${esc(s.displaySelection)}</span><small>${s.fixtureDate?`🕒 ${esc(formatDateTime(s.fixtureDate))}`:''}${s.bookmakerName?`${s.fixtureDate?' · ':''}${esc(s.bookmakerName)}`:''}${s.odd?` · Odd ${Number(s.odd).toFixed(2)}`:''}</small></div>`).join('');
-    preview.innerHTML=`<div class="preview-head"><span class="ticket-profile profile-${esc(payload.profile.toLowerCase())}">${esc(profileLabel(payload.profile))}</span><strong>ODD ${Number.isFinite(odd)?odd.toFixed(2):'—'}</strong></div><h3>${esc(payload.title||'Bilhete Central Pro')}</h3><p>${esc(payload.description||'')}</p><div class="preview-reason"><b>Por que escolhi este bilhete?</b><p>${esc(payload.reason||'')}</p></div>${picks}${payload.ticketUrl?`<a class="preview-ticket-link" href="${esc(payload.ticketUrl)}" target="_blank" rel="noopener noreferrer">🎟 Pegar bilhete</a>`:''}<small class="preview-note">Odds registradas no momento da publicação e sujeitas a alteração.</small>`;
+    preview.innerHTML=`<div class="preview-head"><span class="ticket-profile profile-${esc(payload.profile.toLowerCase())}">${esc(profileLabel(payload.profile))}</span><strong>ODD ${Number.isFinite(odd)?odd.toFixed(2):'—'}</strong></div><h3>${esc(payload.title||'Bilhete Central Pro')}</h3><p>${esc(payload.description||'')}</p><div class="preview-reason"><b>Por que escolhi este bilhete?</b><p>${esc(payload.reason||'')}</p></div>${picks}${payload.betanoUrl?`<a class="preview-ticket-link" href="${esc(payload.betanoUrl)}" target="_blank" rel="noopener noreferrer">🎟 Betano</a>`:''}${payload.superbetUrl?`<a class="preview-ticket-link" href="${esc(payload.superbetUrl)}" target="_blank" rel="noopener noreferrer">🎟 Superbet</a>`:''}<small class="preview-note">Odds registradas no momento da publicação e sujeitas a alteração.</small>`;
     preview.hidden=false;
   };
 
@@ -122,7 +123,8 @@
       form.elements.profile.value=draft.profile||'MODERADO';
       form.elements.reason.value=draft.reason||'';
       form.elements.totalOdd.value=draft.totalOdd||'';
-      if(form.elements.ticketUrl)form.elements.ticketUrl.value=draft.ticketUrl||'';
+      if(form.elements.betanoUrl)form.elements.betanoUrl.value=draft.betanoUrl||draft.ticketUrl||'';
+      if(form.elements.superbetUrl)form.elements.superbetUrl.value=draft.superbetUrl||'';
       list.innerHTML='';(draft.selections||[]).forEach(add);if(!list.children.length)add();
       invalidatePreview();
       const missingOdds=[...list.querySelectorAll('[name="odd"]')].filter(input=>!input.value);
@@ -131,7 +133,7 @@
         ? `Bilhete carregado. ${missingOdds.length} odd(s) ficaram para você preencher manualmente; depois cole o link do bilhete e publique.`
         : 'Bilhete carregado. Confira as odds, cole o link do bilhete e publique.';
       modal.hidden=false;
-      requestAnimationFrame(()=>{(missingOdds[0]||form.elements.ticketUrl||form.elements.totalOdd)?.focus();});
+      requestAnimationFrame(()=>{(missingOdds[0]||form.elements.betanoUrl||form.elements.superbetUrl||form.elements.totalOdd)?.focus();});
       localStorage.removeItem('centralPro.generatorDraft.v1');
       history.replaceState({},'',location.pathname);
     }catch{}

@@ -30,10 +30,26 @@ document.addEventListener('DOMContentLoaded',()=>{
     return parts.length?`<em>${parts.join(' · ')}</em>`:'';
   };
   const statusLabel=v=>v==='OPEN'?'ABERTO':v==='VOID'?'ANULADO':e(v);
+  const bookmakerLink=(kind,url,label)=>{
+    if(!url)return '';
+    if(kind==='neutral'){
+      return `<a class="ticket-link ticket-link-neutral" href="${e(url)}" target="_blank" rel="noopener noreferrer"><span class="bookmaker-icon bookmaker-icon-neutral">↗</span><span class="bookmaker-name">${e(label)}</span></a>`;
+    }
+    return `<a class="ticket-link ticket-link-${kind}" href="${e(url)}" target="_blank" rel="noopener noreferrer"><span class="bookmaker-icon"><img src="/assets/bookmakers/${kind}.svg" alt="" loading="lazy"></span><span class="bookmaker-name">${e(label)}</span></a>`;
+  };
   const card=t=>{
     const profile=profileLabel(t.analysis?.profile);
     const published=formatPublished(t.published_at);
-    return `<article class="ticket-card" data-ticket-id="${e(t.id)}" data-ticket-source="${e(t.source)}"><div class="ticket-head"><div class="ticket-type">${e(t.source==='manual'?(t.title||'Bilhete Central Pro'):tl(t.type))}<small>${e(t.description)}</small>${published?`<small class="published-time">Publicado às ${e(published)}</small>`:''}</div><div class="ticket-head-tags">${profile?`<span class="ticket-profile profile-${e(String(t.analysis.profile).toLowerCase())}">${e(profile)}</span>`:''}<span class="ticket-status status-${e(String(t.status||'').toLowerCase())}">${statusLabel(t.status)}</span></div></div><div class="ticket-picks">${t.selections.map(s=>`<div class="pick"><span>${e(s.displayMatch)}<br><small>${e(ml(s.market||s.marketName))} · ${e(sl(s.displaySelection))}</small>${pickMeta(s)}</span><strong>${s.odd==null?'—':Number(s.odd).toFixed(2)}</strong></div>`).join('')}</div><div class="ticket-foot"><span><small>ODD TOTAL · ${t.selections.length} ${t.selections.length===1?'seleção':'seleções'}${t.combinationType==='SAME_FIXTURE'?' · Mesmo jogo':''}${t.combinedOddType==='CALCULATED'?' · Odd combinada calculada':''}</small><strong>${Number(t.totalOdd).toFixed(2)}</strong></span><small>${e(t.date)}</small></div><div class="ticket-actions"><button data-analysis="${e(t.id)}">Ver análise</button>${t.analysis?.ticketUrl?`<a class="ticket-link" href="${e(t.analysis.ticketUrl)}" target="_blank" rel="noopener noreferrer">🎟 Pegar bilhete</a>`:''}</div></article>`;
+    const linkButtons=[];
+    if(t.analysis?.betanoUrl)linkButtons.push(bookmakerLink('betano',t.analysis.betanoUrl,'Betano'));
+    if(t.analysis?.superbetUrl)linkButtons.push(bookmakerLink('superbet',t.analysis.superbetUrl,'Superbet'));
+    if(!linkButtons.length&&t.analysis?.ticketUrl){
+      const legacyUrl=String(t.analysis.ticketUrl||'').toLowerCase();
+      if(legacyUrl.includes('betano'))linkButtons.push(bookmakerLink('betano',t.analysis.ticketUrl,'Betano'));
+      else if(legacyUrl.includes('superbet'))linkButtons.push(bookmakerLink('superbet',t.analysis.ticketUrl,'Superbet'));
+      else linkButtons.push(bookmakerLink('neutral',t.analysis.ticketUrl,'Abrir bilhete'));
+    }
+    return `<article class="ticket-card" data-ticket-id="${e(t.id)}" data-ticket-source="${e(t.source)}"><div class="ticket-head"><div class="ticket-type">${e(t.source==='manual'?(t.title||'Bilhete Central Pro'):tl(t.type))}<small>${e(t.description)}</small>${published?`<small class="published-time">Publicado às ${e(published)}</small>`:''}</div><div class="ticket-head-tags">${profile?`<span class="ticket-profile profile-${e(String(t.analysis.profile).toLowerCase())}">${e(profile)}</span>`:''}<span class="ticket-status status-${e(String(t.status||'').toLowerCase())}">${statusLabel(t.status)}</span></div></div><div class="ticket-picks">${t.selections.map(s=>`<div class="pick"><span>${e(s.displayMatch)}<br><small>${e(ml(s.market||s.marketName))} · ${e(sl(s.displaySelection))}</small>${pickMeta(s)}</span><strong>${s.odd==null?'—':Number(s.odd).toFixed(2)}</strong></div>`).join('')}</div><div class="ticket-foot"><span><small>ODD TOTAL · ${t.selections.length} ${t.selections.length===1?'seleção':'seleções'}${t.combinationType==='SAME_FIXTURE'?' · Mesmo jogo':''}${t.combinedOddType==='CALCULATED'?' · Odd combinada calculada':''}</small><strong>${Number(t.totalOdd).toFixed(2)}</strong></span><small>${e(t.date)}</small></div><div class="ticket-actions"><button data-analysis="${e(t.id)}">Ver análise</button>${linkButtons.length?`<div class="ticket-link-group">${linkButtons.join('')}</div>`:''}</div></article>`;
   };
 
   const today=()=>new Intl.DateTimeFormat('en-CA',{timeZone:'America/Sao_Paulo',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());

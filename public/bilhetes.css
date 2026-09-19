@@ -19,3 +19,86 @@
 @media(max-width:640px){.manual-publish-actions{grid-template-columns:1fr}.ticket-head{align-items:flex-start}.ticket-head-tags{max-width:46%}.performance-details{margin-left:0}.manual-pick-form{grid-template-columns:1fr}}
 
 .ticket-actions .ticket-link,.preview-ticket-link{display:flex;align-items:center;justify-content:center;min-height:37px;padding:0 12px;border:1px solid var(--green);border-radius:8px;background:var(--green);color:#04150c;font-weight:800;text-decoration:none;box-sizing:border-box}.ticket-actions .ticket-link{flex:1}.preview-ticket-link{margin:12px 0 10px;min-height:42px}.preview-note{display:block;margin-top:8px}
+
+
+/* Bookmakers v3 — pequeno, discreto e com emblema */
+.ticket-actions{
+  display:grid;
+  gap:8px;
+}
+.ticket-link-group{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+}
+.ticket-actions .ticket-link{
+  flex:0 0 auto;
+  min-height:34px;
+  padding:6px 12px 6px 8px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:flex-start;
+  gap:8px;
+  border:1px solid #28463a;
+  border-radius:999px;
+  background:#0b1712;
+  color:#eef7f2;
+  box-shadow:none;
+  font-weight:700;
+  font-size:12px;
+  line-height:1;
+  text-decoration:none;
+}
+.ticket-actions .ticket-link:hover{
+  background:#102019;
+  border-color:#39705a;
+}
+.ticket-actions .ticket-link-betano{
+  border-color:rgba(242,106,33,.40);
+}
+.ticket-actions .ticket-link-superbet{
+  border-color:rgba(223,36,53,.40);
+}
+.ticket-actions .ticket-link-neutral{
+  border-color:#315847;
+}
+.bookmaker-icon{
+  width:22px;
+  height:22px;
+  border-radius:999px;
+  display:grid;
+  place-items:center;
+  background:rgba(255,255,255,.05);
+  flex:0 0 22px;
+}
+.ticket-link-betano .bookmaker-icon{
+  background:rgba(242,106,33,.16);
+}
+.ticket-link-superbet .bookmaker-icon{
+  background:rgba(223,36,53,.16);
+}
+.bookmaker-icon img{
+  display:block;
+  width:14px;
+  height:14px;
+}
+.bookmaker-icon-neutral{
+  background:#173326;
+  color:#6fe3a6;
+  font-size:12px;
+  font-weight:900;
+}
+.bookmaker-name{
+  font-size:12px;
+  line-height:1;
+  white-space:nowrap;
+}
+@media(max-width:650px){
+  .ticket-link-group{
+    gap:6px;
+  }
+  .ticket-actions .ticket-link{
+    min-height:36px;
+    padding:6px 10px 6px 8px;
+  }
+}
