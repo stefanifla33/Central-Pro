@@ -27,6 +27,9 @@
   let generatorButton=document.querySelector('#openTicketGenerator');
   if(!generatorButton){generatorButton=document.createElement('button');generatorButton.id='openTicketGenerator';generatorButton.type='button';generatorButton.className='create-ticket-btn generator-ticket-btn';generatorButton.textContent='⚡ Gerador interno';create.insertAdjacentElement('beforebegin',generatorButton);}
   generatorButton.onclick=()=>{location.href='gerador-bilhetes.html'};
+  let printAnalyzerButton=document.querySelector('#openPrintAnalyzer');
+  if(!printAnalyzerButton){printAnalyzerButton=document.createElement('button');printAnalyzerButton.id='openPrintAnalyzer';printAnalyzerButton.type='button';printAnalyzerButton.className='create-ticket-btn';printAnalyzerButton.textContent='▣ Analisar prints';generatorButton.insertAdjacentElement('beforebegin',printAnalyzerButton);}
+  printAnalyzerButton.onclick=()=>{location.href='analise-prints.html'};
   const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const profileLabel=v=>({CONSERVADOR:'Conservador',MODERADO:'Moderado',AGRESSIVO:'Agressivo'}[v]||'Moderado');
   const formatDateTime=v=>{if(!v)return'';const d=new Date(v);if(Number.isNaN(d.getTime()))return'';return new Intl.DateTimeFormat('pt-BR',{timeZone:'America/Sao_Paulo',day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}).format(d)};

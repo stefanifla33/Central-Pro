@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Analisar prints | Central Pro</title>
+  <script src="auth-guard.js?v=2"></script>
+  <link rel="stylesheet" href="app-shell.css?v=2">
+  <link rel="stylesheet" href="design-system.css?v=1">
+  <link rel="stylesheet" href="analise-prints.css?v=2">
+</head>
+<body class="print-analysis-page">
+  <button class="menu-button" id="menuButton" aria-label="Abrir menu">☰</button>
+  <aside class="sidebar" id="sidebar">
+    <a class="brand" href="index.html"><img class="sidebar-logo" src="assets/central-pro-logo.png" alt="Central Pro"></a>
+    <div class="user-card"><span class="avatar">S</span><span><strong>Stefani</strong><small>Analista</small></span><span class="status-dot"></span></div>
+    <nav class="main-nav">
+      <a href="index.html"><span>⌂</span>Início</a>
+      <a href="bilhetes.html"><span>🎟</span>Bilhetes</a>
+      <a href="games.html"><span>◫</span>Jogos</a>
+      <a href="analysis.html"><span>⌁</span>Análises</a>
+      <a href="opportunities.html"><span>↗</span>Melhores Oportunidades</a>
+      <a class="active" href="analise-prints.html"><span>▣</span>Analisar prints</a>
+      <a href="bankroll.html"><span>◈</span>Minha Banca</a>
+    </nav>
+    <div class="api-state"><span><i></i> Área privada</span><small>Uso administrativo</small></div>
+  </aside>
+
+  <div class="app-frame">
+    <header class="app-header">
+      <div class="page-route"><span>Central Pro</span><b>/</b><strong>Análise por prints</strong></div>
+      <div class="header-actions"><span class="private-badge">🔒 Só você</span><span class="header-avatar">S</span></div>
+    </header>
+
+    <main class="page-content print-analysis-content">
+      <section class="page-heading analyzer-heading">
+        <div>
+          <p class="eyebrow">IA DA CENTRAL PRO</p>
+          <h1>Analisar jogo por prints</h1>
+          <p>Envie todas as telas do mesmo confronto. A IA cruza os dados, procura contradições e entrega uma leitura pronta para sua decisão.</p>
+        </div>
+        <div class="economy-note"><span>◌</span><div><strong>Uma análise, uma chamada</strong><small>Imagens comprimidas e resultado salvo neste navegador</small></div></div>
+      </section>
+
+      <section id="accessState" class="access-state"><span class="loader"></span><strong>Confirmando acesso administrativo…</strong></section>
+
+      <div id="analyzerWorkspace" class="analyzer-workspace" hidden>
+        <section class="upload-panel panel">
+          <div class="panel-title"><div><span class="step">1</span><h2>Adicionar prints</h2></div><small>PNG, JPG ou WEBP · até 8 imagens</small></div>
+          <label class="match-hint-field">Confronto <small>(opcional, mas ajuda a IA)</small><input id="matchHint" maxlength="180" placeholder="Ex.: Flamengo x Palmeiras · Brasileirão"></label>
+          <input id="printsInput" type="file" accept="image/png,image/jpeg,image/webp" multiple hidden>
+          <div id="printsDropzone" class="prints-dropzone" tabindex="0" role="button" aria-label="Selecionar prints das estatísticas">
+            <div class="dropzone-copy"><span>⇧</span><strong>Arraste os prints ou clique para escolher</strong><small>Envie gols, tempos, casa/fora, finalizações, cartões, escalações e jogadores quando houver.</small></div>
+          </div>
+          <div id="previewGrid" class="preview-grid" hidden></div>
+          <div class="upload-actions">
+            <button id="clearPrints" class="secondary-action" type="button" hidden>Limpar</button>
+            <button id="addMorePrints" class="secondary-action" type="button" hidden>+ Adicionar mais</button>
+            <button id="analyzePrints" class="primary-action" type="button" disabled>Analisar confronto</button>
+          </div>
+          <div id="analysisStatus" class="analysis-status" hidden></div>
+        </section>
+
+        <section id="resultPanel" class="result-panel" hidden>
+          <div class="result-hero panel">
+            <div><p class="eyebrow">ANÁLISE CONCLUÍDA</p><h2 id="resultMatch">Confronto analisado</h2><p id="resultCompetition"></p></div>
+            <div class="result-actions"><span id="qualityBadge" class="quality-badge"></span><button id="copyAnalysis" class="secondary-action" type="button">Copiar análise</button></div>
+          </div>
+
+          <article class="analysis-card full"><span class="card-number">01</span><div><h3>Leitura geral</h3><p id="generalReading"></p></div></article>
+
+          <div class="analysis-grid">
+            <article class="analysis-card" data-section="goals"><span class="card-number">02</span><div><h3>Gols</h3><div class="section-content"></div></div></article>
+            <article class="analysis-card" data-section="firstHalf"><span class="card-number">03</span><div><h3>Primeiro tempo</h3><div class="section-content"></div></div></article>
+            <article class="analysis-card" data-section="result"><span class="card-number">04</span><div><h3>Resultado e força</h3><div class="section-content"></div></div></article>
+            <article class="analysis-card" data-section="cards"><span class="card-number">05</span><div><h3>Cartões</h3><div class="section-content"></div></div></article>
+          </div>
+
+          <article class="analysis-card full"><span class="card-number">06</span><div class="card-wide"><h3>Dados que vão contra a leitura</h3><div id="contradictions" class="warning-list"></div></div></article>
+          <section class="markets-section"><div class="section-title"><div><p class="eyebrow">PENEIRA FINAL</p><h2>Mercados mais sustentados</h2></div><small>Máximo de cinco · sem forçar entrada</small></div><div id="marketResults" class="market-results"></div></section>
+          <div class="analysis-grid final-grid">
+            <article class="analysis-card"><span class="card-number">07</span><div><h3>Jogadores</h3><div id="playersResult"></div></div></article>
+            <article class="analysis-card danger-card"><span class="card-number">08</span><div><h3>Mercados que evitaria</h3><div id="avoidMarkets"></div></div></article>
+          </div>
+          <article class="final-conclusion panel"><p class="eyebrow">CONCLUSÃO</p><p id="finalConclusion"></p><div id="warnings" class="warnings"></div></article>
+          <details class="evidence-details"><summary>Ver dados identificados em cada print</summary><div id="printEvidence"></div></details>
+        </section>
+      </div>
+    </main>
+  </div>
+  <div id="toast" class="analyzer-toast" role="status" aria-live="polite"></div>
+  <script src="app-shell.js?v=3"></script>
+  <script src="analise-prints.js?v=2"></script>
+</body>
+</html>

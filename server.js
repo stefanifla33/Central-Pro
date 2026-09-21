@@ -23,6 +23,7 @@ const { createInfinitePayPaymentService, infinitePayCallbackBase } = require("./
 const { createMetricSampleCoverage, selectStatisticsItems, mergeMissingMetricValues, createConcurrencyLimiter, createExpiringCache } = require("./lib/metric-sample-coverage");
 const { CP_MAIN_LEAGUES: MAIN_LEAGUES, cpIsScannerEligibleLeagueId } = require("./public/competition-config");
 const { analyzeSlipWithGemini } = require("./lib/bankroll-slip-ai");
+const { analyzeMatchStatsWithGemini } = require("./lib/match-stats-ai");
 const { createBankrollCloudStore } = require("./lib/bankroll-cloud-store");
 
 const app = express();
@@ -1507,6 +1508,20 @@ app.post("/api/bankroll/read-slip", express.json({ limit: "14mb" }), async (req,
         const status = Number(erro?.statusCode) || 500;
         if (status >= 500) console.error("[BANKROLL-SLIP-AI]", erro?.message || erro);
         res.status(status).json({ error: erro?.message || "Não foi possível analisar o print da aposta." });
+    }
+});
+
+// Analisador privado de estatísticas por múltiplos prints. Reutiliza a chave Gemini do servidor.
+app.post("/api/admin/analyze-match-prints", express.json({ limit: "12mb" }), async (req, res) => {
+    res.set("Cache-Control", "no-store");
+    try {
+        if (!(await authenticateAdmin(req.get("Authorization")))) return res.status(403).json({ error: "Acesso administrativo necessário." });
+        const result = await analyzeMatchStatsWithGemini({ images: req.body?.images, matchHint: req.body?.matchHint });
+        res.json(result);
+    } catch (erro) {
+        const status = Number(erro?.statusCode) || 500;
+        if (status >= 500) console.error("[MATCH-STATS-AI]", erro?.message || erro);
+        res.status(status).json({ error: erro?.message || "Não foi possível analisar os prints." });
     }
 });
 
