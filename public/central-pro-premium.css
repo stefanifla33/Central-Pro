@@ -89,6 +89,9 @@ body:has(.layout) .layout { min-height: 100vh !important; padding-left: 224px !i
   color: var(--muted); font-size: 12px; white-space: nowrap; overflow: hidden;
 }
 .match-breadcrumb strong { color: var(--text); overflow: hidden; text-overflow: ellipsis; }
+.match-breadcrumb a { color: inherit; text-decoration: none; transition: color .18s ease; }
+.match-breadcrumb a:hover, .match-breadcrumb a:focus-visible { color: var(--green); }
+.match-breadcrumb .current { color: var(--text); font-weight: 700; overflow: hidden; text-overflow: ellipsis; }
 .match-breadcrumb i { color: #53605a; font-style: normal; }
 
 .layout .hero {
